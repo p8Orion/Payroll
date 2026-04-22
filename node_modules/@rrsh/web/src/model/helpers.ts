@@ -21,6 +21,96 @@ interface TokenizeOptions {
   conceptCodeById?: Record<number, string>;
 }
 
+function splitBlockArgs(raw: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (let i = 0; i < raw.length; i++) {
+    const two = raw.slice(i, i + 2);
+    if (two === "[[") {
+      depth += 1;
+      current += two;
+      i += 1;
+      continue;
+    }
+    if (two === "]]" && depth > 0) {
+      depth -= 1;
+      current += two;
+      i += 1;
+      continue;
+    }
+    if (raw[i] === "|" && depth === 0) {
+      parts.push(current);
+      current = "";
+      continue;
+    }
+    current += raw[i];
+  }
+  parts.push(current);
+  return parts;
+}
+
+function parseBlockToken(value: string): FormulaToken | null {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("[[") || !trimmed.endsWith("]]")) return null;
+  const inner = trimmed.slice(2, -2);
+  const [name] = splitBlockArgs(inner);
+  if (!name) return null;
+  return token(name.trim().toUpperCase(), trimmed, "block");
+}
+
+function pushChunkTokens(chunk: string, out: FormulaToken[]): void {
+  const value = chunk.trim();
+  if (!value) return;
+
+  let i = 0;
+  let buffer = "";
+  while (i < value.length) {
+    const two = value.slice(i, i + 2);
+    if (two !== "[[") {
+      buffer += value[i];
+      i += 1;
+      continue;
+    }
+
+    // Flush preceding text.
+    if (buffer.trim()) {
+      const siExpanded = expandSiToken(buffer.trim());
+      if (siExpanded) out.push(...siExpanded);
+      else out.push(token(buffer.trim(), buffer.trim(), "text"));
+      buffer = "";
+    }
+
+    let depth = 1;
+    let j = i + 2;
+    while (j < value.length && depth > 0) {
+      const nextTwo = value.slice(j, j + 2);
+      if (nextTwo === "[[") {
+        depth += 1;
+        j += 2;
+        continue;
+      }
+      if (nextTwo === "]]") {
+        depth -= 1;
+        j += 2;
+        continue;
+      }
+      j += 1;
+    }
+    const blockRaw = value.slice(i, j);
+    const block = parseBlockToken(blockRaw);
+    if (block) out.push(block);
+    else out.push(token(blockRaw, blockRaw, "text"));
+    i = j;
+  }
+
+  if (buffer.trim()) {
+    const siExpanded = expandSiToken(buffer.trim());
+    if (siExpanded) out.push(...siExpanded);
+    else out.push(token(buffer.trim(), buffer.trim(), "text"));
+  }
+}
+
 function splitSiArguments(raw: string): [string, string, string] | null {
   const args: string[] = [];
   let depth = 0;
@@ -57,12 +147,8 @@ function expandSiToken(value: string): FormulaToken[] | null {
   const inner = trimmed.slice(3, -1);
   const parts = splitSiArguments(inner);
   if (!parts) return null;
-  return [
-    token("SI", "SI(", "function"),
-    token("CONDICIÓN", `${parts[0] || ""};`, "slot"),
-    token("ENTONCES", `${parts[1]};`, "slot"),
-    token("SI NO", `${parts[2]})`, "slot")
-  ];
+  const blockExpr = `[[SI|${parts[0] ?? ""}|${parts[1] ?? ""}|${parts[2] ?? ""}]]`;
+  return [token("SI", blockExpr, "block")];
 }
 
 function labelForKnownExpression(
@@ -96,6 +182,9 @@ function labelForKnownExpression(
 export function tokenizeFormulaExpression(expression: string, options?: TokenizeOptions): FormulaToken[] {
   if (!expression.trim()) return [];
 
+  const wholeBlock = parseBlockToken(expression);
+  if (wholeBlock) return [wholeBlock];
+
   const tokens: FormulaToken[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -104,15 +193,8 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
     const start = match.index;
     const end = start + match[0].length;
 
-    const before = expression.slice(lastIndex, start).trim();
-    if (before) {
-      const siExpanded = expandSiToken(before);
-      if (siExpanded) {
-        tokens.push(...siExpanded);
-      } else {
-        tokens.push(token(before, before, "text"));
-      }
-    }
+    const before = expression.slice(lastIndex, start);
+    pushChunkTokens(before, tokens);
 
     const expr = match[0];
     const { label, kind } = labelForKnownExpression(expr, options);
@@ -120,15 +202,8 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
     lastIndex = end;
   }
 
-  const tail = expression.slice(lastIndex).trim();
-  if (tail) {
-    const siExpanded = expandSiToken(tail);
-    if (siExpanded) {
-      tokens.push(...siExpanded);
-    } else {
-      tokens.push(token(tail, tail, "text"));
-    }
-  }
+  const tail = expression.slice(lastIndex);
+  pushChunkTokens(tail, tokens);
 
   return tokens;
 }

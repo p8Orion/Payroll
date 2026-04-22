@@ -11,7 +11,7 @@ export type TagAggregationOp = "sum" | "avg" | "max" | "min";
 
 export interface FormulaToken {
   id: string;
-  kind: "concept" | "function" | "param" | "text" | "slot";
+  kind: "concept" | "function" | "param" | "text" | "slot" | "block";
   label: string;
   expression: string;
 }

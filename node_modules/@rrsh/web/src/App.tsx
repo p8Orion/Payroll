@@ -28,6 +28,11 @@ const functionBlockTemplates = {
   }
 } as const;
 
+interface FunctionBlockModel {
+  name: string;
+  args: string[];
+}
+
 function normalizeExcelIf(expression: string): string {
   let out = "";
   let depth = 0;
@@ -70,6 +75,89 @@ function normalizeExcelComparators(expression: string): string {
   return expression
     .replace(/<>/g, "!=")
     .replace(/(?<![<>=!])=(?!=)/g, "==");
+}
+
+function parseFunctionBlock(expression: string): FunctionBlockModel | null {
+  const trimmed = expression.trim();
+  if (!trimmed.startsWith("[[") || !trimmed.endsWith("]]")) return null;
+  const inner = trimmed.slice(2, -2);
+  const args: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (let i = 0; i < inner.length; i++) {
+    const two = inner.slice(i, i + 2);
+    if (two === "[[") {
+      depth += 1;
+      current += two;
+      i += 1;
+      continue;
+    }
+    if (two === "]]" && depth > 0) {
+      depth -= 1;
+      current += two;
+      i += 1;
+      continue;
+    }
+    if (inner[i] === "|" && depth === 0) {
+      args.push(current);
+      current = "";
+      continue;
+    }
+    current += inner[i];
+  }
+  args.push(current);
+  if (!args.length) return null;
+  return { name: (args[0] ?? "").trim().toUpperCase(), args: args.slice(1) };
+}
+
+function serializeFunctionBlock(name: string, args: string[]): string {
+  return `[[${name}|${args.join("|")}]]`;
+}
+
+function expandBracketBlocksToExpressions(expression: string): string {
+  let out = "";
+  let i = 0;
+  while (i < expression.length) {
+    const two = expression.slice(i, i + 2);
+    if (two !== "[[") {
+      out += expression[i];
+      i += 1;
+      continue;
+    }
+    let depth = 1;
+    let j = i + 2;
+    while (j < expression.length && depth > 0) {
+      const nextTwo = expression.slice(j, j + 2);
+      if (nextTwo === "[[") {
+        depth += 1;
+        j += 2;
+        continue;
+      }
+      if (nextTwo === "]]") {
+        depth -= 1;
+        j += 2;
+        continue;
+      }
+      j += 1;
+    }
+    const blockRaw = expression.slice(i, j);
+    const block = parseFunctionBlock(blockRaw);
+    if (!block) {
+      out += blockRaw;
+      i = j;
+      continue;
+    }
+    if (block.name === "SI") {
+      const cond = expandBracketBlocksToExpressions(block.args[0] ?? "");
+      const whenTrue = expandBracketBlocksToExpressions(block.args[1] ?? "");
+      const whenFalse = expandBracketBlocksToExpressions(block.args[2] ?? "");
+      out += `SI(${cond};${whenTrue};${whenFalse})`;
+    } else {
+      out += blockRaw;
+    }
+    i = j;
+  }
+  return out;
 }
 
 function toApiConcept(concept: ConceptModel): ApiConcept {
@@ -263,7 +351,7 @@ export function App() {
           continue;
         }
 
-        const normalized = expression
+        const normalized = expandBracketBlocksToExpressions(expression)
           .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) => {
             const value = values.get(Number(refId));
             if (value === undefined) throw new Error("missing CONCEPTO dep");
@@ -528,7 +616,7 @@ export function App() {
       }
 
       try {
-        const normalized = expression
+        const normalized = expandBracketBlocksToExpressions(expression)
           .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) => {
             const value = values.get(Number(refId));
             if (value === undefined) throw new Error("missing CONCEPTO dep");
@@ -623,14 +711,8 @@ export function App() {
 
   const insertIfTemplateAt = (index: number) => {
     const current = [...(selectedConcept.formulaTokens ?? [])];
-    const blockTemplate = functionBlockTemplates.SI;
-    const tokensToInsert: FormulaToken[] = [
-      token("SI", "SI(", "function"),
-      token(blockTemplate.branches[0], ";", "slot"),
-      token(blockTemplate.branches[1], ";", "slot"),
-      token(blockTemplate.branches[2], ")", "slot")
-    ];
-    current.splice(index, 0, ...tokensToInsert);
+    const expr = serializeFunctionBlock("SI", ["", "", ""]);
+    current.splice(index, 0, token("SI", expr, "block"));
     updateFormulaTokens(current);
   };
 
@@ -784,6 +866,60 @@ export function App() {
       updateFormulaTokens(current);
       setDragInsertIndex(null);
     }
+  };
+
+  const updateBlockArg = (blockId: string, argIndex: number, nextValue: string) => {
+    updateFormulaTokens(
+      selectedConcept.formulaTokens.map((tk) => {
+        if (tk.id !== blockId || tk.kind !== "block") return tk;
+        const parsed = parseFunctionBlock(tk.expression);
+        if (!parsed) return tk;
+        const nextArgs = [...parsed.args];
+        while (nextArgs.length < 3) nextArgs.push("");
+        nextArgs[argIndex] = nextValue.trim();
+        return { ...tk, expression: serializeFunctionBlock(parsed.name, nextArgs) };
+      })
+    );
+  };
+
+  const onDropToBlockArg = (event: DragEvent<HTMLElement>, blockId: string, argIndex: number) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const internalTokenId = event.dataTransfer.getData("text/formula-token-id");
+    let droppedExpression = "";
+
+    if (internalTokenId) {
+      const source = selectedConcept.formulaTokens.find((tk) => tk.id === internalTokenId);
+      if (source) droppedExpression = source.expression.trim();
+    } else {
+      const payload = event.dataTransfer.getData("text/token-json");
+      if (payload) {
+        const parsed = JSON.parse(payload) as FormulaToken;
+        droppedExpression = parsed.expression.trim();
+      } else {
+        const fnTemplate = event.dataTransfer.getData("text/function-template");
+        if (fnTemplate === "SI") droppedExpression = serializeFunctionBlock("SI", ["", "", ""]);
+      }
+    }
+
+    if (!droppedExpression) return;
+
+    updateFormulaTokens(
+      selectedConcept.formulaTokens
+        .filter((tk) => tk.id !== internalTokenId)
+        .map((tk) => {
+          if (tk.id !== blockId || tk.kind !== "block") return tk;
+          const parsedBlock = parseFunctionBlock(tk.expression);
+          if (!parsedBlock) return tk;
+          const nextArgs = [...parsedBlock.args];
+          while (nextArgs.length < 3) nextArgs.push("");
+          nextArgs[argIndex] = [nextArgs[argIndex] ?? "", droppedExpression].filter(Boolean).join(" ");
+          return { ...tk, expression: serializeFunctionBlock(parsedBlock.name, nextArgs) };
+        })
+    );
+    setDragInsertIndex(null);
+    setDraggingFormulaTokenId(null);
   };
 
   const onTokenDropToFormula = (event: DragEvent<HTMLElement>, insertAt?: number) => {
@@ -1413,20 +1549,17 @@ export function App() {
                       }}
                     />
                     {index === 0 && shouldShowInsertEditor(0) && renderInsertEditor(0)}
-                    {isSiBlockStartAt(index) ? (
+                    {tk.kind === "block" ? (
                       <div className="si-block">
-                        <div className="si-block-title">SI</div>
-                        {[
-                          selectedConcept.formulaTokens[index + 1],
-                          selectedConcept.formulaTokens[index + 2],
-                          selectedConcept.formulaTokens[index + 3]
-                        ].map((slotToken, slotOffset) => {
-                          if (!slotToken || slotToken.kind !== "slot") return null;
+                        <div className="si-block-title">{parseFunctionBlock(tk.expression)?.name ?? tk.label}</div>
+                        {(parseFunctionBlock(tk.expression)?.args ?? ["", "", ""]).map((slotExpression, slotOffset) => {
                           const roleClass = slotOffset === 0 ? "slot-cond" : slotOffset === 1 ? "slot-true" : "slot-false";
+                          const branchLabel =
+                            functionBlockTemplates.SI.branches[slotOffset as 0 | 1 | 2] ?? `ARG ${slotOffset + 1}`;
                           return (
-                            <div key={slotToken.id} className={`si-branch ${roleClass}`}>
-                              <strong>{slotToken.label}</strong>
-                              {editingTextTokenId === slotToken.id ? (
+                            <div key={`${tk.id}-${slotOffset}`} className={`si-branch ${roleClass}`}>
+                              <strong>{branchLabel}</strong>
+                              {editingTextTokenId === `${tk.id}:${slotOffset}` ? (
                                 <div className="text-token-edit-wrap" ref={textTokenEditRef}>
                                   <input
                                     className="text-token-input"
@@ -1440,7 +1573,9 @@ export function App() {
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         e.preventDefault();
-                                        commitTextTokenEdit();
+                                        updateBlockArg(tk.id, slotOffset, editingTextDraft);
+                                        setEditingTextTokenId(null);
+                                        setEditingTextDraft("");
                                       }
                                       if (e.key === "Escape") {
                                         e.preventDefault();
@@ -1457,17 +1592,20 @@ export function App() {
                                     e.preventDefault();
                                     e.dataTransfer.dropEffect = "move";
                                   }}
-                                  onDrop={(e) => replaceSlotWithDroppedToken(e, slotToken.id)}
-                                  onClick={() => startEditTextToken(slotToken)}
+                                  onDrop={(e) => onDropToBlockArg(e, tk.id, slotOffset)}
+                                  onClick={() => {
+                                    setEditingTextTokenId(`${tk.id}:${slotOffset}`);
+                                    setEditingTextDraft(slotExpression);
+                                  }}
                                 >
-                                  {renderSlotContent(slotToken.expression)}
+                                  {renderSlotContent(`${slotExpression};`)}
                                 </span>
                               )}
                             </div>
                           );
                         })}
                       </div>
-                    ) : isSiBlockChildSlotAt(index) ? null : tk.kind === "text" ? (
+                    ) : tk.kind === "text" ? (
                       editingTextTokenId === tk.id ? (
                         <div className="text-token-edit-wrap" ref={textTokenEditRef}>
                           <input
