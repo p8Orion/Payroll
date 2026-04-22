@@ -1,0 +1,261 @@
+[
+  {
+    "id": 100,
+    "code": "BASICO",
+    "name": "Sueldo Basico",
+    "conceptClass": "definitivo",
+    "formula": "100000",
+    "tags": [
+      "remunerativo",
+      "basico",
+      "base-tarea-riesgosa"
+    ]
+  },
+  {
+    "id": 120,
+    "code": "ANTIGUEDAD",
+    "name": "Antiguedad",
+    "conceptClass": "definitivo",
+    "formula": "CONCEPTO(100) * CCONCEPTO(\"PORC. ANTIGUEDAD\") %",
+    "tags": [
+      "remunerativo",
+      "base-tarea-riesgosa"
+    ]
+  },
+  {
+    "id": 901,
+    "code": "DEF_901",
+    "name": "Concepto definitivo 901",
+    "conceptClass": "definitivo",
+    "formula": "1+ CONCEPTO(902)",
+    "tags": []
+  },
+  {
+    "id": 902,
+    "code": "DEF_902",
+    "name": "Concepto definitivo 9021",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"sum\",\"remunerativo\")",
+    "tags": []
+  },
+  {
+    "id": 903,
+    "code": "DEF_903",
+    "name": "Concepto definitivo 903",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 904,
+    "code": "DEF_904",
+    "name": "Concepto definitivo 904",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"sum\",\"remunerativo\")",
+    "tags": []
+  },
+  {
+    "id": 905,
+    "code": "DEF_905",
+    "name": "Concepto definitivo 905",
+    "conceptClass": "definitivo",
+    "formula": "1",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 906,
+    "code": "DEF_906",
+    "name": "Concepto definitivo 906",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 907,
+    "code": "DEF_907",
+    "name": "Concepto definitivo 907",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 908,
+    "code": "DEF_908",
+    "name": "Concepto definitivo 908",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 909,
+    "code": "DEF_909",
+    "name": "Concepto definitivo 909",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 910,
+    "code": "DEF_910",
+    "name": "Concepto definitivo 910",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 911,
+    "code": "PORC. ANTIGUEDAD",
+    "name": "% Antiguedad",
+    "conceptClass": "transitorio",
+    "formula": "8",
+    "tags": []
+  },
+  {
+    "id": 912,
+    "code": "DEF_912",
+    "name": "Concepto definitivo 912",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 913,
+    "code": "DEF_913",
+    "name": "Concepto definitivo 913",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 914,
+    "code": "DEF_914",
+    "name": "Concepto definitivo 914",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"sum\",\"weqqwe\")",
+    "tags": []
+  },
+  {
+    "id": 915,
+    "code": "DEF_915",
+    "name": "Concepto definitivo 915",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"sum\",\"weqqwe\")",
+    "tags": []
+  },
+  {
+    "id": 916,
+    "code": "DEF_916",
+    "name": "Concepto definitivo 916",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 917,
+    "code": "DEF_917",
+    "name": "Concepto definitivo 917",
+    "conceptClass": "definitivo",
+    "formula": "CONCEPTO(120) + TAG_OP(\"sum\",\"basico\")",
+    "tags": []
+  },
+  {
+    "id": 918,
+    "code": "DEF_918",
+    "name": "Concepto definitivo 918",
+    "conceptClass": "definitivo",
+    "formula": "40000",
+    "tags": [
+      "basico"
+    ]
+  },
+  {
+    "id": 919,
+    "code": "DEF_919",
+    "name": "Concepto definitivo 919",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"max\",\"remunerativo\")",
+    "tags": []
+  },
+  {
+    "id": 920,
+    "code": "DEF_920",
+    "name": "Concepto definitivo 920",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"min\",\"remunerativo\")",
+    "tags": []
+  },
+  {
+    "id": 921,
+    "code": "DEF_921",
+    "name": "Concepto definitivo 921",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 922,
+    "code": "DEF_922",
+    "name": "Concepto definitivo 922",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 923,
+    "code": "DEF_923",
+    "name": "Concepto definitivo 923",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 924,
+    "code": "DEF_924",
+    "name": "Concepto definitivo 924",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 925,
+    "code": "DEF_925",
+    "name": "Concepto definitivo 925",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 926,
+    "code": "DEF_926",
+    "name": "Concepto definitivo 926",
+    "conceptClass": "definitivo",
+    "formula": "CONCEPTO(120)",
+    "tags": []
+  },
+  {
+    "id": 927,
+    "code": "DEF_927",
+    "name": "Concepto definitivo 927",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 928,
+    "code": "TAREA RIESGOSA",
+    "name": "Adicional por Tarea Riesgosa",
+    "conceptClass": "definitivo",
+    "formula": "TAG_OP(\"sum\",\"base-tarea-riesgosa\") * 10%",
+    "tags": []
+  },
+  {
+    "id": 929,
+    "code": "DEF_929",
+    "name": "Concepto definitivo 929",
+    "conceptClass": "definitivo",
+    "formula": "SI( CONCEPTO(100)",
+    "tags": []
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "name": "@rrsh/formula-engine",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node -e \"console.log('no tests yet')\""
+  },
+  "dependencies": {
+    "@rrsh/shared-types": "0.1.0"
+  }
+}

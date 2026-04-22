@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@rrsh/shared-types": ["packages/shared-types/src"],
+      "@rrsh/formula-engine": ["packages/formula-engine/src"],
+      "@rrsh/payroll-engine": ["packages/payroll-engine/src"],
+      "@rrsh/domain": ["packages/domain/src"],
+      "@rrsh/tax-ar-2026": ["packages/tax-ar-2026/src"]
+    },
+    "strict": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist"
+  }
+}

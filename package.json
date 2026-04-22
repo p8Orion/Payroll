@@ -1,0 +1,14 @@
+{
+  "name": "rrsh-payroll",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run --workspaces build",
+    "dev": "npm run --workspaces dev",
+    "test": "npm run --workspaces test"
+  }
+}
