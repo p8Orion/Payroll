@@ -1,36 +1,5 @@
 [
   {
-    "id": 100,
-    "code": "BASICO",
-    "name": "Sueldo Basico",
-    "conceptClass": "definitivo",
-    "formula": "100000",
-    "tags": [
-      "remunerativo",
-      "basico",
-      "base-tarea-riesgosa"
-    ]
-  },
-  {
-    "id": 120,
-    "code": "ANTIGUEDAD",
-    "name": "Antiguedad",
-    "conceptClass": "definitivo",
-    "formula": "CONCEPTO(100) * CCONCEPTO(\"PORC. ANTIGUEDAD\") %",
-    "tags": [
-      "remunerativo",
-      "base-tarea-riesgosa"
-    ]
-  },
-  {
-    "id": 901,
-    "code": "DEF_901",
-    "name": "Concepto definitivo 901",
-    "conceptClass": "definitivo",
-    "formula": "1+ CONCEPTO(902)",
-    "tags": []
-  },
-  {
     "id": 902,
     "code": "DEF_902",
     "name": "Concepto definitivo 9021",
@@ -247,15 +216,30 @@
     "code": "TAREA RIESGOSA",
     "name": "Adicional por Tarea Riesgosa",
     "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"base-tarea-riesgosa\") * 10%",
+    "formula": "TAG_OP(\"sum\",\"base-tarea-riesgosa\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
     "tags": []
   },
   {
     "id": 929,
-    "code": "DEF_929",
-    "name": "Concepto definitivo 929",
+    "code": "BASICO",
+    "name": "Básico",
     "conceptClass": "definitivo",
-    "formula": "SI( CONCEPTO(100)",
+    "formula": "100",
+    "tags": [
+      "basico",
+      "remunerativo",
+      "base-tarea-riesgosa"
+    ]
+  },
+  {
+    "id": 930,
+    "code": "DEF_930",
+    "name": "Concepto definitivo 930",
+    "conceptClass": "definitivo",
+    "formula": "[[SI|CONSTANTE(\"1123\") MATH(\">\") CONSTANTE(\"22\")|[[SI|CONSTANTE(\"1\") MATH(\"=\") MATH(\"<\")|CONSTANTE(\"123\")|CONSTANTE(\"242\")]]|CONSTANTE(\"7\")]] MATH(\"+\") TAG_OP(\"sum\",\"remunerativo\")",
+    "tags": []
+  }
+]]] MATH(\"+\") TAG_OP(\"sum\",\"remunerativo\")",
     "tags": []
   }
 ]

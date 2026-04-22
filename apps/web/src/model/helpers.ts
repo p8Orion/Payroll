@@ -1,4 +1,5 @@
 import { exampleValues } from "./constants";
+import { parseFunctionBlock, serializeFunctionBlock, splitBlockArgs } from "./function-blocks";
 import { ConceptShape, FormulaToken, TagAggregationOp } from "./types";
 
 const nextTokenId = (() => {
@@ -15,100 +16,50 @@ export function formulaToExpression(tokens: FormulaToken[]): string {
 }
 
 const knownExpressionRegex =
-  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)/g;
+  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
 
 interface TokenizeOptions {
   conceptCodeById?: Record<number, string>;
 }
 
-function splitBlockArgs(raw: string): string[] {
-  const parts: string[] = [];
-  let depth = 0;
-  let current = "";
-  for (let i = 0; i < raw.length; i++) {
-    const two = raw.slice(i, i + 2);
-    if (two === "[[") {
-      depth += 1;
-      current += two;
-      i += 1;
-      continue;
-    }
-    if (two === "]]" && depth > 0) {
-      depth -= 1;
-      current += two;
-      i += 1;
-      continue;
-    }
-    if (raw[i] === "|" && depth === 0) {
-      parts.push(current);
-      current = "";
-      continue;
-    }
-    current += raw[i];
-  }
-  parts.push(current);
-  return parts;
-}
-
 function parseBlockToken(value: string): FormulaToken | null {
-  const trimmed = value.trim();
-  if (!trimmed.startsWith("[[") || !trimmed.endsWith("]]")) return null;
-  const inner = trimmed.slice(2, -2);
-  const [name] = splitBlockArgs(inner);
-  if (!name) return null;
-  return token(name.trim().toUpperCase(), trimmed, "block");
+  const parsed = parseFunctionBlock(value);
+  if (!parsed) return null;
+  return token(parsed.name, value.trim(), "block");
 }
 
 function pushChunkTokens(chunk: string, out: FormulaToken[]): void {
   const value = chunk.trim();
   if (!value) return;
+  const siExpanded = expandSiToken(value);
+  if (siExpanded) out.push(...siExpanded);
+  else out.push(token(value, value, "text"));
+}
 
-  let i = 0;
-  let buffer = "";
-  while (i < value.length) {
-    const two = value.slice(i, i + 2);
-    if (two !== "[[") {
-      buffer += value[i];
-      i += 1;
-      continue;
-    }
+function pushKnownAndTextTokens(
+  chunk: string,
+  out: FormulaToken[],
+  options?: TokenizeOptions
+): void {
+  if (!chunk.trim()) return;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  knownExpressionRegex.lastIndex = 0;
 
-    // Flush preceding text.
-    if (buffer.trim()) {
-      const siExpanded = expandSiToken(buffer.trim());
-      if (siExpanded) out.push(...siExpanded);
-      else out.push(token(buffer.trim(), buffer.trim(), "text"));
-      buffer = "";
-    }
+  while ((match = knownExpressionRegex.exec(chunk)) !== null) {
+    const start = match.index;
+    const end = start + match[0].length;
+    const before = chunk.slice(lastIndex, start);
+    pushChunkTokens(before, out);
 
-    let depth = 1;
-    let j = i + 2;
-    while (j < value.length && depth > 0) {
-      const nextTwo = value.slice(j, j + 2);
-      if (nextTwo === "[[") {
-        depth += 1;
-        j += 2;
-        continue;
-      }
-      if (nextTwo === "]]") {
-        depth -= 1;
-        j += 2;
-        continue;
-      }
-      j += 1;
-    }
-    const blockRaw = value.slice(i, j);
-    const block = parseBlockToken(blockRaw);
-    if (block) out.push(block);
-    else out.push(token(blockRaw, blockRaw, "text"));
-    i = j;
+    const expr = match[0];
+    const { label, kind } = labelForKnownExpression(expr, options);
+    out.push(token(label, expr, kind));
+    lastIndex = end;
   }
 
-  if (buffer.trim()) {
-    const siExpanded = expandSiToken(buffer.trim());
-    if (siExpanded) out.push(...siExpanded);
-    else out.push(token(buffer.trim(), buffer.trim(), "text"));
-  }
+  const tail = chunk.slice(lastIndex);
+  pushChunkTokens(tail, out);
 }
 
 function splitSiArguments(raw: string): [string, string, string] | null {
@@ -147,7 +98,7 @@ function expandSiToken(value: string): FormulaToken[] | null {
   const inner = trimmed.slice(3, -1);
   const parts = splitSiArguments(inner);
   if (!parts) return null;
-  const blockExpr = `[[SI|${parts[0] ?? ""}|${parts[1] ?? ""}|${parts[2] ?? ""}]]`;
+  const blockExpr = serializeFunctionBlock("SI", [parts[0] ?? "", parts[1] ?? "", parts[2] ?? ""]);
   return [token("SI", blockExpr, "block")];
 }
 
@@ -176,6 +127,18 @@ function labelForKnownExpression(
     return { label: `${map[tagOp[1] as keyof typeof map]} #${tagOp[2]}`, kind: "function" };
   }
 
+  const constante = expression.match(/^CONSTANTE\("((?:[^"\\]|\\.)*)"\)$/);
+  if (constante) {
+    const value = constante[1].replace(/\\"/g, "\"");
+    return { label: value, kind: "function" };
+  }
+
+  const math = expression.match(/^MATH\("((?:[^"\\]|\\.)*)"\)$/);
+  if (math) {
+    const op = math[1].replace(/\\"/g, "\"");
+    return { label: op, kind: "function" };
+  }
+
   return { label: expression, kind: "text" };
 }
 
@@ -186,24 +149,47 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
   if (wholeBlock) return [wholeBlock];
 
   const tokens: FormulaToken[] = [];
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
+  let i = 0;
+  let plain = "";
+  while (i < expression.length) {
+    const two = expression.slice(i, i + 2);
+    if (two !== "[[") {
+      plain += expression[i];
+      i += 1;
+      continue;
+    }
 
-  while ((match = knownExpressionRegex.exec(expression)) !== null) {
-    const start = match.index;
-    const end = start + match[0].length;
+    if (plain.trim()) {
+      pushKnownAndTextTokens(plain, tokens, options);
+      plain = "";
+    }
 
-    const before = expression.slice(lastIndex, start);
-    pushChunkTokens(before, tokens);
-
-    const expr = match[0];
-    const { label, kind } = labelForKnownExpression(expr, options);
-    tokens.push(token(label, expr, kind));
-    lastIndex = end;
+    let depth = 1;
+    let j = i + 2;
+    while (j < expression.length && depth > 0) {
+      const nextTwo = expression.slice(j, j + 2);
+      if (nextTwo === "[[") {
+        depth += 1;
+        j += 2;
+        continue;
+      }
+      if (nextTwo === "]]") {
+        depth -= 1;
+        j += 2;
+        continue;
+      }
+      j += 1;
+    }
+    const blockRaw = expression.slice(i, j);
+    const block = parseBlockToken(blockRaw);
+    if (block) tokens.push(block);
+    else pushChunkTokens(blockRaw, tokens);
+    i = j;
   }
 
-  const tail = expression.slice(lastIndex);
-  pushChunkTokens(tail, tokens);
+  if (plain.trim()) {
+    pushKnownAndTextTokens(plain, tokens, options);
+  }
 
   return tokens;
 }
