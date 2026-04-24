@@ -50,8 +50,20 @@ export const initialConcepts: ConceptModel[] = [
 ];
 
 export const initialReceipts: ReceiptModel[] = [
-  { id: "recibo_1", name: "Recibo mensual", convenio: "Luz y Fuerza", definitiveOrder: [100, 120] },
-  { id: "recibo_2", name: "Recibo mensual", convenio: "APUAYE", definitiveOrder: [100] }
+  {
+    id: "Luz y Fuerza__Normal",
+    convenio: "Luz y Fuerza",
+    liquidationType: "Normal",
+    definitiveOrder: [100, 120],
+    transitoryOrder: [900]
+  },
+  {
+    id: "APUAYE__Normal",
+    convenio: "APUAYE",
+    liquidationType: "Normal",
+    definitiveOrder: [100],
+    transitoryOrder: []
+  }
 ];
 
 export const formulaTemplates: FormulaTemplate[] = [

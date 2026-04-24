@@ -1,13 +1,5 @@
 [
   {
-    "id": 902,
-    "code": "DEF_902",
-    "name": "Concepto definitivo 902",
-    "conceptClass": "definitivo",
-    "formula": "[TOPE|[VALOR_LEGAJO|CONCEPTO(904)]|CONSTANTE(\"2\")]",
-    "tags": []
-  },
-  {
     "id": 904,
     "code": "DEF_904",
     "name": "Concepto definitivo 904",
@@ -38,75 +30,7 @@
     "code": "DEF_915",
     "name": "Concepto definitivo 915",
     "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 916,
-    "code": "BASICO",
-    "name": "Concepto definitivo 916",
-    "conceptClass": "definitivo",
-    "formula": "CONSTANTE(\"3\")",
-    "tags": [
-      "remunerativo"
-    ]
-  },
-  {
-    "id": 917,
-    "code": "ANTIG",
-    "name": "Concepto definitivo 917",
-    "conceptClass": "definitivo",
-    "formula": "CONCEPTO(916) MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
-    "tags": [
-      "remunerativo"
-    ]
-  },
-  {
-    "id": 918,
-    "code": "PARA INFORMAR",
-    "name": "Concepto definitivo 918",
-    "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"remunerativo\")",
-    "tags": []
-  },
-  {
-    "id": 919,
-    "code": "DEF_919",
-    "name": "Concepto definitivo 919",
-    "conceptClass": "definitivo",
-    "formula": "[SI|CONCEPTO(916) MATH(\"<\") CONSTANTE(\"1\")|CONSTANTE(\"2\")|CONCEPTO(917)] MATH(\"+\") CONSTANTE(\"1\")",
-    "tags": []
-  },
-  {
-    "id": 920,
-    "code": "TRANS_920",
-    "name": "Transitorio 920",
-    "conceptClass": "transitorio",
-    "formula": "CONSTANTE(\"d\")",
-    "tags": []
-  },
-  {
-    "id": 921,
-    "code": "DEF_921",
-    "name": "Concepto definitivo 921",
-    "conceptClass": "definitivo",
-    "formula": "[SI|CCONCEPTO(\"TRANS_920\") MATH(\"=\") CONSTANTE(\"d\")|CONSTANTE(\"1\")|CONSTANTE(\"2\")]",
-    "tags": []
-  },
-  {
-    "id": 922,
-    "code": "DEF_922",
-    "name": "Concepto definitivo 922",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 923,
-    "code": "DEF_923",
-    "name": "Concepto definitivo 923",
-    "conceptClass": "definitivo",
-    "formula": "CONCEPTO(902) CONCEPTO(902) CONCEPTO(902)",
+    "formula": "VALOR_FIJO(\"A\")",
     "tags": []
   },
   {
@@ -114,7 +38,127 @@
     "code": "DEF_924",
     "name": "Concepto definitivo 924",
     "conceptClass": "definitivo",
-    "formula": "CONCEPTO(904)",
+    "formula": "CONSTANTE(\"1\")",
+    "tags": []
+  },
+  {
+    "id": 925,
+    "code": "TRANS_925",
+    "name": "Transitorio 925",
+    "conceptClass": "transitorio",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 927,
+    "code": "DEF_927",
+    "name": "Concepto definitivo 927",
+    "conceptClass": "definitivo",
+    "formula": "CONSTANTE(\"5\")",
+    "tags": []
+  },
+  {
+    "id": 929,
+    "code": "TRANS_929",
+    "name": "Transitorio 929",
+    "conceptClass": "transitorio",
+    "formula": "VALOR_FIJO(\"A\")",
+    "tags": []
+  },
+  {
+    "id": 930,
+    "code": "TRANS_930",
+    "name": "Transitorio 930",
+    "conceptClass": "transitorio",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 931,
+    "code": "TRANS_931",
+    "name": "Transitorio 931",
+    "conceptClass": "transitorio",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 932,
+    "code": "TRANS_932",
+    "name": "Transitorio 932",
+    "conceptClass": "transitorio",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 933,
+    "code": "DEF_933",
+    "name": "Concepto definitivo 933",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 934,
+    "code": "TRANS_934",
+    "name": "Transitorio 934",
+    "conceptClass": "transitorio",
+    "formula": "CONSTANTE(\"2\")",
+    "tags": []
+  },
+  {
+    "id": 935,
+    "code": "TRANS_935",
+    "name": "Transitorio 935",
+    "conceptClass": "transitorio",
+    "formula": "CONSTANTE(\"1\")",
+    "tags": []
+  },
+  {
+    "id": 936,
+    "code": "TRANS_936",
+    "name": "Transitorio 936",
+    "conceptClass": "transitorio",
+    "formula": "CONSTANTE(\"4\")",
+    "tags": []
+  },
+  {
+    "id": 937,
+    "code": "BÁSICO",
+    "name": "Concepto definitivo 937",
+    "conceptClass": "definitivo",
+    "formula": "VALOR_FIJO(\"Básico\")",
+    "tags": []
+  },
+  {
+    "id": 938,
+    "code": "DEF_938",
+    "name": "Concepto definitivo 938",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 939,
+    "code": "TRANS_939",
+    "name": "Transitorio 939",
+    "conceptClass": "transitorio",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 940,
+    "code": "DEF_940",
+    "name": "Concepto definitivo 940",
+    "conceptClass": "definitivo",
+    "formula": "VALOR_FIJO(\"Básico\")",
+    "tags": []
+  },
+  {
+    "id": 941,
+    "code": "DEF_941",
+    "name": "Concepto definitivo 941",
+    "conceptClass": "definitivo",
+    "formula": "VALOR_FIJO(\"Básico\")",
     "tags": []
   }
 ]

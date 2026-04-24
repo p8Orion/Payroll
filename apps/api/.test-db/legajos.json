@@ -1,0 +1,67 @@
+[
+  {
+    "id": "legajo_1",
+    "nroLegajo": "472",
+    "nombre": "Nestor",
+    "convenio": "Apuaye",
+    "composicionSalarial": "comp_3",
+    "valoresFijos": [
+      {
+        "id": "vf_2",
+        "clave": "A",
+        "valor": 1
+      },
+      {
+        "id": "vf_3",
+        "clave": "B",
+        "valor": 2
+      }
+    ]
+  },
+  {
+    "id": "legajo_2",
+    "nroLegajo": "473",
+    "nombre": "Juan",
+    "convenio": "Luz y Fuerza",
+    "composicionSalarial": "comp_1",
+    "valoresFijos": []
+  },
+  {
+    "id": "legajo_3",
+    "nroLegajo": "474",
+    "nombre": "Pablo",
+    "convenio": "Luz y Fuerza",
+    "composicionSalarial": "comp_2",
+    "valoresFijos": []
+  },
+  {
+    "id": "legajo_4_xt9uhw",
+    "nroLegajo": "353",
+    "nombre": "Sergio",
+    "convenio": "Apuaye",
+    "composicionSalarial": "comp_3",
+    "valoresFijos": []
+  },
+  {
+    "id": "legajo_5_0w45t1",
+    "nroLegajo": "520",
+    "nombre": "Gastón",
+    "convenio": "Luz y Fuerza",
+    "composicionSalarial": "comp_2",
+    "valoresFijos": [
+      {
+        "id": "vf_1",
+        "clave": "A",
+        "valor": 5
+      }
+    ]
+  },
+  {
+    "id": "legajo_6_ih1vqz",
+    "nroLegajo": "438",
+    "nombre": "Diego",
+    "convenio": "Apuaye",
+    "composicionSalarial": "comp_3",
+    "valoresFijos": []
+  }
+]

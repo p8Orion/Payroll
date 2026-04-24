@@ -113,7 +113,7 @@ export function useFormulaEditor({
     insertTokenAt(token(value, buildConstExpression(value), "function"), index);
   };
 
-  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE" | "VALOR_LEGAJO", index: number) => {
+  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE", index: number) => {
     const current = [...selectedFormulaTokens];
     const expr = serializeFunctionBlock(name, Array(getFunctionBlockArity(name)).fill(""));
     current.splice(index, 0, token(name, expr, "block"));
@@ -170,8 +170,7 @@ export function useFormulaEditor({
     if (
       fnTemplate === "SI" ||
       fnTemplate === "BLOQUE" ||
-      fnTemplate === "TOPE" ||
-      fnTemplate === "VALOR_LEGAJO"
+      fnTemplate === "TOPE"
     ) {
       return serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill(""));
     }
@@ -230,7 +229,6 @@ export function useFormulaEditor({
       fnTemplate === "SI" ||
       fnTemplate === "BLOQUE" ||
       fnTemplate === "TOPE" ||
-      fnTemplate === "VALOR_LEGAJO" ||
       fnTemplate === "CONSTANTE" ||
       fnTemplate.startsWith("MATH:")
     ) {
@@ -240,14 +238,13 @@ export function useFormulaEditor({
         if (
           fnTemplate === "SI" ||
           fnTemplate === "BLOQUE" ||
-          fnTemplate === "TOPE" ||
-          fnTemplate === "VALOR_LEGAJO"
+          fnTemplate === "TOPE"
         ) {
           next.splice(
             safeInsertAt,
             0,
             token(
-              fnTemplate as "SI" | "BLOQUE" | "TOPE" | "VALOR_LEGAJO",
+              fnTemplate as "SI" | "BLOQUE" | "TOPE",
               serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill("")),
               "block"
             )
@@ -325,17 +322,15 @@ export function useFormulaEditor({
       ifTemplate === "SI" ||
       ifTemplate === "BLOQUE" ||
       ifTemplate === "TOPE" ||
-      ifTemplate === "VALOR_LEGAJO" ||
       ifTemplate === "CONSTANTE" ||
       ifTemplate.startsWith("MATH:")
     ) {
       if (
         ifTemplate === "SI" ||
         ifTemplate === "BLOQUE" ||
-        ifTemplate === "TOPE" ||
-        ifTemplate === "VALOR_LEGAJO"
+        ifTemplate === "TOPE"
       ) {
-        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE" | "VALOR_LEGAJO", targetIndex);
+        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE", targetIndex);
       } else if (ifTemplate === "CONSTANTE") {
         insertTokenAt(token("const", buildConstExpression("0"), "function"), targetIndex);
       } else {

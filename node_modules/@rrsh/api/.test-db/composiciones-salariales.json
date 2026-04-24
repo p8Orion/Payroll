@@ -1,0 +1,44 @@
+[
+  {
+    "id": "comp_1",
+    "code": "CAT-1",
+    "convenio": "Luz y Fuerza",
+    "valoresFijos": [
+      {
+        "id": "cvf_1",
+        "clave": "Básico",
+        "valor": 100
+      }
+    ]
+  },
+  {
+    "id": "comp_2",
+    "code": "CAT-2",
+    "convenio": "Luz y Fuerza",
+    "valoresFijos": [
+      {
+        "id": "cvf_2",
+        "clave": "Básico",
+        "valor": 200
+      }
+    ]
+  },
+  {
+    "id": "comp_3",
+    "code": "CAT-A",
+    "convenio": "Apuaye",
+    "valoresFijos": [
+      {
+        "id": "cvf_3",
+        "clave": "Básico",
+        "valor": 150
+      }
+    ]
+  },
+  {
+    "id": "comp_1",
+    "code": "",
+    "convenio": "",
+    "valoresFijos": []
+  }
+]

@@ -8,6 +8,16 @@ export type ConceptShape =
   | "plus"
   | "hex";
 export type TagAggregationOp = "sum" | "avg" | "max" | "min";
+export const LIQUIDATION_TYPES = [
+  "Normal",
+  "Vacaciones",
+  "BAE",
+  "SAC",
+  "Final",
+  "Anual",
+  "Ticket"
+] as const;
+export type LiquidationType = (typeof LIQUIDATION_TYPES)[number];
 
 export interface FormulaToken {
   id: string;
@@ -48,9 +58,10 @@ export interface ConceptModel {
 
 export interface ReceiptModel {
   id: string;
-  name: string;
   convenio: string;
+  liquidationType: LiquidationType;
   definitiveOrder: number[];
+  transitoryOrder: number[];
 }
 
 export interface FormulaTemplate {

@@ -16,7 +16,7 @@ export function formulaToExpression(tokens: FormulaToken[]): string {
 }
 
 const knownExpressionRegex =
-  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|VALOR_LEGAJO\("[^"]*"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
+  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|VALOR_FIJO\("[^"]*"\)|VALOR_LEGAJO\("[^"]*"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
 
 interface TokenizeOptions {
   conceptCodeById?: Record<number, string>;
@@ -132,10 +132,10 @@ function labelForKnownExpression(
   const param = expression.match(/^PARAM\("([^"]+)"\)$/);
   if (param) return { label: `Parametro ${param[1]}`, kind: "param" };
 
-  const valorLegajo = expression.match(/^VALOR_LEGAJO\("([^"]*)"\)$/);
-  if (valorLegajo)
+  const valorFijo = expression.match(/^(?:VALOR_FIJO|VALOR_LEGAJO)\("([^"]*)"\)$/);
+  if (valorFijo)
     return {
-      label: valorLegajo[1].trim() ? `Valor legajo ${valorLegajo[1]}` : "Valor legajo (propio)",
+      label: valorFijo[1].trim() ? `Valor Fijo ${valorFijo[1]}` : "Valor Fijo (propio)",
       kind: "function"
     };
 

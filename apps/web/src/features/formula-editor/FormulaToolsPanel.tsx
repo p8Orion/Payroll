@@ -1,29 +1,26 @@
 import { DragEvent } from "react";
-import { getShapeGlyph, token } from "../../model/helpers";
+import { token } from "../../model/helpers";
 import { buildConstExpression } from "../../model/formula-ui";
-import { ConceptModel } from "../../model/types";
 
 interface FormulaToolsPanelProps {
-  transitorios: ConceptModel[];
   allTags: string[];
+  fixedValueKeys: string[];
   insertAt: number;
-  onAddTransitory: () => void;
-  onSelectConcept: (conceptId: number) => void;
-  onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE" | "VALOR_LEGAJO", index: number) => void;
+  onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE", index: number) => void;
   onInsertConst: (index: number) => void;
+  onInsertFixedValue: (key: string, index: number) => void;
   onInsertMath: (op: string, index: number) => void;
   onOpenTagModal: (tag: string, insertAt: number) => void;
   setCursorGhost: (event: DragEvent<HTMLElement>, label: string) => void;
 }
 
 export function FormulaToolsPanel({
-  transitorios,
   allTags,
+  fixedValueKeys,
   insertAt,
-  onAddTransitory,
-  onSelectConcept,
   onInsertBlockTemplate,
   onInsertConst,
+  onInsertFixedValue,
   onInsertMath,
   onOpenTagModal,
   setCursorGhost
@@ -32,40 +29,9 @@ export function FormulaToolsPanel({
     <article className="panel drawer">
       <h2>Herramientas</h2>
 
-      <div className="drawer-header">
-        <h3>Conceptos transitorios</h3>
-        <button className="add-button" onClick={onAddTransitory}>
-          + Nuevo transitorio
-        </button>
-      </div>
-      <div className="chip-wrap">
-        {transitorios.map((concept) => (
-          <button
-            key={concept.id}
-            className="chip transitorio"
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.effectAllowed = "copyMove";
-              e.dataTransfer.setData("text/plain", concept.code);
-              setCursorGhost(e, concept.code);
-              e.dataTransfer.setData(
-                "text/token-json",
-                JSON.stringify(token(concept.code, `CCONCEPTO("${concept.code}")`, "concept"))
-              );
-            }}
-            onClick={() => onSelectConcept(concept.id)}
-          >
-            <span className="concept-marker" style={{ color: concept.color }}>
-              {getShapeGlyph(concept.shape)}
-            </span>
-            {concept.code}
-          </button>
-        ))}
-      </div>
-
       <h3>Funciones</h3>
       <div className="chip-wrap">
-        {(["SI", "BLOQUE", "TOPE", "VALOR_LEGAJO"] as const).map((fn) => (
+        {(["SI", "BLOQUE", "TOPE"] as const).map((fn) => (
           <button
             key={fn}
             className="chip"
@@ -137,6 +103,29 @@ export function FormulaToolsPanel({
             onClick={() => onOpenTagModal(tag, insertAt)}
           >
             #{tag}
+          </button>
+        ))}
+      </div>
+
+      <h3>Valores fijos</h3>
+      <div className="chip-wrap">
+        {fixedValueKeys.map((key) => (
+          <button
+            key={key}
+            className="chip"
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "copyMove";
+              e.dataTransfer.setData("text/plain", key);
+              setCursorGhost(e, key);
+              e.dataTransfer.setData(
+                "text/token-json",
+                JSON.stringify(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"))
+              );
+            }}
+            onClick={() => onInsertFixedValue(key, insertAt)}
+          >
+            {key}
           </button>
         ))}
       </div>

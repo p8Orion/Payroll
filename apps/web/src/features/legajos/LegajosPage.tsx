@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { ComposicionSalarialModel } from "../composiciones/ComposicionesSalarialesPage";
 
 export interface LegajoValorFijo {
   id: string;
-  concepto: string;
+  clave: string;
   valor: number;
 }
 
@@ -17,7 +18,9 @@ export interface LegajoModel {
 
 interface LegajosPageProps {
   legajos: LegajoModel[];
-  conceptOptions: string[];
+  convenioOptions: string[];
+  composiciones: ComposicionSalarialModel[];
+  fixedValueKeys: string[];
   onChangeLegajos: (next: LegajoModel[]) => void;
 }
 
@@ -42,7 +45,13 @@ function createLegajo(): LegajoModel {
   };
 }
 
-export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: LegajosPageProps) {
+export function LegajosPage({
+  legajos,
+  convenioOptions,
+  composiciones,
+  fixedValueKeys,
+  onChangeLegajos
+}: LegajosPageProps) {
   const normalizedLegajos = useMemo(() => {
     const used = new Set<string>();
     return legajos.map((l, index) => {
@@ -66,6 +75,17 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
     () => normalizedLegajos.find((l) => l.id === selectedId) ?? normalizedLegajos[0] ?? null,
     [normalizedLegajos, selectedId]
   );
+  const composicionesByConvenio = useMemo(
+    () =>
+      composiciones
+        .filter((c) => c.convenio.trim() === (selected?.convenio ?? "").trim())
+        .sort((a, b) => a.code.localeCompare(b.code)),
+    [composiciones, selected?.convenio]
+  );
+  const usedFixedKeys = useMemo(
+    () => new Set((selected?.valoresFijos ?? []).map((item) => item.clave.trim().toLowerCase()).filter(Boolean)),
+    [selected]
+  );
 
   useEffect(() => {
     if (needsIdMigration) {
@@ -82,6 +102,19 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
       setSelectedId(normalizedLegajos[0].id);
     }
   }, [normalizedLegajos, selectedId]);
+
+  useEffect(() => {
+    if (!selected) return;
+    const isValid =
+      !selected.composicionSalarial ||
+      composicionesByConvenio.some((c) => c.id === selected.composicionSalarial);
+    if (isValid) return;
+    onChangeLegajos(
+      normalizedLegajos.map((l) =>
+        l.id === selected.id ? { ...l, composicionSalarial: "" } : l
+      )
+    );
+  }, [selected, composicionesByConvenio, normalizedLegajos, onChangeLegajos]);
 
   const updateSelected = (updater: (current: LegajoModel) => LegajoModel) => {
     if (!selected) return;
@@ -159,19 +192,25 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
               </div>
               <div>
                 <label>Convenio</label>
-                <input
+                <select
                   value={selected.convenio}
                   onChange={(e) =>
                     updateSelected((current) => ({ ...current, convenio: e.target.value }))
                   }
-                  placeholder="Ej: Luz y Fuerza"
-                />
+                >
+                  <option value="">Sin convenio</option>
+                  {convenioOptions.map((convenio) => (
+                    <option key={convenio} value={convenio}>
+                      {convenio}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="receipt-toolbar">
               <div style={{ width: "100%" }}>
                 <label>Composición Salarial</label>
-                <input
+                <select
                   value={selected.composicionSalarial}
                   onChange={(e) =>
                     updateSelected((current) => ({
@@ -179,8 +218,20 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
                       composicionSalarial: e.target.value
                     }))
                   }
-                  placeholder="Ej: Administrativo A"
-                />
+                >
+                  <option value="">Sin composición</option>
+                  {composicionesByConvenio.map((composicion) => (
+                    <option key={composicion.id} value={composicion.id}>
+                      {composicion.code}
+                    </option>
+                  ))}
+                </select>
+                {selected.composicionSalarial &&
+                !composicionesByConvenio.some((c) => c.id === selected.composicionSalarial) ? (
+                  <p className="concept-error-inline">
+                    Composición inválida para el convenio seleccionado.
+                  </p>
+                ) : null}
               </div>
             </div>
 
@@ -194,7 +245,7 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
                       ...current,
                       valoresFijos: [
                         ...current.valoresFijos,
-                        { id: nextValorId(), concepto: "", valor: 0 }
+                        { id: nextValorId(), clave: "", valor: 0 }
                       ]
                     }))
                   }
@@ -209,19 +260,22 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
                   {selected.valoresFijos.map((vf) => (
                     <div key={vf.id} className="legajos-fixed-row">
                       <input
-                        list="legajos-concept-options"
-                        value={vf.concepto}
-                        onChange={(e) =>
+                        className="fixed-value-key-input"
+                        list={`fixed-value-keys-legajo-${selected.id}`}
+                        value={vf.clave}
+                        onChange={(e) => {
+                          const nextKey = e.target.value;
                           updateSelected((current) => ({
                             ...current,
                             valoresFijos: current.valoresFijos.map((item) =>
-                              item.id === vf.id ? { ...item, concepto: e.target.value } : item
+                              item.id === vf.id ? { ...item, clave: nextKey } : item
                             )
-                          }))
-                        }
-                        placeholder="Concepto"
+                          }));
+                        }}
+                        placeholder="Clave"
                       />
                       <input
+                        className="fixed-value-number-input"
                         type="number"
                         value={vf.valor}
                         onChange={(e) =>
@@ -250,10 +304,12 @@ export function LegajosPage({ legajos, conceptOptions, onChangeLegajos }: Legajo
                   ))}
                 </div>
               )}
-              <datalist id="legajos-concept-options">
-                {conceptOptions.map((code) => (
-                  <option key={code} value={code} />
-                ))}
+              <datalist id={`fixed-value-keys-legajo-${selected.id}`}>
+                {fixedValueKeys
+                  .filter((key) => !usedFixedKeys.has(key.trim().toLowerCase()))
+                  .map((key) => (
+                    <option key={key} value={key} />
+                  ))}
               </datalist>
             </div>
           </>

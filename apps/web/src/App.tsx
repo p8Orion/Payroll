@@ -24,8 +24,21 @@ import { useFormulaEditor } from "./features/formula-editor/useFormulaEditor";
 import { FormulaEditorSection } from "./features/formula-editor/FormulaEditorSection";
 import { FormulaToolsPanel } from "./features/formula-editor/FormulaToolsPanel";
 import { LegajoModel, LegajosPage } from "./features/legajos/LegajosPage";
+import { LiquidacionesPage } from "./features/liquidaciones/LiquidacionesPage";
+import {
+  ComposicionSalarialModel,
+  ComposicionesSalarialesPage
+} from "./features/composiciones/ComposicionesSalarialesPage";
 import { initialConcepts, initialReceipts } from "./model/seed";
-import { ConceptShape, ConceptModel, FormulaToken, ReceiptModel, TagAggregationOp } from "./model/types";
+import {
+  ConceptShape,
+  ConceptModel,
+  FormulaToken,
+  LIQUIDATION_TYPES,
+  LiquidationType,
+  ReceiptModel,
+  TagAggregationOp
+} from "./model/types";
 
 interface ApiConcept {
   id: number;
@@ -38,12 +51,66 @@ interface ApiConcept {
 
 const apiBaseUrl = "http://localhost:3001";
 const receiptsStorageKey = "rrsh.receipts.v1";
-const legajosStorageKey = "rrsh.legajos.v1";
 const maxHistoryEntries = 200;
+const defaultConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"];
+const virtualAllConvenio = "(Todos)";
 
 interface EditorSnapshot {
   concepts: ConceptModel[];
   receipts: ReceiptModel[];
+}
+
+function receiptId(convenio: string, liquidationType: LiquidationType): string {
+  return `${convenio}__${liquidationType}`;
+}
+
+function normalizeReceipt(
+  receipt: Partial<ReceiptModel> & { id?: string; convenio?: string; name?: string; liquidationType?: string },
+  fallbackOrder: number[]
+): ReceiptModel | null {
+  const convenio = (receipt.convenio ?? "").trim();
+  if (!convenio) return null;
+  const liquid = LIQUIDATION_TYPES.includes(receipt.liquidationType as LiquidationType)
+    ? (receipt.liquidationType as LiquidationType)
+    : "Normal";
+  return {
+    id: receiptId(convenio, liquid),
+    convenio,
+    liquidationType: liquid,
+    definitiveOrder: Array.isArray(receipt.definitiveOrder) ? receipt.definitiveOrder : fallbackOrder,
+    transitoryOrder: Array.isArray((receipt as { transitoryOrder?: number[] }).transitoryOrder)
+      ? ((receipt as { transitoryOrder?: number[] }).transitoryOrder as number[])
+      : []
+  };
+}
+
+function ensureReceiptMatrix(
+  receipts: ReceiptModel[],
+  convenios: string[],
+  fallbackOrder: number[]
+): ReceiptModel[] {
+  const byKey = new Map<string, ReceiptModel>();
+  for (const raw of receipts) {
+    const normalized = normalizeReceipt(raw, fallbackOrder);
+    if (!normalized) continue;
+    byKey.set(receiptId(normalized.convenio, normalized.liquidationType), normalized);
+  }
+  const next: ReceiptModel[] = [];
+  for (const convenio of convenios) {
+    for (const liquidationType of LIQUIDATION_TYPES) {
+      const key = receiptId(convenio, liquidationType);
+      next.push(
+        byKey.get(key) ?? {
+          id: key,
+          convenio,
+          liquidationType,
+          definitiveOrder: [],
+          transitoryOrder: []
+        }
+      );
+    }
+  }
+  return next;
 }
 
 function applyImplicitPlusBetweenValues(expression: string): string {
@@ -91,35 +158,34 @@ async function persistConcept(concept: ConceptModel): Promise<void> {
 }
 
 export function App() {
-  const [menu, setMenu] = useState("modelo");
+  const [menu, setMenu] = useState("conceptos");
+  const [liquidacionesMenuOpen, setLiquidacionesMenuOpen] = useState(false);
   const [concepts, setConcepts] = useState<ConceptModel[]>(initialConcepts);
+  const defaultReceiptOrder = useMemo(() => [] as number[], []);
   const [receipts, setReceipts] = useState<ReceiptModel[]>(() => {
+    const fallbackOrder = initialConcepts
+      .filter((c) => c.conceptClass === "definitivo")
+      .map((c) => c.id);
     if (typeof window === "undefined") return initialReceipts;
     try {
       const raw = window.localStorage.getItem(receiptsStorageKey);
-      if (!raw) return initialReceipts;
+      if (!raw) {
+        return ensureReceiptMatrix(initialReceipts, defaultConvenios, fallbackOrder);
+      }
       const parsed = JSON.parse(raw) as ReceiptModel[];
-      return parsed.length ? parsed : initialReceipts;
+      const base = parsed.length ? parsed : initialReceipts;
+      return ensureReceiptMatrix(base, defaultConvenios, fallbackOrder);
     } catch {
-      return initialReceipts;
+      return ensureReceiptMatrix(initialReceipts, defaultConvenios, fallbackOrder);
     }
   });
-  const [activeReceiptId, setActiveReceiptId] = useState("recibo_1");
+  const [activeReceiptId, setActiveReceiptId] = useState("");
   const [activeConvenio, setActiveConvenio] = useState("Luz y Fuerza");
+  const [convenioOptions, setConvenioOptions] = useState<string[]>(defaultConvenios);
   const [legajos, setLegajos] = useState<LegajoModel[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const raw = window.localStorage.getItem(legajosStorageKey);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as LegajoModel[];
-      return parsed.map((item) => ({
-        ...item,
-        convenio: item.convenio ?? ""
-      }));
-    } catch {
-      return [];
-    }
+    return [];
   });
+  const [composiciones, setComposiciones] = useState<ComposicionSalarialModel[]>([]);
   const [simLegajoId, setSimLegajoId] = useState<string>("");
   const [newTagDraft, setNewTagDraft] = useState("");
   const [appearanceOpen, setAppearanceOpen] = useState(false);
@@ -127,7 +193,9 @@ export function App() {
   const [conceptCodeDraft, setConceptCodeDraft] = useState("");
   const [conceptNameDraft, setConceptNameDraft] = useState("");
   const [conceptsLoaded, setConceptsLoaded] = useState(false);
+  const [legajosLoaded, setLegajosLoaded] = useState(false);
   const appearanceRef = useRef<HTMLDivElement | null>(null);
+  const liquidacionesMenuRef = useRef<HTMLDivElement | null>(null);
   const [tagModal, setTagModal] = useState<{
     open: boolean;
     tag: string;
@@ -192,15 +260,39 @@ export function App() {
   };
 
   const definitivos = concepts.filter((c) => c.conceptClass === "definitivo");
-  const transitorios = concepts.filter((c) => c.conceptClass === "transitorio");
+  const convenios = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          virtualAllConvenio,
+          ...convenioOptions,
+          ...receipts.map((r) => r.convenio),
+          activeConvenio
+        ])
+      ),
+    [receipts, convenioOptions, activeConvenio]
+  );
   const receiptsByConvenio = receipts.filter((r) => r.convenio === activeConvenio);
   const allTags = [...new Set(concepts.flatMap((c) => c.tags))];
+  const fixedValueKeys = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...legajos.flatMap((l) => (l.valoresFijos ?? []).map((vf) => (vf.clave ?? "").trim())),
+          ...composiciones.flatMap((c) => (c.valoresFijos ?? []).map((vf) => (vf.clave ?? "").trim()))
+        ].filter(Boolean))
+      ).sort((a, b) => a.localeCompare(b)),
+    [legajos, composiciones]
+  );
   const filteredTagSuggestions = allTags.filter((tag) =>
     tag.toLowerCase().includes(newTagDraft.trim().toLowerCase())
   );
   const [editingId, setEditingId] = useState<number>(definitivos[0].id);
   const activeReceipt = receipts.find((r) => r.id === activeReceiptId) ?? receiptsByConvenio[0] ?? receipts[0];
   const definitivosEnRecibo = activeReceipt.definitiveOrder
+    .map((id) => concepts.find((c) => c.id === id))
+    .filter((c): c is ConceptModel => Boolean(c));
+  const transitoriosEnRecibo = activeReceipt.transitoryOrder
     .map((id) => concepts.find((c) => c.id === id))
     .filter((c): c is ConceptModel => Boolean(c));
 
@@ -220,14 +312,45 @@ export function App() {
     () => legajos.find((l) => l.id === simLegajoId) ?? legajos[0] ?? null,
     [legajos, simLegajoId]
   );
+  const simLegajosForConvenio = useMemo(
+    () =>
+      (activeConvenio ?? "").trim() === virtualAllConvenio
+        ? legajos
+        : legajos.filter((l) => (l.convenio ?? "").trim() === (activeConvenio ?? "").trim()),
+    [legajos, activeConvenio]
+  );
+  const resolveComposicionLegajo = (legajo: LegajoModel | null): ComposicionSalarialModel | undefined => {
+    if (!legajo) return undefined;
+    const selected = (legajo.composicionSalarial ?? "").trim();
+    if (!selected) return undefined;
+    const normalize = (value: string | undefined): string => (value ?? "").trim().toLowerCase();
+    const byId = composiciones.find(
+      (c) =>
+        c.id === selected &&
+        normalize(c.convenio) === normalize(legajo.convenio)
+    );
+    if (byId) return byId;
+    return composiciones.find(
+      (c) =>
+        normalize(c.code) === normalize(selected) &&
+        normalize(c.convenio) === normalize(legajo.convenio)
+    );
+  };
   const getValorLegajo = (concepto: string, fallbackConcepto: string): number => {
     if (!simLegajo) return 0;
     const requested = concepto.trim();
     const effectiveConcepto = requested.length ? requested : fallbackConcepto;
     const key = effectiveConcepto.trim().toLowerCase();
     if (!key) return 0;
-    const found = simLegajo.valoresFijos.find((vf) => vf.concepto.trim().toLowerCase() === key);
-    return found?.valor ?? 0;
+    const foundLegajo = simLegajo.valoresFijos.find(
+      (vf) => ((vf.clave ?? "").trim().toLowerCase() === key || ((vf as { concepto?: string }).concepto ?? "").trim().toLowerCase() === key)
+    );
+    if (foundLegajo) return foundLegajo.valor;
+    const comp = resolveComposicionLegajo(simLegajo);
+    const foundComp = comp?.valoresFijos.find(
+      (vf) => ((vf.clave ?? "").trim().toLowerCase() === key || ((vf as { concepto?: string }).concepto ?? "").trim().toLowerCase() === key)
+    );
+    return foundComp?.valor ?? 0;
   };
   const resolveValorLegajoConceptCode = (rawArg: string, fallbackConcepto: string): string => {
     const arg = rawArg.trim();
@@ -290,9 +413,9 @@ export function App() {
     setCursorGhost
   });
   const participatingConcepts = useMemo(() => {
-    const inReceipt = new Set(activeReceipt.definitiveOrder);
+    const inReceipt = new Set([...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder]);
     const result = concepts.filter(
-      (c) => c.conceptClass === "transitorio" || inReceipt.has(c.id)
+      (c) => inReceipt.has(c.id)
     );
     if (!result.some((c) => c.id === selectedConcept.id)) {
       result.push(selectedConcept);
@@ -374,10 +497,17 @@ export function App() {
 
         try {
           const normalized = expandBracketBlocksToExpressions(expression)
+            .replace(/VALOR_FIJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+              const code = resolveValorLegajoConceptCode(rawArg, concept.code);
+              return String(getValorLegajo(code, concept.code));
+            })
             .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
               const code = resolveValorLegajoConceptCode(rawArg, concept.code);
               return String(getValorLegajo(code, concept.code));
             })
+            .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
+              String(getValorLegajo(concepto, concept.code))
+            )
             .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) =>
               String(getValorLegajo(concepto, concept.code))
             )
@@ -679,10 +809,17 @@ export function App() {
 
       try {
         const normalized = expandBracketBlocksToExpressions(expression)
+          .replace(/VALOR_FIJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+            const code = resolveValorLegajoConceptCode(rawArg, concept.code);
+            return String(getValorLegajo(code, concept.code));
+          })
           .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
             const code = resolveValorLegajoConceptCode(rawArg, concept.code);
             return String(getValorLegajo(code, concept.code));
           })
+          .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
+            String(getValorLegajo(concepto, concept.code))
+          )
           .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) =>
             String(getValorLegajo(concepto, concept.code))
           )
@@ -824,10 +961,17 @@ export function App() {
 
       try {
         const normalized = expandBracketBlocksToExpressions(expression)
+          .replace(/VALOR_FIJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+            const code = resolveValorLegajoConceptCode(rawArg, concept.code);
+            return String(getValorLegajo(code, concept.code));
+          })
           .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
             const code = resolveValorLegajoConceptCode(rawArg, concept.code);
             return String(getValorLegajo(code, concept.code));
           })
+          .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
+            String(getValorLegajo(concepto, concept.code))
+          )
           .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) =>
             String(getValorLegajo(concepto, concept.code))
           )
@@ -908,18 +1052,6 @@ export function App() {
     );
   };
 
-  const addReceipt = () => {
-    const id = `recibo_${receipts.length + 1}`;
-    const newReceipt: ReceiptModel = {
-      id,
-      name: `Recibo ${receipts.length + 1}`,
-      convenio: activeConvenio,
-      definitiveOrder: definitivos.map((c) => c.id)
-    };
-    setReceipts((prev) => [...prev, newReceipt]);
-    setActiveReceiptId(id);
-  };
-
   const addTransitory = () => {
     const newId = Math.max(...concepts.map((c) => c.id)) + 1;
     const newConcept: ConceptModel = {
@@ -933,6 +1065,13 @@ export function App() {
       formulaAst: []
     };
     setConcepts((prev) => [...prev, newConcept]);
+    setReceipts((prev) =>
+      prev.map((receipt) =>
+        receipt.id === activeReceiptId
+          ? { ...receipt, transitoryOrder: [...receipt.transitoryOrder, newId] }
+          : receipt
+      )
+    );
     setEditingId(newId);
   };
 
@@ -999,7 +1138,8 @@ export function App() {
     setReceipts((prev) =>
       prev.map((receipt) => ({
         ...receipt,
-        definitiveOrder: receipt.definitiveOrder.filter((id) => id !== removingId)
+        definitiveOrder: receipt.definitiveOrder.filter((id) => id !== removingId),
+        transitoryOrder: receipt.transitoryOrder.filter((id) => id !== removingId)
       }))
     );
     const nextSelected = remaining[0];
@@ -1043,6 +1183,7 @@ export function App() {
     setTagModal({ open: false, tag: "", insertAt: 0 });
   };
 
+
   useEffect(() => {
     if (!appearanceOpen) return;
     const onPointerDown = (event: MouseEvent) => {
@@ -1053,6 +1194,17 @@ export function App() {
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [appearanceOpen]);
+
+  useEffect(() => {
+    if (!liquidacionesMenuOpen) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (!liquidacionesMenuRef.current) return;
+      if (liquidacionesMenuRef.current.contains(event.target as Node)) return;
+      setLiquidacionesMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [liquidacionesMenuOpen]);
 
   useEffect(() => {
     const loadConcepts = async () => {
@@ -1080,6 +1232,110 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (!composiciones.length || !legajos.length) return;
+    let changed = false;
+    const normalize = (value: string | undefined): string => (value ?? "").trim().toLowerCase();
+    const migrated = legajos.map((legajo) => {
+      const selected = (legajo.composicionSalarial ?? "").trim();
+      if (!selected) return legajo;
+      const byId = composiciones.find(
+        (c) =>
+          c.id === selected &&
+          normalize(c.convenio) === normalize(legajo.convenio)
+      );
+      if (byId) return legajo;
+      const byCode = composiciones.find(
+        (c) =>
+          normalize(c.code) === normalize(selected) &&
+          normalize(c.convenio) === normalize(legajo.convenio)
+      );
+      if (!byCode) return legajo;
+      changed = true;
+      return { ...legajo, composicionSalarial: byCode.id };
+    });
+    if (changed) {
+      setLegajos(migrated);
+    }
+  }, [composiciones, legajos]);
+
+  useEffect(() => {
+    const loadLegajos = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/legajos`);
+        if (!response.ok) {
+          setLegajosLoaded(true);
+          return;
+        }
+        const apiLegajos = (await response.json()) as LegajoModel[];
+        setLegajos(
+          (apiLegajos ?? []).map((item) => ({
+            ...item,
+            convenio: item.convenio ?? "",
+            composicionSalarial: item.composicionSalarial ?? "",
+            valoresFijos: Array.isArray(item.valoresFijos) ? item.valoresFijos : []
+          })).map((item) => ({
+            ...item,
+            valoresFijos: item.valoresFijos.map((vf) => ({
+              id: vf.id,
+              clave: (vf as { clave?: string; concepto?: string }).clave ??
+                (vf as { clave?: string; concepto?: string }).concepto ??
+                "",
+              valor: vf.valor
+            }))
+          }))
+        );
+      } catch {
+        // Mantiene estado local en memoria si API no esta disponible.
+      } finally {
+        setLegajosLoaded(true);
+      }
+    };
+    void loadLegajos();
+  }, []);
+
+  useEffect(() => {
+    const loadComposiciones = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/composiciones-salariales`);
+        if (!response.ok) return;
+        const parsed = (await response.json()) as ComposicionSalarialModel[];
+        setComposiciones(
+          (parsed ?? []).map((item) => ({
+            ...item,
+            convenio: item.convenio ?? "",
+            valoresFijos: Array.isArray(item.valoresFijos)
+              ? item.valoresFijos.map((vf) => ({
+                  id: vf.id,
+                  clave: (vf as { clave?: string; concepto?: string }).clave ??
+                    (vf as { clave?: string; concepto?: string }).concepto ??
+                    "",
+                  valor: vf.valor
+                }))
+              : []
+          }))
+        );
+      } catch {
+        // noop
+      }
+    };
+    void loadComposiciones();
+  }, []);
+
+  useEffect(() => {
+    const loadConvenios = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/convenios`);
+        if (!response.ok) return;
+        const parsed = (await response.json()) as string[];
+        if (Array.isArray(parsed) && parsed.length) setConvenioOptions(parsed);
+      } catch {
+        // Mantiene convenios por defecto.
+      }
+    };
+    void loadConvenios();
+  }, []);
+
+  useEffect(() => {
     if (!conceptsLoaded) return;
     const timeout = setTimeout(() => {
       void Promise.allSettled(concepts.map((concept) => persistConcept(concept)));
@@ -1093,19 +1349,72 @@ export function App() {
   }, [receipts]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(legajosStorageKey, JSON.stringify(legajos));
-  }, [legajos]);
+    setReceipts((prev) => {
+      const normalized = ensureReceiptMatrix(prev, convenios, defaultReceiptOrder);
+      if (
+        normalized.length === prev.length &&
+        normalized.every(
+          (receipt, index) =>
+            receipt.id === prev[index].id &&
+            receipt.convenio === prev[index].convenio &&
+            receipt.liquidationType === prev[index].liquidationType &&
+            JSON.stringify(receipt.definitiveOrder) === JSON.stringify(prev[index].definitiveOrder) &&
+            JSON.stringify(receipt.transitoryOrder) === JSON.stringify(prev[index].transitoryOrder)
+        )
+      ) {
+        return prev;
+      }
+      return normalized;
+    });
+  }, [convenios, defaultReceiptOrder]);
 
   useEffect(() => {
-    if (!legajos.length) {
+    if (!legajosLoaded) return;
+    const timeout = setTimeout(() => {
+      void fetch(`${apiBaseUrl}/legajos`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(legajos)
+      });
+    }, 250);
+    return () => clearTimeout(timeout);
+  }, [legajos, legajosLoaded]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      void fetch(`${apiBaseUrl}/composiciones-salariales`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(composiciones)
+      });
+    }, 250);
+    return () => clearTimeout(timeout);
+  }, [composiciones]);
+
+  useEffect(() => {
+    if (!simLegajosForConvenio.length) {
       setSimLegajoId("");
       return;
     }
-    if (!simLegajoId || !legajos.some((l) => l.id === simLegajoId)) {
-      setSimLegajoId(legajos[0].id);
+    if (!simLegajoId || !simLegajosForConvenio.some((l) => l.id === simLegajoId)) {
+      setSimLegajoId(simLegajosForConvenio[0].id);
     }
-  }, [legajos, simLegajoId]);
+  }, [simLegajosForConvenio, simLegajoId]);
+
+  useEffect(() => {
+    if (!receipts.length) return;
+    const active = receipts.find((r) => r.id === activeReceiptId);
+    if (active) {
+      if (activeConvenio !== active.convenio) setActiveConvenio(active.convenio);
+      return;
+    }
+    const firstForConvenio = receipts.find((r) => r.convenio === activeConvenio);
+    if (firstForConvenio) {
+      setActiveReceiptId(firstForConvenio.id);
+      return;
+    }
+    setActiveReceiptId(receipts[0].id);
+  }, [receipts, activeReceiptId, activeConvenio]);
 
   useEffect(() => {
     if (!conceptsLoaded) return;
@@ -1187,17 +1496,63 @@ export function App() {
           <button className={menu === "dashboard" ? "menu active" : "menu"} onClick={() => setMenu("dashboard")}>
             Dashboard
           </button>
-          <button className={menu === "modelo" ? "menu active" : "menu"} onClick={() => setMenu("modelo")}>
-            Modelo de liquidacion
-          </button>
-          <button className={menu === "novedades" ? "menu active" : "menu"} onClick={() => setMenu("novedades")}>
-            Novedades
-          </button>
-          <button className={menu === "afip" ? "menu active" : "menu"} onClick={() => setMenu("afip")}>
-            Contable / AFIP
-          </button>
           <button className={menu === "legajos" ? "menu active" : "menu"} onClick={() => setMenu("legajos")}>
             Legajos
+          </button>
+          <div className="topbar-dropdown" ref={liquidacionesMenuRef}>
+            <button
+              className={
+                menu === "conceptos" || menu === "composiciones" || menu === "novedades" || menu === "liquidaciones"
+                  ? "menu active"
+                  : "menu"
+              }
+              onClick={() => setLiquidacionesMenuOpen((prev) => !prev)}
+            >
+              Liquidaciones
+            </button>
+            {liquidacionesMenuOpen ? (
+              <div className="topbar-dropdown-menu">
+                <button
+                  className={menu === "conceptos" ? "topbar-dropdown-item active" : "topbar-dropdown-item"}
+                  onClick={() => {
+                    setMenu("conceptos");
+                    setLiquidacionesMenuOpen(false);
+                  }}
+                >
+                  Conceptos
+                </button>
+                <button
+                  className={menu === "composiciones" ? "topbar-dropdown-item active" : "topbar-dropdown-item"}
+                  onClick={() => {
+                    setMenu("composiciones");
+                    setLiquidacionesMenuOpen(false);
+                  }}
+                >
+                  Composiciones Salariales
+                </button>
+                <button
+                  className={menu === "novedades" ? "topbar-dropdown-item active" : "topbar-dropdown-item"}
+                  onClick={() => {
+                    setMenu("novedades");
+                    setLiquidacionesMenuOpen(false);
+                  }}
+                >
+                  Novedades
+                </button>
+                <button
+                  className={menu === "liquidaciones" ? "topbar-dropdown-item active" : "topbar-dropdown-item"}
+                  onClick={() => {
+                    setMenu("liquidaciones");
+                    setLiquidacionesMenuOpen(false);
+                  }}
+                >
+                  Liquidacion
+                </button>
+              </div>
+            ) : null}
+          </div>
+          <button className={menu === "afip" ? "menu active" : "menu"} onClick={() => setMenu("afip")}>
+            Contable
           </button>
         </nav>
       </header>
@@ -1206,13 +1561,30 @@ export function App() {
         {menu === "legajos" ? (
           <LegajosPage
             legajos={legajos}
-            conceptOptions={concepts.map((c) => c.code)}
+            convenioOptions={convenioOptions}
+            composiciones={composiciones}
+            fixedValueKeys={fixedValueKeys}
             onChangeLegajos={setLegajos}
           />
-        ) : menu !== "modelo" ? (
+        ) : menu === "composiciones" ? (
+          <ComposicionesSalarialesPage
+            composiciones={composiciones}
+            convenioOptions={convenioOptions}
+            fixedValueKeys={fixedValueKeys}
+            onEnsureFixedValueKey={() => {}}
+            onChangeComposiciones={setComposiciones}
+          />
+        ) : menu === "liquidaciones" ? (
+          <LiquidacionesPage
+            concepts={concepts}
+            receipts={receipts}
+            legajos={legajos}
+            composiciones={composiciones}
+          />
+        ) : menu !== "conceptos" ? (
           <section className="placeholder">
-            <h2>{menu === "dashboard" ? "Dashboard" : menu === "novedades" ? "Novedades" : "Contable / AFIP"}</h2>
-            <p>Seccion en construccion. El foco de este MVP es Modelo de liquidacion.</p>
+            <h2>{menu === "dashboard" ? "Dashboard" : menu === "novedades" ? "Novedades" : "Contable"}</h2>
+            <p>Seccion en construccion. El foco de este MVP es Conceptos.</p>
           </section>
         ) : (
           <section className="modelo-grid">
@@ -1231,13 +1603,15 @@ export function App() {
                       if (nextReceipt) setActiveReceiptId(nextReceipt.id);
                     }}
                   >
-                    <option>Luz y Fuerza</option>
-                    <option>APUAYE</option>
-                    <option>Otro convenio</option>
+                    {convenios.map((convenio) => (
+                      <option key={convenio} value={convenio}>
+                        {convenio}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="receipt">Recibo</label>
+                  <label htmlFor="receipt">Tipo de liquidación</label>
                   <select
                     id="receipt"
                     value={activeReceiptId}
@@ -1250,7 +1624,7 @@ export function App() {
                   >
                     {receiptsByConvenio.map((receipt) => (
                       <option key={receipt.id} value={receipt.id}>
-                        {receipt.name}
+                        {receipt.liquidationType}
                       </option>
                     ))}
                   </select>
@@ -1261,12 +1635,12 @@ export function App() {
                     id="sim-legajo"
                     value={simLegajoId}
                     onChange={(e) => setSimLegajoId(e.target.value)}
-                    disabled={!legajos.length}
+                    disabled={!simLegajosForConvenio.length}
                   >
-                    {legajos.length === 0 ? (
-                      <option value="">Sin legajos</option>
+                    {simLegajosForConvenio.length === 0 ? (
+                      <option value="">Sin legajos para este convenio</option>
                     ) : (
-                      legajos.map((legajo) => (
+                      simLegajosForConvenio.map((legajo) => (
                         <option key={legajo.id} value={legajo.id}>
                           {legajo.nroLegajo || "S/N"} - {legajo.nombre || "Sin nombre"}
                         </option>
@@ -1274,9 +1648,6 @@ export function App() {
                     )}
                   </select>
                 </div>
-                <button className="add-button" onClick={addReceipt}>
-                  + Nuevo recibo
-                </button>
               </div>
               <div className="panel-actions">
                 <button className="add-button" onClick={addDefinitiveToReceipt}>
@@ -1311,6 +1682,59 @@ export function App() {
                       reorderDefinitivo(dragId, concept.id);
                     }}
                     className={concept.id === selectedConcept.id ? "concept-item selected" : "concept-item"}
+                  >
+                    <div>
+                      <span className="concept-marker" style={{ color: concept.color }}>
+                        {getShapeGlyph(concept.shape)}
+                      </span>
+                      <strong>{concept.code}</strong> - {concept.name}
+                      <span className="concept-meta-inline">
+                        {cycleConceptIds.has(concept.id) ? (
+                          <span className="concept-error-inline">CICLO</span>
+                        ) : null}
+                        {formulaErrorById.get(concept.id) ? (
+                          <span className="concept-error-inline">ERROR</span>
+                        ) : null}
+                        #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
+                        {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
+                        {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="panel-actions" style={{ marginTop: 12, borderTop: "1px dashed #d5deee", paddingTop: 10 }}>
+                <button className="add-button" onClick={addTransitory}>
+                  + Nuevo transitorio
+                </button>
+              </div>
+              <ul className="concept-list">
+                {transitoriosEnRecibo.map((concept) => (
+                  <li
+                    key={concept.id}
+                    draggable
+                    onClick={() => setEditingId(concept.id)}
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = "copyMove";
+                      e.dataTransfer.setData("text/plain", concept.code);
+                      setCursorGhost(e, concept.code);
+                      e.dataTransfer.setData("text/concept-id", String(concept.id));
+                      e.dataTransfer.setData(
+                        "text/token-json",
+                        JSON.stringify(
+                          token(
+                            concept.code,
+                            `CCONCEPTO("${concept.code}")`,
+                            "concept"
+                          )
+                        )
+                      );
+                    }}
+                    className={
+                      concept.id === selectedConcept.id
+                        ? "concept-item transitorio-item selected"
+                        : "concept-item transitorio-item"
+                    }
                   >
                     <div>
                       <span className="concept-marker" style={{ color: concept.color }}>
@@ -1479,14 +1903,15 @@ export function App() {
             </article>
 
             <FormulaToolsPanel
-              transitorios={transitorios}
               allTags={allTags}
+              fixedValueKeys={fixedValueKeys}
               insertAt={selectedFormulaTokens.length}
-              onAddTransitory={addTransitory}
-              onSelectConcept={setEditingId}
               onInsertBlockTemplate={insertBlockTemplateAt}
               onInsertConst={(index) =>
                 insertTokenAt(token("const", buildConstExpression("0"), "function"), index)
+              }
+              onInsertFixedValue={(key, index) =>
+                insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)
               }
               onInsertMath={(op, index) => insertTokenAt(token(op, `MATH("${op}")`, "function"), index)}
               onOpenTagModal={(tag, insertAt) => setTagModal({ open: true, tag, insertAt })}

@@ -77,6 +77,45 @@
   color: #fff;
 }
 
+.topbar-dropdown {
+  position: relative;
+}
+
+.topbar-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 240px;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #2a3a66;
+  border-radius: 10px;
+  background: #111b2f;
+  box-shadow: 0 8px 24px rgba(5, 10, 20, 0.4);
+  z-index: 40;
+}
+
+.topbar-dropdown-item {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: left;
+  background: transparent;
+  color: #d3ddff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.topbar-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.topbar-dropdown-item.active {
+  background: #395eff;
+  color: #fff;
+}
+
 .content {
   padding: 24px;
 }
@@ -110,6 +149,27 @@
   align-items: start;
 }
 
+.liquidaciones-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 2fr;
+  align-items: start;
+}
+
+.liquidaciones-left-column {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.liquidaciones-detail-panel {
+  min-height: 100%;
+}
+
+.liquidaciones-concepts-title {
+  margin-top: 24px;
+}
+
 .legajos-header {
   display: flex;
   justify-content: space-between;
@@ -134,6 +194,21 @@
   grid-template-columns: 1fr 150px auto;
   gap: 8px;
   align-items: center;
+  padding: 8px;
+  border: 1px solid #d7deef;
+  border-radius: 8px;
+  background: #f9fbff;
+}
+
+.fixed-value-key-input,
+.fixed-value-number-input {
+  width: 100%;
+  border: 1px solid #c6d0ea;
+  border-radius: 8px;
+  padding: 7px 8px;
+  box-sizing: border-box;
+  background: #fff;
+  font: inherit;
 }
 
 .concept-list {
@@ -155,6 +230,11 @@
   cursor: grab;
 }
 
+.transitorio-item {
+  background: #e5e9f0;
+  border-color: #c4ccda;
+}
+
 .concept-item > div {
   display: flex;
   align-items: center;
@@ -166,6 +246,23 @@
   color: #7b849a;
   font-size: 0.78rem;
   font-weight: 500;
+}
+
+.liquidacion-valor {
+  margin-left: auto;
+  text-align: right;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #1f2937;
+}
+
+.liquidacion-valor.positivo {
+  color: #15803d;
+}
+
+.liquidacion-valor.negativo {
+  color: #b91c1c;
 }
 
 .concept-error-inline {
@@ -586,11 +683,15 @@
   margin-bottom: 4px;
 }
 
-.receipt-toolbar select {
+.receipt-toolbar select,
+.receipt-toolbar input {
   width: 100%;
   border: 1px solid #c6d0ea;
   border-radius: 8px;
   padding: 8px;
+  box-sizing: border-box;
+  font: inherit;
+  background: #fff;
 }
 
 .add-button {
@@ -611,6 +712,9 @@
 }
 
 .panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 10px;
 }
 
