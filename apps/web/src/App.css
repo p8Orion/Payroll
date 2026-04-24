@@ -33,6 +33,29 @@
   flex-wrap: wrap;
 }
 
+.history-controls {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.history-button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.history-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .menu {
   width: auto;
   text-align: center;
@@ -454,6 +477,12 @@
   flex-wrap: wrap;
   width: 100%;
   padding: 2px 0;
+}
+
+.si-branch-content .empty-drop-target {
+  flex: 1 1 100%;
+  min-width: 100%;
+  min-height: 26px;
 }
 
 .formula-slot.slot-cond {

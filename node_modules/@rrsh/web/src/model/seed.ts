@@ -1,6 +1,13 @@
 import { ConceptModel, FormulaTemplate, ReceiptModel } from "./types";
 import { colorPalette30 } from "./constants";
 import { token } from "./helpers";
+import { parseTokensToAst } from "./formula-dnd";
+
+const codeByIdSeed: Record<number, string> = {
+  100: "BASICO",
+  120: "ANTIGUEDAD",
+  900: "BASE_REMU"
+};
 
 export const initialConcepts: ConceptModel[] = [
   {
@@ -11,7 +18,7 @@ export const initialConcepts: ConceptModel[] = [
     color: colorPalette30[0],
     shape: "circle",
     tags: ["remunerativo", "basico"],
-    formulaTokens: [token("300000", "300000", "number")]
+    formulaAst: parseTokensToAst([token("300000", "300000", "text")], codeByIdSeed)
   },
   {
     id: 120,
@@ -21,11 +28,11 @@ export const initialConcepts: ConceptModel[] = [
     color: colorPalette30[1],
     shape: "square",
     tags: ["remunerativo", "antiguedad"],
-    formulaTokens: [
+    formulaAst: parseTokensToAst([
       token("Sueldo Basico", "CONCEPTO(100)", "concept"),
       token("*", "*", "text"),
       token("Parametro: % antiguedad", 'PARAM("porc_antiguedad")', "param")
-    ]
+    ], codeByIdSeed)
   },
   {
     id: 900,
@@ -35,7 +42,10 @@ export const initialConcepts: ConceptModel[] = [
     color: colorPalette30[2],
     shape: "star",
     tags: ["base"],
-    formulaTokens: [token("Suma de conceptos remunerativos", 'SUM_TAG("remunerativo")', "function")]
+    formulaAst: parseTokensToAst(
+      [token("Suma de conceptos remunerativos", 'SUM_TAG("remunerativo")', "function")],
+      codeByIdSeed
+    )
   }
 ];
 

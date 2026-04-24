@@ -2,17 +2,9 @@
   {
     "id": 902,
     "code": "DEF_902",
-    "name": "Concepto definitivo 9021",
+    "name": "Concepto definitivo 902",
     "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"remunerativo\")",
-    "tags": []
-  },
-  {
-    "id": 903,
-    "code": "DEF_903",
-    "name": "Concepto definitivo 903",
-    "conceptClass": "definitivo",
-    "formula": "",
+    "formula": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"12\") MATH(\"%\")",
     "tags": []
   },
   {
@@ -20,41 +12,17 @@
     "code": "DEF_904",
     "name": "Concepto definitivo 904",
     "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"remunerativo\")",
-    "tags": []
+    "formula": "CONSTANTE(\"100\")",
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 905,
     "code": "DEF_905",
     "name": "Concepto definitivo 905",
     "conceptClass": "definitivo",
-    "formula": "1",
-    "tags": [
-      "remunerativo"
-    ]
-  },
-  {
-    "id": 906,
-    "code": "DEF_906",
-    "name": "Concepto definitivo 906",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 907,
-    "code": "DEF_907",
-    "name": "Concepto definitivo 907",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 908,
-    "code": "DEF_908",
-    "name": "Concepto definitivo 908",
-    "conceptClass": "definitivo",
-    "formula": "",
+    "formula": "CONSTANTE(\"0\") CONCEPTO(904) [SI|CONCEPTO(904)|[SI|||]|]",
     "tags": []
   },
   {
@@ -62,47 +30,7 @@
     "code": "DEF_909",
     "name": "Concepto definitivo 909",
     "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 910,
-    "code": "DEF_910",
-    "name": "Concepto definitivo 910",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 911,
-    "code": "PORC. ANTIGUEDAD",
-    "name": "% Antiguedad",
-    "conceptClass": "transitorio",
-    "formula": "8",
-    "tags": []
-  },
-  {
-    "id": 912,
-    "code": "DEF_912",
-    "name": "Concepto definitivo 912",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 913,
-    "code": "DEF_913",
-    "name": "Concepto definitivo 913",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 914,
-    "code": "DEF_914",
-    "name": "Concepto definitivo 914",
-    "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"weqqwe\")",
+    "formula": "[SI|CONSTANTE(\"1\")|CONSTANTE(\"1\")|CONSTANTE(\"0\")] MATH(\"+\") CONSTANTE(\"3\")",
     "tags": []
   },
   {
@@ -110,136 +38,43 @@
     "code": "DEF_915",
     "name": "Concepto definitivo 915",
     "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"weqqwe\")",
-    "tags": []
-  },
-  {
-    "id": 916,
-    "code": "DEF_916",
-    "name": "Concepto definitivo 916",
-    "conceptClass": "definitivo",
     "formula": "",
     "tags": []
   },
   {
+    "id": 916,
+    "code": "BASICO",
+    "name": "Concepto definitivo 916",
+    "conceptClass": "definitivo",
+    "formula": "CONSTANTE(\"3\")",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
     "id": 917,
-    "code": "DEF_917",
+    "code": "ANTIG",
     "name": "Concepto definitivo 917",
     "conceptClass": "definitivo",
-    "formula": "CONCEPTO(120) + TAG_OP(\"sum\",\"basico\")",
-    "tags": []
+    "formula": "CONCEPTO(916) MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 918,
-    "code": "DEF_918",
+    "code": "PARA INFORMAR",
     "name": "Concepto definitivo 918",
     "conceptClass": "definitivo",
-    "formula": "40000",
-    "tags": [
-      "basico"
-    ]
+    "formula": "TAG_OP(\"sum\",\"remunerativo\")",
+    "tags": []
   },
   {
     "id": 919,
     "code": "DEF_919",
     "name": "Concepto definitivo 919",
     "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"max\",\"remunerativo\")",
-    "tags": []
-  },
-  {
-    "id": 920,
-    "code": "DEF_920",
-    "name": "Concepto definitivo 920",
-    "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"min\",\"remunerativo\")",
-    "tags": []
-  },
-  {
-    "id": 921,
-    "code": "DEF_921",
-    "name": "Concepto definitivo 921",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 922,
-    "code": "DEF_922",
-    "name": "Concepto definitivo 922",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 923,
-    "code": "DEF_923",
-    "name": "Concepto definitivo 923",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 924,
-    "code": "DEF_924",
-    "name": "Concepto definitivo 924",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 925,
-    "code": "DEF_925",
-    "name": "Concepto definitivo 925",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 926,
-    "code": "DEF_926",
-    "name": "Concepto definitivo 926",
-    "conceptClass": "definitivo",
-    "formula": "CONCEPTO(120)",
-    "tags": []
-  },
-  {
-    "id": 927,
-    "code": "DEF_927",
-    "name": "Concepto definitivo 927",
-    "conceptClass": "definitivo",
-    "formula": "",
-    "tags": []
-  },
-  {
-    "id": 928,
-    "code": "TAREA RIESGOSA",
-    "name": "Adicional por Tarea Riesgosa",
-    "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"base-tarea-riesgosa\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
-    "tags": []
-  },
-  {
-    "id": 929,
-    "code": "BASICO",
-    "name": "Básico",
-    "conceptClass": "definitivo",
-    "formula": "100",
-    "tags": [
-      "basico",
-      "remunerativo",
-      "base-tarea-riesgosa"
-    ]
-  },
-  {
-    "id": 930,
-    "code": "DEF_930",
-    "name": "Concepto definitivo 930",
-    "conceptClass": "definitivo",
-    "formula": "[[SI|CONSTANTE(\"1123\") MATH(\">\") CONSTANTE(\"22\")|[[SI|CONSTANTE(\"1\") MATH(\"=\") MATH(\"<\")|CONSTANTE(\"123\")|CONSTANTE(\"242\")]]|CONSTANTE(\"7\")]] MATH(\"+\") TAG_OP(\"sum\",\"remunerativo\")",
-    "tags": []
-  }
-]]] MATH(\"+\") TAG_OP(\"sum\",\"remunerativo\")",
+    "formula": "[SI|CONCEPTO(916) MATH(\"<\") CONSTANTE(\"1\")|CONSTANTE(\"2\")|CONCEPTO(917)] MATH(\"+\") CONSTANTE(\"1\")",
     "tags": []
   }
 ]

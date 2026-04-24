@@ -22,6 +22,17 @@ interface TokenizeOptions {
   conceptCodeById?: Record<number, string>;
 }
 
+function isSingleBracketBlockStart(expression: string, index: number): boolean {
+  if (expression[index] !== "[") return false;
+  const next = expression[index + 1] ?? "";
+  if (!/[A-Za-z_]/.test(next)) return false;
+  const close = expression.indexOf("]", index + 1);
+  if (close === -1) return false;
+  const pipe = expression.indexOf("|", index + 1);
+  if (pipe === -1 || pipe > close) return false;
+  return true;
+}
+
 function parseBlockToken(value: string): FormulaToken | null {
   const parsed = parseFunctionBlock(value);
   if (!parsed) return null;
@@ -152,8 +163,7 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
   let i = 0;
   let plain = "";
   while (i < expression.length) {
-    const two = expression.slice(i, i + 2);
-    if (two !== "[[") {
+    if (!isSingleBracketBlockStart(expression, i)) {
       plain += expression[i];
       i += 1;
       continue;
@@ -165,17 +175,16 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
     }
 
     let depth = 1;
-    let j = i + 2;
+    let j = i + 1;
     while (j < expression.length && depth > 0) {
-      const nextTwo = expression.slice(j, j + 2);
-      if (nextTwo === "[[") {
+      if (isSingleBracketBlockStart(expression, j)) {
         depth += 1;
-        j += 2;
+        j += 1;
         continue;
       }
-      if (nextTwo === "]]") {
+      if (expression[j] === "]") {
         depth -= 1;
-        j += 2;
+        j += 1;
         continue;
       }
       j += 1;

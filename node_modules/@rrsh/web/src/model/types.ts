@@ -16,6 +16,25 @@ export interface FormulaToken {
   expression: string;
 }
 
+export interface FormulaAstNodeBase {
+  id: string;
+  kind: FormulaToken["kind"];
+  label: string;
+  expression: string;
+}
+
+export interface FormulaAstPlainNode extends FormulaAstNodeBase {
+  kind: Exclude<FormulaToken["kind"], "block">;
+}
+
+export interface FormulaAstBlockNode extends FormulaAstNodeBase {
+  kind: "block";
+  blockName: string;
+  args: FormulaAstNode[][];
+}
+
+export type FormulaAstNode = FormulaAstPlainNode | FormulaAstBlockNode;
+
 export interface ConceptModel {
   id: number;
   code: string;
@@ -24,7 +43,7 @@ export interface ConceptModel {
   color: string;
   shape: ConceptShape;
   tags: string[];
-  formulaTokens: FormulaToken[];
+  formulaAst: FormulaAstNode[];
 }
 
 export interface ReceiptModel {
