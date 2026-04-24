@@ -10,6 +10,10 @@ export const functionBlockTemplates = {
   TOPE: {
     blockTitle: "TOPE",
     branches: ["VALOR", "MÁXIMO"] as const
+  },
+  VALOR_LEGAJO: {
+    blockTitle: "VALOR_LEGAJO",
+    branches: ["CONCEPTO"] as const
   }
 } as const;
 
@@ -186,6 +190,9 @@ export function expandBracketBlocksToExpressions(expression: string): string {
       const value = expandBracketBlocksToExpressions(block.args[0] ?? "");
       const max = expandBracketBlocksToExpressions(block.args[1] ?? "");
       out += `Math.min((${value || "0"}),(${max || "0"}))`;
+    } else if (block.name === "VALOR_LEGAJO") {
+      const arg = (block.args[0] ?? "").trim();
+      out += `VALOR_LEGAJO_ARG[[${arg}]]`;
     } else {
       out += blockRaw;
     }

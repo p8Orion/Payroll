@@ -1,4 +1,4 @@
-import { DragEvent, useEffect, useRef, useState } from "react";
+import { DragEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormulaToken } from "../model/types";
 
 interface FormulaInlineEditorProps {
@@ -68,10 +68,15 @@ export function FormulaInlineEditor({
     setActiveDropIndex(null);
   };
 
-  const startInsertEditor = (index: number) => {
+  const startInsertEditor = (index: number, initialValue = "") => {
     if (!onInsertAt) return;
     setInsertEditorIndex(index);
-    setInsertEditorDraft("");
+    setInsertEditorDraft(initialValue);
+  };
+
+  const isTypeableKey = (event: KeyboardEvent<HTMLElement>): boolean => {
+    if (event.ctrlKey || event.metaKey || event.altKey) return false;
+    return event.key.length === 1;
   };
 
   const commitInsertEditor = () => {
@@ -93,42 +98,89 @@ export function FormulaInlineEditor({
     return clientX < midpoint ? beforeIndex : afterIndex;
   };
 
+  const handleBackgroundType = (event: KeyboardEvent<HTMLElement>) => {
+    if (!onInsertAt) return;
+    if (event.target !== event.currentTarget) return;
+    if (!isTypeableKey(event)) return;
+    const target = event.target as HTMLElement | null;
+    if (target && target.tagName === "INPUT") return;
+    event.preventDefault();
+    event.stopPropagation();
+    startInsertEditor(tokens.length, event.key);
+  };
+
   if (!tokens.length) {
     return (
       <div
-        className={emptyActive ? "empty-drop-target active" : "empty-drop-target"}
-        onDoubleClick={() => startInsertEditor(0)}
-        onDragEnter={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!dndEnabled) return;
-          setEmptyActive(true);
+        className="formula-inline-surface"
+        tabIndex={0}
+        onKeyDown={handleBackgroundType}
+        onMouseDown={(e) => {
+          if (e.target === e.currentTarget) e.currentTarget.focus();
         }}
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!dndEnabled) return;
-          e.dataTransfer.dropEffect = "move";
-          setEmptyActive(true);
-        }}
-        onDragLeave={(e) => {
-          e.stopPropagation();
-          setEmptyActive(false);
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setEmptyActive(false);
-          if (!dndEnabled) return;
-          if (onEmptyDrop) onEmptyDrop(e);
-          else onDropAt(e, 0);
-        }}
-      />
+      >
+        {insertEditorIndex === 0 ? (
+          <input
+            className="formula-insert-input"
+            value={insertEditorDraft}
+            onChange={(e) => setInsertEditorDraft(e.target.value)}
+            autoFocus
+            onBlur={commitInsertEditor}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                commitInsertEditor();
+              }
+              if (e.key === "Escape") {
+                e.preventDefault();
+                setInsertEditorIndex(null);
+                setInsertEditorDraft("");
+              }
+            }}
+          />
+        ) : null}
+        <div
+          className={emptyActive ? "empty-drop-target active" : "empty-drop-target"}
+          onDoubleClick={() => startInsertEditor(0)}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!dndEnabled) return;
+            setEmptyActive(true);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!dndEnabled) return;
+            e.dataTransfer.dropEffect = "move";
+            setEmptyActive(true);
+          }}
+          onDragLeave={(e) => {
+            e.stopPropagation();
+            setEmptyActive(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setEmptyActive(false);
+            if (!dndEnabled) return;
+            if (onEmptyDrop) onEmptyDrop(e);
+            else onDropAt(e, 0);
+          }}
+        />
+      </div>
     );
   }
 
   return (
-    <>
+    <div
+      className="formula-inline-surface"
+      tabIndex={0}
+      onKeyDown={handleBackgroundType}
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) e.currentTarget.focus();
+      }}
+    >
       {insertEditorIndex === 0 ? (
         <input
           className="formula-insert-input"
@@ -151,7 +203,15 @@ export function FormulaInlineEditor({
       ) : null}
       <span
         className={activeDropIndex === 0 ? "drag-insert-cursor active leading" : "drag-insert-cursor leading"}
+        tabIndex={0}
         onDoubleClick={() => startInsertEditor(0)}
+        onKeyDown={(e) => {
+          if (!onInsertAt) return;
+          if (isTypeableKey(e)) {
+            e.preventDefault();
+            startInsertEditor(0, e.key);
+          }
+        }}
         onDragOver={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -173,7 +233,15 @@ export function FormulaInlineEditor({
         >
           <span
             className={activeDropIndex === index ? "drag-insert-cursor active" : "drag-insert-cursor"}
+            tabIndex={0}
             onDoubleClick={() => startInsertEditor(index)}
+            onKeyDown={(e) => {
+              if (!onInsertAt) return;
+              if (isTypeableKey(e)) {
+                e.preventDefault();
+                startInsertEditor(index, e.key);
+              }
+            }}
             onDragOver={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -226,7 +294,15 @@ export function FormulaInlineEditor({
                 className={
                   activeDropIndex === index + 1 ? "drag-insert-cursor active" : "drag-insert-cursor"
                 }
+                tabIndex={0}
                 onDoubleClick={() => startInsertEditor(index + 1)}
+                onKeyDown={(e) => {
+                  if (!onInsertAt) return;
+                  if (isTypeableKey(e)) {
+                    e.preventDefault();
+                    startInsertEditor(index + 1, e.key);
+                  }
+                }}
                 onDragOver={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -260,6 +336,6 @@ export function FormulaInlineEditor({
           ) : null}
         </div>
       ))}
-    </>
+    </div>
   );
 }

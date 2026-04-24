@@ -103,6 +103,39 @@
   align-items: start;
 }
 
+.legajos-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 2fr;
+  align-items: start;
+}
+
+.legajos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.legajos-fixed-values {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed #d5deee;
+}
+
+.legajos-fixed-values-list {
+  display: grid;
+  gap: 8px;
+}
+
+.legajos-fixed-row {
+  display: grid;
+  grid-template-columns: 1fr 150px auto;
+  gap: 8px;
+  align-items: center;
+}
+
 .concept-list {
   list-style: none;
   margin: 0;
@@ -151,7 +184,7 @@
   width: 100%;
   max-width: 100%;
   min-height: 190px;
-  padding: 12px;
+  padding: 12px 0;
   box-sizing: border-box;
   border-radius: 10px;
   border: 1px solid #c6d0ea;
@@ -167,6 +200,26 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
+}
+
+.formula-inline-surface {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  width: 100%;
+  min-width: 100%;
+  border-radius: 8px;
+  transition: background-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.formula-inline-surface:focus {
+  outline: none;
+}
+
+.formula-inline-surface:focus-within {
+  background: transparent;
+  box-shadow: none;
 }
 
 .drag-insert-cursor {

@@ -4,7 +4,7 @@
     "code": "DEF_902",
     "name": "Concepto definitivo 902",
     "conceptClass": "definitivo",
-    "formula": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"12\") MATH(\"%\")",
+    "formula": "[TOPE|[VALOR_LEGAJO|CONCEPTO(904)]|CONSTANTE(\"2\")]",
     "tags": []
   },
   {
@@ -22,7 +22,7 @@
     "code": "DEF_905",
     "name": "Concepto definitivo 905",
     "conceptClass": "definitivo",
-    "formula": "CONSTANTE(\"0\") CONCEPTO(904) [SI|CONCEPTO(904)|[SI|||]|]",
+    "formula": "CONSTANTE(\"3\")",
     "tags": []
   },
   {
@@ -75,6 +75,46 @@
     "name": "Concepto definitivo 919",
     "conceptClass": "definitivo",
     "formula": "[SI|CONCEPTO(916) MATH(\"<\") CONSTANTE(\"1\")|CONSTANTE(\"2\")|CONCEPTO(917)] MATH(\"+\") CONSTANTE(\"1\")",
+    "tags": []
+  },
+  {
+    "id": 920,
+    "code": "TRANS_920",
+    "name": "Transitorio 920",
+    "conceptClass": "transitorio",
+    "formula": "CONSTANTE(\"d\")",
+    "tags": []
+  },
+  {
+    "id": 921,
+    "code": "DEF_921",
+    "name": "Concepto definitivo 921",
+    "conceptClass": "definitivo",
+    "formula": "[SI|CCONCEPTO(\"TRANS_920\") MATH(\"=\") CONSTANTE(\"d\")|CONSTANTE(\"1\")|CONSTANTE(\"2\")]",
+    "tags": []
+  },
+  {
+    "id": 922,
+    "code": "DEF_922",
+    "name": "Concepto definitivo 922",
+    "conceptClass": "definitivo",
+    "formula": "",
+    "tags": []
+  },
+  {
+    "id": 923,
+    "code": "DEF_923",
+    "name": "Concepto definitivo 923",
+    "conceptClass": "definitivo",
+    "formula": "CONCEPTO(902) CONCEPTO(902) CONCEPTO(902)",
+    "tags": []
+  },
+  {
+    "id": 924,
+    "code": "DEF_924",
+    "name": "Concepto definitivo 924",
+    "conceptClass": "definitivo",
+    "formula": "CONCEPTO(904)",
     "tags": []
   }
 ]

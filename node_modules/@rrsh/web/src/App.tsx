@@ -1,47 +1,29 @@
-import { CSSProperties, DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
-import { FormulaInlineEditor } from "./components/FormulaInlineEditor";
-import { FormulaBlockEditor } from "./components/FormulaBlockEditor";
 import { colorPalette30, shapeCycle } from "./model/constants";
 import {
   formulaToExpression,
   getShapeGlyph,
-  token,
-  tokenizeFormulaExpression
+  token
 } from "./model/helpers";
 import {
   expandBracketBlocksToExpressions,
-  functionBlockTemplates,
-  getFunctionBlockArity,
   normalizeExcelComparators,
   normalizeExcelIf,
-  parseFunctionBlock,
-  serializeFunctionBlock,
   type FunctionBlockModel
 } from "./model/function-blocks";
 import {
-  type AstNode,
-  type FormulaDragSource,
   astToTokens,
-  duplicateNestedAstNode,
-  duplicateNestedAstNodeToRoot,
-  duplicateRootAstNodeToNested,
-  moveNestedAstNode,
-  moveNestedAstNodeToRoot,
-  moveRootAstNodeToNested,
-  parseExpressionToAst,
-  parseTokensToAst
+  parseExpressionToAst
 } from "./model/formula-dnd";
-import { insertRawTextIntoBlockArg, mutateBlockArgExpression } from "./model/formula-edit";
 import { useFormulaDragSource } from "./hooks/useFormulaDragSource";
 import {
-  buildConstExpression,
-  isConstExpression,
-  isMathExpression,
-  isMathOperatorText,
-  isTagAggregationExpression,
-  parseConstValue
+  buildConstExpression
 } from "./model/formula-ui";
+import { useFormulaEditor } from "./features/formula-editor/useFormulaEditor";
+import { FormulaEditorSection } from "./features/formula-editor/FormulaEditorSection";
+import { FormulaToolsPanel } from "./features/formula-editor/FormulaToolsPanel";
+import { LegajoModel, LegajosPage } from "./features/legajos/LegajosPage";
 import { initialConcepts, initialReceipts } from "./model/seed";
 import { ConceptShape, ConceptModel, FormulaToken, ReceiptModel, TagAggregationOp } from "./model/types";
 
@@ -56,6 +38,7 @@ interface ApiConcept {
 
 const apiBaseUrl = "http://localhost:3001";
 const receiptsStorageKey = "rrsh.receipts.v1";
+const legajosStorageKey = "rrsh.legajos.v1";
 const maxHistoryEntries = 200;
 
 interface EditorSnapshot {
@@ -123,45 +106,39 @@ export function App() {
   });
   const [activeReceiptId, setActiveReceiptId] = useState("recibo_1");
   const [activeConvenio, setActiveConvenio] = useState("Luz y Fuerza");
+  const [legajos, setLegajos] = useState<LegajoModel[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = window.localStorage.getItem(legajosStorageKey);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as LegajoModel[];
+      return parsed.map((item) => ({
+        ...item,
+        convenio: item.convenio ?? ""
+      }));
+    } catch {
+      return [];
+    }
+  });
+  const [simLegajoId, setSimLegajoId] = useState<string>("");
   const [newTagDraft, setNewTagDraft] = useState("");
   const [appearanceOpen, setAppearanceOpen] = useState(false);
-  const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
-  const [draggingFormulaTokenId, setDraggingFormulaTokenId] = useState<string | null>(null);
-  const [editingTextTokenId, setEditingTextTokenId] = useState<string | null>(null);
-  const [editingTextDraft, setEditingTextDraft] = useState("");
-  const [editingConstTokenId, setEditingConstTokenId] = useState<string | null>(null);
-  const [editingConstDraft, setEditingConstDraft] = useState("");
   const [conceptEditOpen, setConceptEditOpen] = useState(false);
   const [conceptCodeDraft, setConceptCodeDraft] = useState("");
   const [conceptNameDraft, setConceptNameDraft] = useState("");
   const [conceptsLoaded, setConceptsLoaded] = useState(false);
   const appearanceRef = useRef<HTMLDivElement | null>(null);
-  const textTokenEditRef = useRef<HTMLDivElement | null>(null);
   const [tagModal, setTagModal] = useState<{
     open: boolean;
     tag: string;
     insertAt: number;
   }>({ open: false, tag: "", insertAt: 0 });
-  const [rootInsertSignal, setRootInsertSignal] = useState<number | undefined>(undefined);
   const [historyPast, setHistoryPast] = useState<EditorSnapshot[]>([]);
   const [historyFuture, setHistoryFuture] = useState<EditorSnapshot[]>([]);
   const historyLastRef = useRef<string>("");
   const historyApplyingRef = useRef(false);
   const { dragSourceRef: formulaDragSourceRef, setRootDragSource, setNestedDragSource } =
     useFormulaDragSource();
-
-  const scopePastelStyle = (functionName: string, level: number): CSSProperties => {
-    const normalized = functionName.trim().toUpperCase() || "FN";
-    const hash = Array.from(normalized).reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-    const hue = (hash * 37) % 360;
-    const depth = Math.max(0, level);
-    const bgLightness = Math.max(80, 96 - depth * 4);
-    const borderLightness = Math.max(68, 84 - depth * 4);
-    return {
-      background: `hsl(${hue} 58% ${bgLightness}%)`,
-      borderColor: `hsl(${hue} 36% ${borderLightness}%)`
-    };
-  };
 
   const setCursorGhost = (event: DragEvent<HTMLElement>, label: string) => {
     const ghost = document.createElement("div");
@@ -214,23 +191,6 @@ export function App() {
     applySnapshot(next);
   };
 
-  const saveConstAtRoot = (tokenId: string) => {
-    const value = editingConstDraft.trim();
-    if (!value) {
-      updateFormulaTokens(selectedFormulaTokens.filter((item) => item.id !== tokenId));
-    } else {
-      updateFormulaTokens(
-        selectedFormulaTokens.map((item) =>
-          item.id === tokenId
-            ? { ...item, label: value, expression: buildConstExpression(value) }
-            : item
-        )
-      );
-    }
-    setEditingConstTokenId(null);
-    setEditingConstDraft("");
-  };
-
   const definitivos = concepts.filter((c) => c.conceptClass === "definitivo");
   const transitorios = concepts.filter((c) => c.conceptClass === "transitorio");
   const receiptsByConvenio = receipts.filter((r) => r.convenio === activeConvenio);
@@ -256,6 +216,79 @@ export function App() {
     () => Object.fromEntries(concepts.map((c) => [c.id, c.code])) as Record<number, string>,
     [concepts]
   );
+  const simLegajo = useMemo(
+    () => legajos.find((l) => l.id === simLegajoId) ?? legajos[0] ?? null,
+    [legajos, simLegajoId]
+  );
+  const getValorLegajo = (concepto: string, fallbackConcepto: string): number => {
+    if (!simLegajo) return 0;
+    const requested = concepto.trim();
+    const effectiveConcepto = requested.length ? requested : fallbackConcepto;
+    const key = effectiveConcepto.trim().toLowerCase();
+    if (!key) return 0;
+    const found = simLegajo.valoresFijos.find((vf) => vf.concepto.trim().toLowerCase() === key);
+    return found?.valor ?? 0;
+  };
+  const resolveValorLegajoConceptCode = (rawArg: string, fallbackConcepto: string): string => {
+    const arg = rawArg.trim();
+    if (!arg) return fallbackConcepto;
+
+    const byCode = arg.match(/^CCONCEPTO\("([^"]+)"\)$/);
+    if (byCode) return byCode[1];
+
+    const byId = arg.match(/^CONCEPTO\((\d+)\)$/);
+    if (byId) return conceptCodeById[Number(byId[1])] ?? "";
+
+    const byConst = arg.match(/^CONSTANTE\("((?:[^"\\]|\\.)*)"\)$/);
+    if (byConst) return byConst[1].replace(/\\"/g, "\"");
+
+    const byQuoted = arg.match(/^"((?:[^"\\]|\\.)*)"$/);
+    if (byQuoted) return byQuoted[1].replace(/\\"/g, "\"");
+
+    return arg;
+  };
+  const toExpressionLiteral = (value: unknown): string => {
+    if (typeof value === "number") return Number.isFinite(value) ? String(value) : "0";
+    if (typeof value === "string") return JSON.stringify(value);
+    if (typeof value === "boolean") return value ? "true" : "false";
+    if (value === null || value === undefined) return "null";
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return JSON.stringify(String(value));
+    }
+  };
+  const toNumericOrZero = (value: unknown): number => {
+    if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+    if (typeof value === "boolean") return value ? 1 : 0;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const formatPreviewAmount = (value: unknown): string =>
+    typeof value === "number" ? `$${value.toLocaleString("es-AR")}` : String(value);
+  const {
+    rootInsertSignal,
+    triggerRootInsert,
+    insertTokenAt,
+    insertFromRawTextAt,
+    insertBlockTemplateAt,
+    setFormulaExpressionText,
+    onTokenDropToFormula,
+    renderRootFormulaToken,
+    formulaExpressionText
+  } = useFormulaEditor({
+    selectedConcept,
+    selectedFormulaTokens,
+    selectedFormulaAst,
+    conceptCodeById,
+    concepts,
+    setConcepts,
+    setTagModal,
+    formulaDragSourceRef,
+    setRootDragSource,
+    setNestedDragSource,
+    setCursorGhost
+  });
   const participatingConcepts = useMemo(() => {
     const inReceipt = new Set(activeReceipt.definitiveOrder);
     const result = concepts.filter(
@@ -327,7 +360,7 @@ export function App() {
     }
 
     const params: Record<string, number> = { porc_antiguedad: 0.12 };
-    const values = new Map<number, number>();
+    const values = new Map<number, unknown>();
 
     try {
       for (const id of topo) {
@@ -341,22 +374,29 @@ export function App() {
 
         try {
           const normalized = expandBracketBlocksToExpressions(expression)
+            .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+              const code = resolveValorLegajoConceptCode(rawArg, concept.code);
+              return String(getValorLegajo(code, concept.code));
+            })
+            .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) =>
+              String(getValorLegajo(concepto, concept.code))
+            )
             .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) => {
               const value = values.get(Number(refId));
               if (value === undefined) throw new Error("missing CONCEPTO dep");
-              return String(value);
+              return toExpressionLiteral(value);
             })
             .replace(/CCONCEPTO\("([^"]+)"\)/g, (_, refCode: string) => {
               const refId = conceptIdByCode.get(refCode);
               if (!refId) throw new Error("missing CCONCEPTO code");
               const value = values.get(refId);
               if (value === undefined) throw new Error("missing CCONCEPTO dep");
-              return String(value);
+              return toExpressionLiteral(value);
             })
             .replace(/SUM_TAG\("([^"]+)"\)/g, (_, tag: string) => {
               const sum = participatingConcepts
                 .filter((c) => c.tags.includes(tag))
-                .reduce((acc, c) => acc + (values.get(c.id) ?? 0), 0);
+                .reduce((acc, c) => acc + toNumericOrZero(values.get(c.id)), 0);
               return String(sum);
             })
             .replace(/PARAM\("([^"]+)"\)/g, (_, param: string) => {
@@ -367,7 +407,7 @@ export function App() {
             .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
               const tagged = participatingConcepts
                 .filter((c) => c.tags.includes(tag))
-                .map((c) => values.get(c.id) ?? 0);
+                .map((c) => toNumericOrZero(values.get(c.id)));
               if (!tagged.length) return "0";
               if (op === "avg") return String(tagged.reduce((a, b) => a + b, 0) / tagged.length);
               if (op === "max") return String(Math.max(...tagged));
@@ -393,9 +433,6 @@ export function App() {
           result = Function(
             `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
           )();
-          if (typeof result !== "number" || Number.isNaN(result)) {
-            throw new Error("invalid result");
-          }
           values.set(id, result);
         } catch (error) {
           const message = error instanceof Error ? error.message : "error de compilacion";
@@ -425,11 +462,11 @@ export function App() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "error de compilacion";
       return {
-        value: null as number | null,
+        value: null as unknown | null,
         error: message
       };
     }
-  }, [editingId, selectedConcept, participatingConcepts]);
+  }, [editingId, selectedConcept, participatingConcepts, simLegajo, simLegajoId]);
   const dagOrderById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
@@ -502,7 +539,7 @@ export function App() {
       }
     }
     return orderById;
-  }, [participatingConcepts]);
+  }, [participatingConcepts, simLegajo, simLegajoId]);
   const cycleConceptIds = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
@@ -562,7 +599,7 @@ export function App() {
     }
 
     return new Set(ids.filter((id) => (incoming.get(id) ?? 0) > 0));
-  }, [participatingConcepts]);
+  }, [participatingConcepts, simLegajo, simLegajoId]);
   const formulaErrorById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
@@ -626,7 +663,7 @@ export function App() {
       if (!topo.includes(id)) topo.push(id);
     }
 
-    const values = new Map<number, number>();
+    const values = new Map<number, unknown>();
     const errors = new Map<number, boolean>();
     const params: Record<string, number> = { porc_antiguedad: 0.12 };
 
@@ -642,22 +679,29 @@ export function App() {
 
       try {
         const normalized = expandBracketBlocksToExpressions(expression)
+          .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+            const code = resolveValorLegajoConceptCode(rawArg, concept.code);
+            return String(getValorLegajo(code, concept.code));
+          })
+          .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) =>
+            String(getValorLegajo(concepto, concept.code))
+          )
           .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) => {
             const value = values.get(Number(refId));
             if (value === undefined) throw new Error("missing CONCEPTO dep");
-            return String(value);
+            return toExpressionLiteral(value);
           })
           .replace(/CCONCEPTO\("([^"]+)"\)/g, (_, refCode: string) => {
             const refId = conceptIdByCode.get(refCode);
             if (!refId) throw new Error("missing CCONCEPTO code");
             const value = values.get(refId);
             if (value === undefined) throw new Error("missing CCONCEPTO dep");
-            return String(value);
+            return toExpressionLiteral(value);
           })
           .replace(/SUM_TAG\("([^"]+)"\)/g, (_, tag: string) => {
             const sum = participatingConcepts
               .filter((c) => c.tags.includes(tag))
-              .reduce((acc, c) => acc + (values.get(c.id) ?? 0), 0);
+              .reduce((acc, c) => acc + toNumericOrZero(values.get(c.id)), 0);
             return String(sum);
           })
           .replace(/PARAM\("([^"]+)"\)/g, (_, param: string) => {
@@ -668,7 +712,7 @@ export function App() {
           .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
             const tagged = participatingConcepts
               .filter((c) => c.tags.includes(tag))
-              .map((c) => values.get(c.id) ?? 0);
+              .map((c) => toNumericOrZero(values.get(c.id)));
             if (!tagged.length) return "0";
             if (op === "avg") return String(tagged.reduce((a, b) => a + b, 0) / tagged.length);
             if (op === "max") return String(Math.max(...tagged));
@@ -693,9 +737,6 @@ export function App() {
         const result = Function(
           `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
         )();
-        if (typeof result !== "number" || Number.isNaN(result)) {
-          throw new Error("invalid result");
-        }
         values.set(id, result);
         errors.set(id, false);
       } catch {
@@ -705,7 +746,150 @@ export function App() {
     }
 
     return errors;
-  }, [participatingConcepts]);
+  }, [participatingConcepts, simLegajo, simLegajoId]);
+  const previewValueById = useMemo(() => {
+    const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
+    const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
+    const incoming = new Map<number, number>();
+    const outgoing = new Map<number, number[]>();
+    const ids = participatingConcepts.map((c) => c.id);
+
+    for (const id of ids) {
+      incoming.set(id, 0);
+      outgoing.set(id, []);
+    }
+
+    const conceptIdRefs = /CONCEPTO\((\d+)\)/g;
+    const conceptCodeRefs = /CCONCEPTO\("([^"]+)"\)/g;
+    const sumTagRefs = /SUM_TAG\("([^"]+)"\)/g;
+    const tagOpRefs = /TAG_OP\("(sum|avg|max|min)","([^"]+)"\)/g;
+
+    for (const concept of participatingConcepts) {
+      const expression = conceptExpression(concept);
+      const seenDeps = new Set<number>();
+      for (const m of expression.matchAll(conceptIdRefs)) {
+        const depId = Number(m[1]);
+        if (!conceptById.has(depId) || depId === concept.id || seenDeps.has(depId)) continue;
+        seenDeps.add(depId);
+        outgoing.get(depId)?.push(concept.id);
+        incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+      }
+      for (const m of expression.matchAll(conceptCodeRefs)) {
+        const depId = conceptIdByCode.get(m[1]);
+        if (!depId || depId === concept.id || seenDeps.has(depId)) continue;
+        seenDeps.add(depId);
+        outgoing.get(depId)?.push(concept.id);
+        incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+      }
+      const tagDeps = new Set<string>();
+      for (const m of expression.matchAll(sumTagRefs)) tagDeps.add(m[1]);
+      for (const m of expression.matchAll(tagOpRefs)) tagDeps.add(m[2]);
+      for (const tag of tagDeps) {
+        for (const depConcept of participatingConcepts) {
+          if (!depConcept.tags.includes(tag)) continue;
+          if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+          seenDeps.add(depConcept.id);
+          outgoing.get(depConcept.id)?.push(concept.id);
+          incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+        }
+      }
+    }
+
+    const queue = ids.filter((id) => (incoming.get(id) ?? 0) === 0);
+    const topo: number[] = [];
+    while (queue.length) {
+      const current = queue.shift()!;
+      topo.push(current);
+      for (const next of outgoing.get(current) ?? []) {
+        const left = (incoming.get(next) ?? 0) - 1;
+        incoming.set(next, left);
+        if (left === 0) queue.push(next);
+      }
+    }
+    for (const id of ids) {
+      if (!topo.includes(id)) topo.push(id);
+    }
+
+    const values = new Map<number, unknown>();
+    const params: Record<string, number> = { porc_antiguedad: 0.12 };
+
+    for (const id of topo) {
+      const concept = conceptById.get(id);
+      if (!concept) continue;
+      const expression = conceptExpression(concept);
+      if (!expression.trim()) {
+        values.set(id, 0);
+        continue;
+      }
+
+      try {
+        const normalized = expandBracketBlocksToExpressions(expression)
+          .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+            const code = resolveValorLegajoConceptCode(rawArg, concept.code);
+            return String(getValorLegajo(code, concept.code));
+          })
+          .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) =>
+            String(getValorLegajo(concepto, concept.code))
+          )
+          .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) => {
+            const value = values.get(Number(refId));
+            if (value === undefined) throw new Error("missing CONCEPTO dep");
+            return toExpressionLiteral(value);
+          })
+          .replace(/CCONCEPTO\("([^"]+)"\)/g, (_, refCode: string) => {
+            const refId = conceptIdByCode.get(refCode);
+            if (!refId) throw new Error("missing CCONCEPTO code");
+            const value = values.get(refId);
+            if (value === undefined) throw new Error("missing CCONCEPTO dep");
+            return toExpressionLiteral(value);
+          })
+          .replace(/SUM_TAG\("([^"]+)"\)/g, (_, tag: string) => {
+            const sum = participatingConcepts
+              .filter((c) => c.tags.includes(tag))
+              .reduce((acc, c) => acc + toNumericOrZero(values.get(c.id)), 0);
+            return String(sum);
+          })
+          .replace(/PARAM\("([^"]+)"\)/g, (_, param: string) => {
+            const value = params[param];
+            if (value === undefined) throw new Error("missing PARAM");
+            return String(value);
+          })
+          .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
+            const tagged = participatingConcepts
+              .filter((c) => c.tags.includes(tag))
+              .map((c) => toNumericOrZero(values.get(c.id)));
+            if (!tagged.length) return "0";
+            if (op === "avg") return String(tagged.reduce((a, b) => a + b, 0) / tagged.length);
+            if (op === "max") return String(Math.max(...tagged));
+            if (op === "min") return String(Math.min(...tagged));
+            return String(tagged.reduce((a, b) => a + b, 0));
+          })
+          .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
+            const value = raw.replace(/\\"/g, "\"");
+            const asNumber = Number(value);
+            if (!Number.isNaN(asNumber) && value.trim() !== "") return String(asNumber);
+            return JSON.stringify(value);
+          })
+          .replace(/MATH\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => raw.replace(/\\"/g, "\""))
+          .replace(/%\s*(-?\d+(?:\.\d+)?)/g, "* ($1) / 100")
+          .replace(/(-?\d+(?:\.\d+)?)\s*%/g, "($1 / 100)")
+          .replace(/\[/g, "(")
+          .replace(/\]/g, ")");
+
+        const excelLike = normalizeExcelComparators(
+          normalizeExcelIf(applyImplicitPlusBetweenValues(normalized))
+        );
+        const result = Function(
+          `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
+        )();
+        values.set(id, result);
+      } catch {
+        values.set(id, 0);
+      }
+    }
+
+    return values;
+  }, [participatingConcepts, simLegajo, simLegajoId]);
 
   const reorderDefinitivo = (dragId: number, dropId: number) => {
     const dragConcept = concepts.find((c) => c.id === dragId);
@@ -722,667 +906,6 @@ export function App() {
         return { ...receipt, definitiveOrder: withoutDragged };
       })
     );
-  };
-
-  const updateFormulaTokens = (tokens: FormulaToken[]) => {
-    setConcepts((old) =>
-      old.map((c) =>
-        c.id === selectedConcept.id
-          ? { ...c, formulaAst: parseTokensToAst(tokens, conceptCodeById) }
-          : c
-      )
-    );
-  };
-
-  const updateFormulaAst = (ast: AstNode[]) => {
-    setConcepts((old) =>
-      old.map((c) =>
-        c.id === selectedConcept.id
-          ? { ...c, formulaAst: ast }
-          : c
-      )
-    );
-  };
-
-  const insertToken = (newToken: FormulaToken) => {
-    updateFormulaTokens([
-      ...selectedFormulaTokens,
-      token(newToken.label, newToken.expression, newToken.kind)
-    ]);
-  };
-
-  const insertTokenAt = (newToken: FormulaToken, index: number) => {
-    const current = [...selectedFormulaTokens];
-    current.splice(index, 0, token(newToken.label, newToken.expression, newToken.kind));
-    updateFormulaTokens(current);
-  };
-
-  const insertFromRawTextAt = (rawValue: string, index: number) => {
-    const value = rawValue.trim();
-    if (!value) return;
-    if (isMathOperatorText(value)) {
-      insertTokenAt(token(value, `MATH("${value}")`, "function"), index);
-      return;
-    }
-    insertTokenAt(token(value, buildConstExpression(value), "function"), index);
-  };
-
-  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE", index: number) => {
-    const current = [...selectedFormulaTokens];
-    const expr = serializeFunctionBlock(name, Array(getFunctionBlockArity(name)).fill(""));
-    current.splice(index, 0, token(name, expr, "block"));
-    updateFormulaTokens(current);
-  };
-
-  const slotSuffixFor = (slotExpression: string): ";" | ")" =>
-    slotExpression.trim().endsWith(")") ? ")" : ";";
-
-  const stripSlotSuffix = (expression: string): string => {
-    const value = expression.trim();
-    if (!value) return value;
-    if (value.endsWith(";")) return value.slice(0, -1);
-    if (!value.endsWith(")")) return value;
-
-    const opens = (value.match(/\(/g) ?? []).length;
-    const closes = (value.match(/\)/g) ?? []).length;
-    // For SI slot storage we append an extra ')' only when closes > opens.
-    if (closes > opens) return value.slice(0, -1);
-    return value;
-  };
-
-  const slotRoleAt = (index: number): "cond" | "true" | "false" | null => {
-    const tokens = selectedFormulaTokens;
-    if (tokens[index]?.kind !== "slot") return null;
-    const prev = tokens[index - 1];
-    const prev2 = tokens[index - 2];
-    const prev3 = tokens[index - 3];
-    if (prev?.kind === "function" && prev.label === "SI") return "cond";
-    if (prev?.kind === "slot" && prev2?.kind === "function" && prev2.label === "SI") return "true";
-    if (
-      prev?.kind === "slot" &&
-      prev2?.kind === "slot" &&
-      prev3?.kind === "function" &&
-      prev3.label === "SI"
-    ) {
-      return "false";
-    }
-    return null;
-  };
-
-  const isSiBlockStartAt = (index: number): boolean => {
-    const tokens = selectedFormulaTokens;
-    const template = functionBlockTemplates.SI;
-    return (
-      tokens[index]?.kind === "function" &&
-      tokens[index]?.label === "SI" &&
-      tokens[index + 1]?.kind === "slot" &&
-      tokens[index + 1]?.label === template.branches[0] &&
-      tokens[index + 2]?.kind === "slot" &&
-      tokens[index + 2]?.label === template.branches[1] &&
-      tokens[index + 3]?.kind === "slot" &&
-      tokens[index + 3]?.label === template.branches[2]
-    );
-  };
-
-  const isSiBlockChildSlotAt = (index: number): boolean => {
-    const tokens = selectedFormulaTokens;
-    for (let back = 1; back <= 3; back++) {
-      const start = index - back;
-      if (start < 0) continue;
-      if (isSiBlockStartAt(start) && tokens[index]?.kind === "slot") return true;
-    }
-    return false;
-  };
-
-  const renderSlotContent = (rawExpression: string): ReactNode => {
-    const content = stripSlotSuffix(rawExpression).trim();
-    if (!content) return <em>vacio</em>;
-    const parsed = tokenizeFormulaExpression(content, { conceptCodeById });
-    return (
-      <>
-        {parsed.map((part) =>
-          part.kind === "text" ? (
-            <span key={part.id} className="slot-fragment-text">
-              {part.label}
-            </span>
-          ) : (
-            <span key={part.id} className={`slot-fragment-pill ${part.kind}`}>
-              {part.label}
-            </span>
-          )
-        )}
-      </>
-    );
-  };
-
-  const replaceSlotWithDroppedToken = (event: DragEvent<HTMLElement>, slotId: string) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const current = [...selectedFormulaTokens];
-    const slotIndex = current.findIndex((item) => item.id === slotId);
-    if (slotIndex === -1) return;
-
-    const internalTokenId = event.dataTransfer.getData("text/formula-token-id");
-    if (internalTokenId) {
-      const fromIndex = current.findIndex((item) => item.id === internalTokenId);
-      if (fromIndex !== -1) {
-        const source = current[fromIndex];
-        const sourceExpr =
-          source.kind === "slot"
-            ? stripSlotSuffix(source.expression).trim()
-            : source.expression.trim();
-
-        const targetExpr = stripSlotSuffix(current[slotIndex].expression).trim();
-        const targetSuffix = slotSuffixFor(current[slotIndex].expression);
-        const merged = [targetExpr, sourceExpr].filter(Boolean).join(" ");
-
-        current[slotIndex] = token(current[slotIndex].label, `${merged}${targetSuffix}`, "slot");
-
-        // Keep SI block structure stable: never replace slot tokens.
-        // If source was a slot, clear it but keep slot delimiters.
-        if (source.kind === "slot") {
-          const sourceSuffix = slotSuffixFor(source.expression);
-          current[fromIndex] = token(source.label, sourceSuffix, "slot");
-        } else {
-          current.splice(fromIndex, 1);
-        }
-        updateFormulaTokens(current);
-      }
-      setDragInsertIndex(null);
-      setDraggingFormulaTokenId(null);
-      return;
-    }
-
-    const payload = event.dataTransfer.getData("text/token-json");
-    if (payload) {
-      const parsed = JSON.parse(payload) as FormulaToken;
-      const suffix = slotSuffixFor(current[slotIndex].expression);
-      const base = stripSlotSuffix(current[slotIndex].expression).trim();
-      const nextChunk = parsed.expression.trim();
-      const merged = [base, nextChunk].filter(Boolean).join(" ");
-      current.splice(
-        slotIndex,
-        1,
-        token(current[slotIndex].label, `${merged}${suffix}`, "slot")
-      );
-      updateFormulaTokens(current);
-      setDragInsertIndex(null);
-      return;
-    }
-
-    const ifTemplate = event.dataTransfer.getData("text/function-template");
-    if (ifTemplate === "SI") {
-      const suffix = slotSuffixFor(current[slotIndex].expression);
-      const base = stripSlotSuffix(current[slotIndex].expression).trim();
-      const appended = `${base}${base ? " " : ""}SI(condicion;0;0)`;
-      current.splice(
-        slotIndex,
-        1,
-                        token(current[slotIndex].label, `${appended}${suffix}`, "slot")
-      );
-      updateFormulaTokens(current);
-      setDragInsertIndex(null);
-    }
-  };
-
-  const updateBlockArg = (blockId: string, argIndex: number, nextValue: string) => {
-    updateFormulaTokens(
-      selectedFormulaTokens.map((tk) => {
-        if (tk.id !== blockId || tk.kind !== "block") return tk;
-        const parsed = parseFunctionBlock(tk.expression);
-        if (!parsed) return tk;
-        const nextArgs = [...parsed.args];
-        while (nextArgs.length < getFunctionBlockArity(parsed.name)) nextArgs.push("");
-        nextArgs[argIndex] = nextValue.trim();
-        return { ...tk, expression: serializeFunctionBlock(parsed.name, nextArgs) };
-      })
-    );
-  };
-
-  const onDropToBlockArg = (event: DragEvent<HTMLElement>, blockId: string, argIndex: number) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const internalTokenId = event.dataTransfer.getData("text/formula-token-id");
-    let droppedExpression = "";
-
-    if (internalTokenId) {
-      const source = selectedFormulaTokens.find((tk) => tk.id === internalTokenId);
-      if (source) droppedExpression = source.expression.trim();
-    } else {
-      const payload = event.dataTransfer.getData("text/token-json");
-      if (payload) {
-        const parsed = JSON.parse(payload) as FormulaToken;
-        droppedExpression = parsed.expression.trim();
-      } else {
-        const fnTemplate = event.dataTransfer.getData("text/function-template");
-        if (fnTemplate === "SI" || fnTemplate === "BLOQUE" || fnTemplate === "TOPE") {
-          droppedExpression = serializeFunctionBlock(
-            fnTemplate as "SI" | "BLOQUE" | "TOPE",
-            Array(getFunctionBlockArity(fnTemplate)).fill("")
-          );
-        }
-      }
-    }
-
-    if (!droppedExpression) return;
-
-    updateFormulaTokens(
-      selectedFormulaTokens
-        .filter((tk) => tk.id !== internalTokenId)
-        .map((tk) => {
-          if (tk.id !== blockId || tk.kind !== "block") return tk;
-          const parsedBlock = parseFunctionBlock(tk.expression);
-          if (!parsedBlock) return tk;
-          const nextArgs = [...parsedBlock.args];
-          while (nextArgs.length < getFunctionBlockArity(parsedBlock.name)) nextArgs.push("");
-          nextArgs[argIndex] = [nextArgs[argIndex] ?? "", droppedExpression].filter(Boolean).join(" ");
-          return { ...tk, expression: serializeFunctionBlock(parsedBlock.name, nextArgs) };
-        })
-    );
-    setDragInsertIndex(null);
-    setDraggingFormulaTokenId(null);
-  };
-
-  const updateBlockArgTokens = (
-    blockId: string,
-    argIndex: number,
-    updater: (tokens: FormulaToken[]) => FormulaToken[]
-  ) => {
-    updateFormulaTokens(
-      selectedFormulaTokens.map((tk) => {
-        if (tk.id !== blockId || tk.kind !== "block") return tk;
-        return {
-          ...tk,
-          expression: mutateBlockArgExpression(tk.expression, argIndex, conceptCodeById, updater)
-        };
-      })
-    );
-  };
-
-  const mutateBlockArgTokens = (
-    blockExpr: string,
-    argIndex: number,
-    updater: (tokens: FormulaToken[]) => FormulaToken[]
-  ): string => mutateBlockArgExpression(blockExpr, argIndex, conceptCodeById, updater);
-
-  const insertRawTextIntoNestedArg = (
-    blockExpr: string,
-    onChange: (next: string) => void,
-    argIndex: number,
-    insertAt: number,
-    rawValue: string
-  ) => {
-    onChange(insertRawTextIntoBlockArg(blockExpr, argIndex, insertAt, rawValue, conceptCodeById));
-  };
-
-  const onDropToNestedArgAt = (
-    event: DragEvent<HTMLElement>,
-    blockExpr: string,
-    onChange: (next: string) => void,
-    pathKey: string,
-    argIndex: number,
-    insertAt: number
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const dragSource = formulaDragSourceRef.current;
-    const internalTokenId =
-      dragSource?.kind === "root"
-        ? dragSource.tokenId
-        : dragSource?.kind === "nested"
-          ? ""
-          : event.dataTransfer.getData("text/formula-token-id");
-    if (internalTokenId) {
-      const nextAst = structuredClone(selectedFormulaAst) as AstNode[];
-      const ok = event.ctrlKey
-        ? duplicateRootAstNodeToNested(nextAst, internalTokenId, pathKey, argIndex, insertAt)
-        : moveRootAstNodeToNested(nextAst, internalTokenId, pathKey, argIndex, insertAt);
-      if (ok) {
-        updateFormulaAst(nextAst);
-      }
-      return;
-    }
-
-    const localPayload = event.dataTransfer.getData("text/block-local-token-json");
-    const parsedLocal =
-      dragSource?.kind === "nested"
-        ? dragSource
-        : localPayload
-          ? (JSON.parse(localPayload) as Extract<FormulaDragSource, { kind: "nested" }>)
-          : null;
-    if (parsedLocal) {
-      const nextAst = structuredClone(selectedFormulaAst) as AstNode[];
-      const ok = event.ctrlKey
-        ? duplicateNestedAstNode(nextAst, parsedLocal, pathKey, argIndex, insertAt)
-        : moveNestedAstNode(nextAst, parsedLocal, pathKey, argIndex, insertAt);
-      if (ok) {
-        updateFormulaAst(nextAst);
-      }
-      return;
-    }
-
-    const payload = event.dataTransfer.getData("text/token-json");
-    if (payload) {
-      const parsed = JSON.parse(payload) as FormulaToken;
-      const nextExpr = mutateBlockArgTokens(blockExpr, argIndex, (tokens) => {
-        const next = [...tokens];
-        const safeInsertAt = Math.max(0, Math.min(insertAt, next.length));
-        next.splice(safeInsertAt, 0, token(parsed.label, parsed.expression, parsed.kind));
-        return next;
-      });
-      onChange(nextExpr);
-      return;
-    }
-
-    const fnTemplate = event.dataTransfer.getData("text/function-template");
-    if (
-      fnTemplate === "SI" ||
-      fnTemplate === "BLOQUE" ||
-      fnTemplate === "TOPE" ||
-      fnTemplate === "CONSTANTE" ||
-      fnTemplate.startsWith("MATH:")
-    ) {
-      const nextExpr = mutateBlockArgTokens(blockExpr, argIndex, (tokens) => {
-        const next = [...tokens];
-        const safeInsertAt = Math.max(0, Math.min(insertAt, next.length));
-        if (fnTemplate === "SI" || fnTemplate === "BLOQUE" || fnTemplate === "TOPE") {
-          next.splice(
-            safeInsertAt,
-            0,
-            token(
-              fnTemplate as "SI" | "BLOQUE" | "TOPE",
-              serializeFunctionBlock(
-                fnTemplate,
-                Array(getFunctionBlockArity(fnTemplate)).fill("")
-              ),
-              "block"
-            )
-          );
-        } else if (fnTemplate === "CONSTANTE") {
-          next.splice(safeInsertAt, 0, token("const", buildConstExpression("0"), "function"));
-        } else {
-          const op = fnTemplate.slice("MATH:".length);
-          next.splice(safeInsertAt, 0, token(op, `MATH("${op}")`, "function"));
-        }
-        return next;
-      });
-      onChange(nextExpr);
-      return;
-    }
-
-    const resolved = resolveDroppedExpression(event);
-    if (!resolved) return;
-    const nextExpr = mutateBlockArgTokens(blockExpr, argIndex, (tokens) => {
-      const next = [...tokens];
-      const safeInsertAt = Math.max(0, Math.min(insertAt, next.length));
-      next.splice(safeInsertAt, 0, token(resolved, resolved, "text"));
-      return next;
-    });
-    onChange(nextExpr);
-  };
-
-  const renderFunctionBlockEditor = (
-    blockExpr: string,
-    onChange: (next: string) => void,
-    pathKey: string,
-    level: number,
-    onRemove?: () => void
-  ): ReactNode => (
-    <FormulaBlockEditor
-      blockExpr={blockExpr}
-      onChange={onChange}
-      pathKey={pathKey}
-      level={level}
-      onRemove={onRemove}
-      conceptCodeById={conceptCodeById}
-      scopePastelStyle={scopePastelStyle}
-      onDropToNestedArgAt={onDropToNestedArgAt}
-      insertRawTextIntoNestedArg={insertRawTextIntoNestedArg}
-      mutateBlockArgTokens={mutateBlockArgTokens}
-      setNestedDragSource={setNestedDragSource}
-      setCursorGhost={setCursorGhost}
-      editingTextTokenId={editingTextTokenId}
-      setEditingTextTokenId={setEditingTextTokenId}
-      editingTextDraft={editingTextDraft}
-      setEditingTextDraft={setEditingTextDraft}
-      textTokenEditRef={textTokenEditRef}
-      editingConstTokenId={editingConstTokenId}
-      setEditingConstTokenId={setEditingConstTokenId}
-      editingConstDraft={editingConstDraft}
-      setEditingConstDraft={setEditingConstDraft}
-      isConstExpression={isConstExpression}
-      parseConstValue={parseConstValue}
-      buildConstExpression={buildConstExpression}
-      isMathExpression={isMathExpression}
-      isTagAggregationExpression={isTagAggregationExpression}
-      conceptVisualForToken={conceptVisualForToken}
-    />
-  );
-
-  const resolveDroppedExpression = (event: DragEvent<HTMLElement>): string => {
-    const blockPayload = event.dataTransfer.getData("text/block-token-json");
-    if (blockPayload) {
-      const parsed = JSON.parse(blockPayload) as { token?: FormulaToken };
-      return parsed.token?.expression?.trim() ?? "";
-    }
-    const internalTokenId = event.dataTransfer.getData("text/formula-token-id");
-    if (internalTokenId) {
-      const source = selectedFormulaTokens.find((tk) => tk.id === internalTokenId);
-      return source?.expression?.trim() ?? "";
-    }
-    const payload = event.dataTransfer.getData("text/token-json");
-    if (payload) {
-      const parsed = JSON.parse(payload) as FormulaToken;
-      return parsed.expression.trim();
-    }
-    const fnTemplate = event.dataTransfer.getData("text/function-template");
-    if (fnTemplate === "SI" || fnTemplate === "BLOQUE" || fnTemplate === "TOPE") {
-      return serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill(""));
-    }
-    return "";
-  };
-
-  const onDropToBlockArgAt = (
-    event: DragEvent<HTMLElement>,
-    blockId: string,
-    argIndex: number,
-    insertAt: number
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const blockPayload = event.dataTransfer.getData("text/block-token-json");
-    if (blockPayload) {
-      const parsed = JSON.parse(blockPayload) as {
-        sourceBlockId: string;
-        sourceArgIndex: number;
-        sourceTokenIndex: number;
-        token: FormulaToken;
-      };
-      updateFormulaTokens(
-        selectedFormulaTokens.map((tk) => {
-          if (tk.kind !== "block") return tk;
-          const block = parseFunctionBlock(tk.expression);
-          if (!block) return tk;
-          const nextArgs = [...block.args];
-          while (nextArgs.length < getFunctionBlockArity(block.name)) nextArgs.push("");
-
-          if (tk.id === parsed.sourceBlockId) {
-          const sourceTokens = tokenizeFormulaExpression(nextArgs[parsed.sourceArgIndex] ?? "", {
-            conceptCodeById
-          });
-            if (parsed.sourceTokenIndex >= 0 && parsed.sourceTokenIndex < sourceTokens.length) {
-              sourceTokens.splice(parsed.sourceTokenIndex, 1);
-              nextArgs[parsed.sourceArgIndex] = formulaToExpression(sourceTokens);
-            }
-          }
-
-          if (tk.id === blockId) {
-            const targetTokens = tokenizeFormulaExpression(nextArgs[argIndex] ?? "", {
-              conceptCodeById
-            });
-            const safeInsertAt = Math.max(0, Math.min(insertAt, targetTokens.length));
-            targetTokens.splice(
-              safeInsertAt,
-              0,
-              token(parsed.token.label, parsed.token.expression, parsed.token.kind)
-            );
-            nextArgs[argIndex] = formulaToExpression(targetTokens);
-          }
-
-          return { ...tk, expression: serializeFunctionBlock(block.name, nextArgs) };
-        })
-      );
-      return;
-    }
-
-    const internalTokenId = event.dataTransfer.getData("text/formula-token-id");
-    if (internalTokenId) {
-      const source = selectedFormulaTokens.find((tk) => tk.id === internalTokenId);
-      if (!source) return;
-      updateFormulaTokens(
-        selectedFormulaTokens
-          .filter((tk) => tk.id !== internalTokenId)
-          .map((tk) => {
-            if (tk.id !== blockId || tk.kind !== "block") return tk;
-            const block = parseFunctionBlock(tk.expression);
-            if (!block) return tk;
-            const nextArgs = [...block.args];
-            while (nextArgs.length < getFunctionBlockArity(block.name)) nextArgs.push("");
-            const targetTokens = tokenizeFormulaExpression(nextArgs[argIndex] ?? "", {
-              conceptCodeById
-            });
-            const safeInsertAt = Math.max(0, Math.min(insertAt, targetTokens.length));
-            targetTokens.splice(safeInsertAt, 0, token(source.label, source.expression, source.kind));
-            nextArgs[argIndex] = formulaToExpression(targetTokens);
-            return { ...tk, expression: serializeFunctionBlock(block.name, nextArgs) };
-          })
-      );
-      return;
-    }
-
-    const payload = event.dataTransfer.getData("text/token-json");
-    if (payload) {
-      const parsed = JSON.parse(payload) as FormulaToken;
-      updateBlockArgTokens(blockId, argIndex, (tokens) => {
-        const next = [...tokens];
-        const safeInsertAt = Math.max(0, Math.min(insertAt, next.length));
-        next.splice(safeInsertAt, 0, token(parsed.label, parsed.expression, parsed.kind));
-        return next;
-      });
-      return;
-    }
-
-    const fnTemplate = event.dataTransfer.getData("text/function-template");
-    if (fnTemplate === "SI" || fnTemplate === "BLOQUE" || fnTemplate === "TOPE") {
-      updateBlockArgTokens(blockId, argIndex, (tokens) => {
-        const next = [...tokens];
-        const safeInsertAt = Math.max(0, Math.min(insertAt, next.length));
-        next.splice(
-          safeInsertAt,
-          0,
-          token(
-            fnTemplate as "SI" | "BLOQUE" | "TOPE",
-            serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill("")),
-            "block"
-          )
-        );
-        return next;
-      });
-    }
-  };
-
-  const onTokenDropToFormula = (event: DragEvent<HTMLElement>, insertAt?: number) => {
-    event.preventDefault();
-    const targetIndex =
-      insertAt ?? dragInsertIndex ?? selectedFormulaTokens.length;
-
-    const dragSource = formulaDragSourceRef.current;
-    const internalTokenId =
-      dragSource?.kind === "root"
-        ? dragSource.tokenId
-        : dragSource?.kind === "nested"
-          ? ""
-          : event.dataTransfer.getData("text/formula-token-id");
-    if (internalTokenId) {
-      const current = [...selectedFormulaTokens];
-      const fromIndex = current.findIndex((item) => item.id === internalTokenId);
-      if (fromIndex !== -1) {
-        if (event.ctrlKey) {
-          const source = current[fromIndex];
-          if (source) {
-            const clone = token(source.label, source.expression, source.kind);
-            current.splice(Math.max(0, targetIndex), 0, clone);
-          }
-        } else {
-          const [moved] = current.splice(fromIndex, 1);
-          const adjustedIndex = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
-          current.splice(Math.max(0, adjustedIndex), 0, moved);
-        }
-        updateFormulaTokens(current);
-      }
-      setDragInsertIndex(null);
-      setDraggingFormulaTokenId(null);
-      return;
-    }
-
-    const localPayload = event.dataTransfer.getData("text/block-local-token-json");
-    const parsedLocal =
-      dragSource?.kind === "nested"
-        ? dragSource
-        : localPayload
-          ? (JSON.parse(localPayload) as Extract<FormulaDragSource, { kind: "nested" }>)
-          : null;
-    if (parsedLocal) {
-      const nextAst = structuredClone(selectedFormulaAst) as AstNode[];
-      const ok = event.ctrlKey
-        ? duplicateNestedAstNodeToRoot(nextAst, parsedLocal, targetIndex)
-        : moveNestedAstNodeToRoot(nextAst, parsedLocal, targetIndex);
-      if (ok) {
-        updateFormulaAst(nextAst);
-      }
-      setDragInsertIndex(null);
-      setDraggingFormulaTokenId(null);
-      return;
-    }
-
-    const payload = event.dataTransfer.getData("text/token-json");
-    if (payload) {
-      insertTokenAt(JSON.parse(payload) as FormulaToken, targetIndex);
-      setDragInsertIndex(null);
-      return;
-    }
-    const ifTemplate = event.dataTransfer.getData("text/function-template");
-    if (
-      ifTemplate === "SI" ||
-      ifTemplate === "BLOQUE" ||
-      ifTemplate === "TOPE" ||
-      ifTemplate === "CONSTANTE" ||
-      ifTemplate.startsWith("MATH:")
-    ) {
-      if (ifTemplate === "SI" || ifTemplate === "BLOQUE" || ifTemplate === "TOPE") {
-        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE", targetIndex);
-      } else if (ifTemplate === "CONSTANTE") {
-        insertTokenAt(token("const", buildConstExpression("0"), "function"), targetIndex);
-      } else {
-        const op = ifTemplate.slice("MATH:".length);
-        insertTokenAt(token(op, `MATH("${op}")`, "function"), targetIndex);
-      }
-      setDragInsertIndex(null);
-      return;
-    }
-    const tagPayload = event.dataTransfer.getData("text/tag-name");
-    if (tagPayload) {
-      setTagModal({
-        open: true,
-        tag: tagPayload,
-        insertAt: targetIndex
-      });
-      setDragInsertIndex(null);
-    }
   };
 
   const addReceipt = () => {
@@ -1520,60 +1043,6 @@ export function App() {
     setTagModal({ open: false, tag: "", insertAt: 0 });
   };
 
-  const startEditTextToken = (tk: FormulaToken) => {
-    setEditingTextTokenId(tk.id);
-    setEditingTextDraft(tk.kind === "slot" ? stripSlotSuffix(tk.expression) : tk.label);
-  };
-
-  const commitTextTokenEdit = () => {
-    if (!editingTextTokenId) return;
-    const nextValue = editingTextDraft.trim();
-    if (!nextValue) {
-      updateFormulaTokens(
-        selectedFormulaTokens.filter((item) => item.id !== editingTextTokenId)
-      );
-    } else {
-      updateFormulaTokens(
-        selectedFormulaTokens.map((item) =>
-          item.id === editingTextTokenId
-            ? item.kind === "slot"
-              ? {
-                  ...item,
-                  label: nextValue,
-                  expression: `${nextValue}${slotSuffixFor(item.expression)}`
-                }
-              : { ...item, label: nextValue, expression: nextValue }
-            : item
-        )
-      );
-    }
-    setEditingTextTokenId(null);
-    setEditingTextDraft("");
-  };
-
-  const removeEditingTextToken = () => {
-    if (!editingTextTokenId) return;
-    updateFormulaTokens(
-      selectedFormulaTokens.filter((item) => item.id !== editingTextTokenId)
-    );
-    setEditingTextTokenId(null);
-    setEditingTextDraft("");
-  };
-
-  const conceptVisualForToken = (tk: FormulaToken) => {
-    const byId = tk.expression.match(/^CONCEPTO\((\d+)\)$/);
-    if (byId) {
-      const concept = concepts.find((c) => c.id === Number(byId[1]));
-      if (concept) return concept;
-    }
-    const byCode = tk.expression.match(/^CCONCEPTO\("([^"]+)"\)$/);
-    if (byCode) {
-      const concept = concepts.find((c) => c.code === byCode[1]);
-      if (concept) return concept;
-    }
-    return null;
-  };
-
   useEffect(() => {
     if (!appearanceOpen) return;
     const onPointerDown = (event: MouseEvent) => {
@@ -1584,29 +1053,6 @@ export function App() {
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [appearanceOpen]);
-
-  useEffect(() => {
-    if (!editingTextTokenId) return;
-    const isRootTokenEditor = editingTextTokenId.startsWith("tk_");
-    if (!isRootTokenEditor) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (!textTokenEditRef.current) return;
-      if (textTokenEditRef.current.contains(event.target as Node)) return;
-      commitTextTokenEdit();
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [editingTextTokenId, editingTextDraft, selectedFormulaTokens]);
-
-  useEffect(() => {
-    setDragInsertIndex(null);
-    setDraggingFormulaTokenId(null);
-  }, [editingId]);
-
-  useEffect(() => {
-    setEditingTextTokenId(null);
-    setEditingTextDraft("");
-  }, [editingId]);
 
   useEffect(() => {
     const loadConcepts = async () => {
@@ -1645,6 +1091,21 @@ export function App() {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(receiptsStorageKey, JSON.stringify(receipts));
   }, [receipts]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(legajosStorageKey, JSON.stringify(legajos));
+  }, [legajos]);
+
+  useEffect(() => {
+    if (!legajos.length) {
+      setSimLegajoId("");
+      return;
+    }
+    if (!simLegajoId || !legajos.some((l) => l.id === simLegajoId)) {
+      setSimLegajoId(legajos[0].id);
+    }
+  }, [legajos, simLegajoId]);
 
   useEffect(() => {
     if (!conceptsLoaded) return;
@@ -1735,11 +1196,20 @@ export function App() {
           <button className={menu === "afip" ? "menu active" : "menu"} onClick={() => setMenu("afip")}>
             Contable / AFIP
           </button>
+          <button className={menu === "legajos" ? "menu active" : "menu"} onClick={() => setMenu("legajos")}>
+            Legajos
+          </button>
         </nav>
       </header>
 
       <main className="content">
-        {menu !== "modelo" ? (
+        {menu === "legajos" ? (
+          <LegajosPage
+            legajos={legajos}
+            conceptOptions={concepts.map((c) => c.code)}
+            onChangeLegajos={setLegajos}
+          />
+        ) : menu !== "modelo" ? (
           <section className="placeholder">
             <h2>{menu === "dashboard" ? "Dashboard" : menu === "novedades" ? "Novedades" : "Contable / AFIP"}</h2>
             <p>Seccion en construccion. El foco de este MVP es Modelo de liquidacion.</p>
@@ -1783,6 +1253,25 @@ export function App() {
                         {receipt.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="sim-legajo">Legajo (simulación)</label>
+                  <select
+                    id="sim-legajo"
+                    value={simLegajoId}
+                    onChange={(e) => setSimLegajoId(e.target.value)}
+                    disabled={!legajos.length}
+                  >
+                    {legajos.length === 0 ? (
+                      <option value="">Sin legajos</option>
+                    ) : (
+                      legajos.map((legajo) => (
+                        <option key={legajo.id} value={legajo.id}>
+                          {legajo.nroLegajo || "S/N"} - {legajo.nombre || "Sin nombre"}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
                 <button className="add-button" onClick={addReceipt}>
@@ -1836,6 +1325,7 @@ export function App() {
                           <span className="concept-error-inline">ERROR</span>
                         ) : null}
                         #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
+                        {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
                         {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
                       </span>
                     </div>
@@ -1973,419 +1463,35 @@ export function App() {
                   </datalist>
                 </div>
               </div>
-              <div
-                className="formula-dropzone"
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  e.dataTransfer.dropEffect = "move";
-                }}
-                onDrop={(e) => onTokenDropToFormula(e)}
-                onDoubleClick={(e) => {
-                  if (e.target !== e.currentTarget) return;
-                  setRootInsertSignal((v) => (v ?? 0) + 1);
-                }}
-              >
-                <FormulaInlineEditor
-                  tokens={selectedFormulaTokens}
-                  onInsertAt={(rawValue, insertAt) => insertFromRawTextAt(rawValue, insertAt)}
-                  openInsertAtEndSignal={rootInsertSignal}
-                  onDropAt={(e, insertAt) => onTokenDropToFormula(e, insertAt)}
-                  onEmptyDrop={(e) => onTokenDropToFormula(e, 0)}
-                  renderToken={(tk, index) =>
-                    tk.kind === "block" ? (
-                      <div
-                        className="formula-block-token"
-                        draggable
-                        onDragStart={(e) => {
-                          setRootDragSource(tk.id);
-                          e.dataTransfer.setData("text/plain", tk.label);
-                          e.dataTransfer.setData("text/formula-token-id", tk.id);
-                          e.dataTransfer.setData("text/token-json", JSON.stringify(tk));
-                          e.dataTransfer.effectAllowed = "move";
-                          setCursorGhost(e, tk.label);
-                          setDraggingFormulaTokenId(tk.id);
-                        }}
-                        onDragEnd={() => {
-                          setDraggingFormulaTokenId(null);
-                          setDragInsertIndex(null);
-                        }}
-                      >
-                        {renderFunctionBlockEditor(
-                          tk.expression,
-                          (nextExpr) => {
-                            updateFormulaTokens(
-                              selectedFormulaTokens.map((item) =>
-                                item.id === tk.id ? { ...item, expression: nextExpr } : item
-                              )
-                            );
-                          },
-                          tk.id,
-                          0,
-                          () => {
-                            updateFormulaTokens(
-                              selectedFormulaTokens.filter((item) => item.id !== tk.id)
-                            );
-                          }
-                        )}
-                      </div>
-                    ) : tk.kind === "text" ? (
-                      editingTextTokenId === tk.id ? (
-                        <div className="text-token-edit-wrap" ref={textTokenEditRef}>
-                          <input
-                            className="text-token-input"
-                            value={editingTextDraft}
-                            onChange={(e) => setEditingTextDraft(e.target.value)}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onPointerDown={(e) => e.stopPropagation()}
-                            draggable={false}
-                            onDragStart={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                            }}
-                            autoComplete="off"
-                            autoCorrect="off"
-                            autoCapitalize="off"
-                            spellCheck={false}
-                            style={{ width: `${Math.max(4, editingTextDraft.length + 1)}ch` }}
-                            onBlur={() => {
-                              if (editingTextTokenId === tk.id) commitTextTokenEdit();
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                commitTextTokenEdit();
-                              }
-                              if (e.key === "Escape") {
-                                e.preventDefault();
-                                setEditingTextTokenId(null);
-                                setEditingTextDraft("");
-                              }
-                            }}
-                          />
-                          <button
-                            className="text-token-remove-float"
-                            onClick={removeEditingTextToken}
-                            title="Borrar texto"
-                          >
-                            -
-                          </button>
-                        </div>
-                      ) : (
-                        <span
-                          className="formula-text"
-                          draggable
-                          onDragStart={(e) => {
-                            setRootDragSource(tk.id);
-                            e.dataTransfer.setData("text/plain", tk.label);
-                            e.dataTransfer.setData("text/formula-token-id", tk.id);
-                            e.dataTransfer.effectAllowed = "move";
-                            setCursorGhost(e, tk.label);
-                            setDraggingFormulaTokenId(tk.id);
-                          }}
-                          onDragEnd={() => {
-                            setDraggingFormulaTokenId(null);
-                            setDragInsertIndex(null);
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            startEditTextToken(tk);
-                          }}
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-                            updateFormulaTokens(
-                              selectedFormulaTokens.filter((item) => item.id !== tk.id)
-                            );
-                          }}
-                          title="Click para editar"
-                          style={{ opacity: draggingFormulaTokenId === tk.id ? 0.12 : 1 }}
-                        >
-                          {tk.label}
-                        </span>
-                      )
-                    ) : (
-                      isConstExpression(tk.expression) && editingConstTokenId === tk.id ? (
-                        <input
-                          className="text-token-input"
-                          value={editingConstDraft}
-                          onChange={(e) => setEditingConstDraft(e.target.value)}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onPointerDown={(e) => e.stopPropagation()}
-                          autoFocus
-                          draggable={false}
-                          onDragStart={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                          autoComplete="off"
-                          autoCorrect="off"
-                          autoCapitalize="off"
-                          spellCheck={false}
-                          style={{ width: `${Math.max(4, editingConstDraft.length + 1)}ch` }}
-                          onBlur={() => saveConstAtRoot(tk.id)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              (e.target as HTMLInputElement).blur();
-                            }
-                            if (e.key === "Escape") {
-                              e.preventDefault();
-                              setEditingConstTokenId(null);
-                              setEditingConstDraft("");
-                            }
-                          }}
-                        />
-                      ) : (
-                        <button
-                          className={`formula-pill ${tk.kind}${
-                            isConstExpression(tk.expression)
-                              ? " const-pill"
-                              : isMathExpression(tk.expression)
-                                ? " math-pill"
-                                : isTagAggregationExpression(tk.expression)
-                                  ? " tag-pill"
-                                : ""
-                          }`}
-                          draggable
-                          onDragStart={(e) => {
-                            setRootDragSource(tk.id);
-                            e.dataTransfer.setData("text/plain", tk.label);
-                            e.dataTransfer.setData("text/formula-token-id", tk.id);
-                            e.dataTransfer.effectAllowed = "move";
-                            setCursorGhost(e, tk.label);
-                            setDraggingFormulaTokenId(tk.id);
-                          }}
-                          onDragEnd={() => {
-                            setDraggingFormulaTokenId(null);
-                            setDragInsertIndex(null);
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isConstExpression(tk.expression)) {
-                              setEditingConstTokenId(tk.id);
-                              setEditingConstDraft(parseConstValue(tk.expression));
-                            }
-                          }}
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-                            updateFormulaTokens(
-                              selectedFormulaTokens.filter((item) => item.id !== tk.id)
-                            );
-                          }}
-                          title="Click izq: editar constante. Click der: quitar"
-                          style={{ opacity: draggingFormulaTokenId === tk.id ? 0.12 : 1 }}
-                        >
-                          {tk.kind === "concept" ? (
-                            <span className="formula-pill-concept">
-                              <span
-                                className="concept-marker"
-                                style={{ color: conceptVisualForToken(tk)?.color ?? "#334155" }}
-                              >
-                                {getShapeGlyph(conceptVisualForToken(tk)?.shape ?? "circle")}
-                              </span>
-                              {tk.label}
-                            </span>
-                          ) : isMathExpression(tk.expression) ? (
-                            tk.expression.match(/^MATH\("((?:[^"\\]|\\.)*)"\)$/)?.[1] ?? tk.label
-                          ) : (
-                            tk.label
-                          )}
-                        </button>
-                      )
-                    )
-                  }
-                />
-              </div>
-              <div className="formula-text-section">
-                <h3>Formula</h3>
-                <input
-                  className="formula-text-live-input"
-                  value={formulaToExpression(selectedFormulaTokens)}
-                  onChange={(e) => {
-                    updateFormulaTokens(
-                      tokenizeFormulaExpression(e.target.value, {
-                        conceptCodeById
-                      })
-                    );
-                  }}
-                  placeholder='Ej: CCONCEPTO("BASICO") MATH("*") PARAM("porc_antiguedad")'
-                />
-              </div>
-              <div className="preview">
-                <h3>Pre-calculo de prueba</h3>
-                <p>
-                  <strong>
-                    {cycleConceptIds.has(selectedConcept.id)
-                      ? "Error (ciclo DAG)"
-                      : previewInfo.value === null
-                      ? `Error: ${previewInfo.error ?? "error de compilacion"}`
-                      : `$${previewInfo.value.toLocaleString("es-AR")}`}
-                  </strong>
-                </p>
-              </div>
+              <FormulaEditorSection
+                tokens={selectedFormulaTokens}
+                rootInsertSignal={rootInsertSignal}
+                onInsertAt={insertFromRawTextAt}
+                onDropToFormula={onTokenDropToFormula}
+                onTriggerRootInsert={triggerRootInsert}
+                renderRootToken={renderRootFormulaToken}
+                formulaText={formulaExpressionText}
+                onFormulaTextChange={setFormulaExpressionText}
+                previewValue={previewInfo.value}
+                previewError={previewInfo.error}
+                hasCycle={cycleConceptIds.has(selectedConcept.id)}
+              />
             </article>
 
-            <article className="panel drawer">
-              <h2>Herramientas</h2>
-
-              <div className="drawer-header">
-                <h3>Conceptos transitorios</h3>
-                <button className="add-button" onClick={addTransitory}>
-                  + Nuevo transitorio
-                </button>
-              </div>
-              <div className="chip-wrap">
-                {transitorios.map((concept) => (
-                  <button
-                    key={concept.id}
-                    className="chip transitorio"
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.effectAllowed = "copyMove";
-                      e.dataTransfer.setData("text/plain", concept.code);
-                      setCursorGhost(e, concept.code);
-                      e.dataTransfer.setData(
-                        "text/token-json",
-                        JSON.stringify(
-                          token(
-                            concept.code,
-                            `CCONCEPTO("${concept.code}")`,
-                            "concept"
-                          )
-                        )
-                      );
-                    }}
-                    onClick={() => {
-                      setEditingId(concept.id);
-                    }}
-                  >
-                    <span className="concept-marker" style={{ color: concept.color }}>
-                      {getShapeGlyph(concept.shape)}
-                    </span>
-                    {concept.code}
-                  </button>
-                ))}
-              </div>
-
-              <h3>Funciones</h3>
-              <div className="chip-wrap">
-                <button
-                  className="chip"
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = "copyMove";
-                    e.dataTransfer.setData("text/plain", "SI");
-                    setCursorGhost(e, "SI");
-                    e.dataTransfer.setData("text/function-template", "SI");
-                  }}
-                  onClick={() => insertBlockTemplateAt("SI", selectedFormulaTokens.length)}
-                >
-                  SI
-                </button>
-                <button
-                  className="chip"
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = "copyMove";
-                    e.dataTransfer.setData("text/plain", "BLOQUE");
-                    setCursorGhost(e, "BLOQUE");
-                    e.dataTransfer.setData("text/function-template", "BLOQUE");
-                  }}
-                  onClick={() => insertBlockTemplateAt("BLOQUE", selectedFormulaTokens.length)}
-                >
-                  BLOQUE
-                </button>
-                <button
-                  className="chip"
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = "copyMove";
-                    e.dataTransfer.setData("text/plain", "TOPE");
-                    setCursorGhost(e, "TOPE");
-                    e.dataTransfer.setData("text/function-template", "TOPE");
-                  }}
-                  onClick={() => insertBlockTemplateAt("TOPE", selectedFormulaTokens.length)}
-                >
-                  TOPE
-                </button>
-                <button
-                  className="chip"
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.effectAllowed = "copyMove";
-                    e.dataTransfer.setData("text/plain", "CONSTANTE");
-                    setCursorGhost(e, "CONSTANTE");
-                    e.dataTransfer.setData("text/function-template", "CONSTANTE");
-                    e.dataTransfer.setData(
-                      "text/token-json",
-                      JSON.stringify(token("0", buildConstExpression("0"), "function"))
-                    );
-                  }}
-                  onClick={() =>
-                    insertTokenAt(token("const", buildConstExpression("0"), "function"), selectedFormulaTokens.length)
-                  }
-                >
-                  CONSTANTE
-                </button>
-              </div>
-
-              <h3>Funciones matematicas</h3>
-              <div className="chip-wrap">
-                {["+", "-", "*", "/", "%", ">", "<", ">=", "<=", "=", "<>"].map((op) => (
-                  <button
-                    key={op}
-                    className="chip"
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.effectAllowed = "copyMove";
-                      e.dataTransfer.setData("text/plain", op);
-                      setCursorGhost(e, op);
-                      e.dataTransfer.setData("text/function-template", `MATH:${op}`);
-                      e.dataTransfer.setData(
-                        "text/token-json",
-                        JSON.stringify(token(op, `MATH("${op}")`, "function"))
-                      );
-                    }}
-                    onClick={() => insertTokenAt(token(op, `MATH("${op}")`, "function"), selectedFormulaTokens.length)}
-                  >
-                    {op}
-                  </button>
-                ))}
-              </div>
-
-              <h3>Tags</h3>
-              <div className="chip-wrap">
-                {allTags.map((tag) => (
-                  <button
-                    key={tag}
-                    className="chip"
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.effectAllowed = "copyMove";
-                      e.dataTransfer.setData("text/plain", `#${tag}`);
-                      setCursorGhost(e, `#${tag}`);
-                      e.dataTransfer.setData("text/tag-name", tag);
-                    }}
-                    onClick={() =>
-                      setTagModal({
-                        open: true,
-                        tag,
-                        insertAt: selectedFormulaTokens.length
-                      })
-                    }
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-            </article>
+            <FormulaToolsPanel
+              transitorios={transitorios}
+              allTags={allTags}
+              insertAt={selectedFormulaTokens.length}
+              onAddTransitory={addTransitory}
+              onSelectConcept={setEditingId}
+              onInsertBlockTemplate={insertBlockTemplateAt}
+              onInsertConst={(index) =>
+                insertTokenAt(token("const", buildConstExpression("0"), "function"), index)
+              }
+              onInsertMath={(op, index) => insertTokenAt(token(op, `MATH("${op}")`, "function"), index)}
+              onOpenTagModal={(tag, insertAt) => setTagModal({ open: true, tag, insertAt })}
+              setCursorGhost={setCursorGhost}
+            />
           </section>
         )}
       </main>
