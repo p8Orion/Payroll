@@ -1,10 +1,10 @@
 [
   {
-    "id": "liq_2026_4_Vacaciones_1777047168115",
+    "id": "liq_2026_4_Vacaciones_1777299305967",
     "liquidationType": "Vacaciones",
     "month": 4,
     "year": 2026,
-    "createdAt": "2026-04-24T16:12:48.115Z",
+    "createdAt": "2026-04-27T14:15:05.967Z",
     "legajos": [
       {
         "legajoId": "legajo_1",
@@ -13,15 +13,15 @@
         "convenio": "Apuaye",
         "conceptos": [
           {
-            "conceptId": 941,
-            "conceptCode": "DEF_941",
-            "conceptName": "Concepto definitivo 941",
+            "conceptId": 943,
+            "conceptCode": "DEF_943",
+            "conceptName": "Concepto definitivo 943",
             "conceptClass": "definitivo",
-            "value": 150,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
+            "value": 300,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")"
           }
         ],
-        "total": 150
+        "total": 300
       },
       {
         "legajoId": "legajo_2",
@@ -30,15 +30,15 @@
         "convenio": "Luz y Fuerza",
         "conceptos": [
           {
-            "conceptId": 941,
-            "conceptCode": "DEF_941",
-            "conceptName": "Concepto definitivo 941",
+            "conceptId": 943,
+            "conceptCode": "DEF_943",
+            "conceptName": "Concepto definitivo 943",
             "conceptClass": "definitivo",
-            "value": 100,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
+            "value": 200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")"
           }
         ],
-        "total": 100
+        "total": 200
       },
       {
         "legajoId": "legajo_3",
@@ -47,15 +47,15 @@
         "convenio": "Luz y Fuerza",
         "conceptos": [
           {
-            "conceptId": 941,
-            "conceptCode": "DEF_941",
-            "conceptName": "Concepto definitivo 941",
+            "conceptId": 943,
+            "conceptCode": "DEF_943",
+            "conceptName": "Concepto definitivo 943",
             "conceptClass": "definitivo",
-            "value": 200,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
+            "value": 400,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")"
           }
         ],
-        "total": 200
+        "total": 400
       },
       {
         "legajoId": "legajo_4_xt9uhw",
@@ -64,15 +64,15 @@
         "convenio": "Apuaye",
         "conceptos": [
           {
-            "conceptId": 941,
-            "conceptCode": "DEF_941",
-            "conceptName": "Concepto definitivo 941",
+            "conceptId": 943,
+            "conceptCode": "DEF_943",
+            "conceptName": "Concepto definitivo 943",
             "conceptClass": "definitivo",
-            "value": 150,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
+            "value": 300,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")"
           }
         ],
-        "total": 150
+        "total": 300
       },
       {
         "legajoId": "legajo_5_0w45t1",
@@ -81,15 +81,15 @@
         "convenio": "Luz y Fuerza",
         "conceptos": [
           {
-            "conceptId": 941,
-            "conceptCode": "DEF_941",
-            "conceptName": "Concepto definitivo 941",
+            "conceptId": 943,
+            "conceptCode": "DEF_943",
+            "conceptName": "Concepto definitivo 943",
             "conceptClass": "definitivo",
-            "value": 200,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
+            "value": 400,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")"
           }
         ],
-        "total": 200
+        "total": 400
       },
       {
         "legajoId": "legajo_6_ih1vqz",
@@ -98,50 +98,24 @@
         "convenio": "Apuaye",
         "conceptos": [
           {
-            "conceptId": 941,
-            "conceptCode": "DEF_941",
-            "conceptName": "Concepto definitivo 941",
+            "conceptId": 943,
+            "conceptCode": "DEF_943",
+            "conceptName": "Concepto definitivo 943",
             "conceptClass": "definitivo",
-            "value": 150,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
+            "value": 300,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")"
           }
         ],
-        "total": 150
+        "total": 300
       }
     ]
   },
   {
-    "id": "liq_2026_4_Normal_1777046151396",
+    "id": "liq_2026_4_Normal_1777299018141",
     "liquidationType": "Normal",
     "month": 4,
     "year": 2026,
-    "createdAt": "2026-04-24T15:55:51.396Z",
-    "legajos": [
-      {
-        "legajoId": "legajo_1",
-        "legajoNro": "472",
-        "legajoNombre": "Nestor",
-        "convenio": "Apuaye",
-        "conceptos": [
-          {
-            "conceptId": 936,
-            "conceptCode": "TRANS_936",
-            "conceptName": "Transitorio 936",
-            "conceptClass": "transitorio",
-            "value": 4,
-            "formulaUsed": "CONSTANTE(\"4\")"
-          }
-        ],
-        "total": 0
-      }
-    ]
-  },
-  {
-    "id": "liq_2026_4_Normal_1777046146143",
-    "liquidationType": "Normal",
-    "month": 4,
-    "year": 2026,
-    "createdAt": "2026-04-24T15:55:46.143Z",
+    "createdAt": "2026-04-27T14:10:18.141Z",
     "legajos": [
       {
         "legajoId": "legajo_1",
@@ -199,6 +173,14 @@
             "formulaUsed": "VALOR_FIJO(\"A\")"
           },
           {
+            "conceptId": 938,
+            "conceptCode": "DEF_938",
+            "conceptName": "Concepto definitivo 938",
+            "conceptClass": "definitivo",
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
             "conceptId": 934,
             "conceptCode": "TRANS_934",
             "conceptName": "Transitorio 934",
@@ -213,6 +195,14 @@
             "conceptClass": "transitorio",
             "value": 1,
             "formulaUsed": "CONSTANTE(\"1\")"
+          },
+          {
+            "conceptId": 939,
+            "conceptCode": "TRANS_939",
+            "conceptName": "Transitorio 939",
+            "conceptClass": "transitorio",
+            "value": 0,
+            "formulaUsed": ""
           }
         ],
         "total": 109
@@ -256,6 +246,14 @@
             "formulaUsed": "VALOR_FIJO(\"A\")"
           },
           {
+            "conceptId": 938,
+            "conceptCode": "DEF_938",
+            "conceptName": "Concepto definitivo 938",
+            "conceptClass": "definitivo",
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
             "conceptId": 934,
             "conceptCode": "TRANS_934",
             "conceptName": "Transitorio 934",
@@ -270,6 +268,14 @@
             "conceptClass": "transitorio",
             "value": 1,
             "formulaUsed": "CONSTANTE(\"1\")"
+          },
+          {
+            "conceptId": 939,
+            "conceptCode": "TRANS_939",
+            "conceptName": "Transitorio 939",
+            "conceptClass": "transitorio",
+            "value": 0,
+            "formulaUsed": ""
           }
         ],
         "total": 209
@@ -330,104 +336,12 @@
             "formulaUsed": "VALOR_FIJO(\"A\")"
           },
           {
-            "conceptId": 934,
-            "conceptCode": "TRANS_934",
-            "conceptName": "Transitorio 934",
-            "conceptClass": "transitorio",
-            "value": 2,
-            "formulaUsed": "CONSTANTE(\"2\")"
-          },
-          {
-            "conceptId": 935,
-            "conceptCode": "TRANS_935",
-            "conceptName": "Transitorio 935",
-            "conceptClass": "transitorio",
-            "value": 1,
-            "formulaUsed": "CONSTANTE(\"1\")"
-          }
-        ],
-        "total": 214
-      },
-      {
-        "legajoId": "legajo_6_ih1vqz",
-        "legajoNro": "438",
-        "legajoNombre": "Diego",
-        "convenio": "Apuaye",
-        "conceptos": [
-          {
-            "conceptId": 936,
-            "conceptCode": "TRANS_936",
-            "conceptName": "Transitorio 936",
-            "conceptClass": "transitorio",
-            "value": 4,
-            "formulaUsed": "CONSTANTE(\"4\")"
-          }
-        ],
-        "total": 0
-      }
-    ]
-  },
-  {
-    "id": "liq_2026_4_Normal_1777045997712",
-    "liquidationType": "Normal",
-    "month": 4,
-    "year": 2026,
-    "createdAt": "2026-04-24T15:53:17.712Z",
-    "legajos": [
-      {
-        "legajoId": "legajo_1",
-        "legajoNro": "472",
-        "legajoNombre": "Nestor",
-        "convenio": "Apuaye",
-        "conceptos": [
-          {
-            "conceptId": 936,
-            "conceptCode": "TRANS_936",
-            "conceptName": "Transitorio 936",
-            "conceptClass": "transitorio",
-            "value": 4,
-            "formulaUsed": "CONSTANTE(\"4\")"
-          }
-        ],
-        "total": 0
-      },
-      {
-        "legajoId": "legajo_2",
-        "legajoNro": "473",
-        "legajoNombre": "Juan",
-        "convenio": "Luz y Fuerza",
-        "conceptos": [
-          {
-            "conceptId": 937,
-            "conceptCode": "BÁSICO",
-            "conceptName": "Concepto definitivo 937",
-            "conceptClass": "definitivo",
-            "value": 100,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
-          },
-          {
-            "conceptId": 909,
-            "conceptCode": "DEF_909",
-            "conceptName": "Concepto definitivo 909",
-            "conceptClass": "definitivo",
-            "value": 4,
-            "formulaUsed": "[SI|CONSTANTE(\"1\")|CONSTANTE(\"1\")|CONSTANTE(\"0\")] MATH(\"+\") CONSTANTE(\"3\")"
-          },
-          {
-            "conceptId": 927,
-            "conceptCode": "DEF_927",
-            "conceptName": "Concepto definitivo 927",
-            "conceptClass": "definitivo",
-            "value": 5,
-            "formulaUsed": "CONSTANTE(\"5\")"
-          },
-          {
-            "conceptId": 915,
-            "conceptCode": "DEF_915",
-            "conceptName": "Concepto definitivo 915",
+            "conceptId": 938,
+            "conceptCode": "DEF_938",
+            "conceptName": "Concepto definitivo 938",
             "conceptClass": "definitivo",
             "value": 0,
-            "formulaUsed": "VALOR_FIJO(\"A\")"
+            "formulaUsed": ""
           },
           {
             "conceptId": 934,
@@ -444,137 +358,14 @@
             "conceptClass": "transitorio",
             "value": 1,
             "formulaUsed": "CONSTANTE(\"1\")"
-          }
-        ],
-        "total": 109
-      },
-      {
-        "legajoId": "legajo_3",
-        "legajoNro": "474",
-        "legajoNombre": "Pablo",
-        "convenio": "Luz y Fuerza",
-        "conceptos": [
-          {
-            "conceptId": 937,
-            "conceptCode": "BÁSICO",
-            "conceptName": "Concepto definitivo 937",
-            "conceptClass": "definitivo",
-            "value": 200,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
           },
           {
-            "conceptId": 909,
-            "conceptCode": "DEF_909",
-            "conceptName": "Concepto definitivo 909",
-            "conceptClass": "definitivo",
-            "value": 4,
-            "formulaUsed": "[SI|CONSTANTE(\"1\")|CONSTANTE(\"1\")|CONSTANTE(\"0\")] MATH(\"+\") CONSTANTE(\"3\")"
-          },
-          {
-            "conceptId": 927,
-            "conceptCode": "DEF_927",
-            "conceptName": "Concepto definitivo 927",
-            "conceptClass": "definitivo",
-            "value": 5,
-            "formulaUsed": "CONSTANTE(\"5\")"
-          },
-          {
-            "conceptId": 915,
-            "conceptCode": "DEF_915",
-            "conceptName": "Concepto definitivo 915",
-            "conceptClass": "definitivo",
+            "conceptId": 939,
+            "conceptCode": "TRANS_939",
+            "conceptName": "Transitorio 939",
+            "conceptClass": "transitorio",
             "value": 0,
-            "formulaUsed": "VALOR_FIJO(\"A\")"
-          },
-          {
-            "conceptId": 934,
-            "conceptCode": "TRANS_934",
-            "conceptName": "Transitorio 934",
-            "conceptClass": "transitorio",
-            "value": 2,
-            "formulaUsed": "CONSTANTE(\"2\")"
-          },
-          {
-            "conceptId": 935,
-            "conceptCode": "TRANS_935",
-            "conceptName": "Transitorio 935",
-            "conceptClass": "transitorio",
-            "value": 1,
-            "formulaUsed": "CONSTANTE(\"1\")"
-          }
-        ],
-        "total": 209
-      },
-      {
-        "legajoId": "legajo_4_xt9uhw",
-        "legajoNro": "353",
-        "legajoNombre": "Sergio",
-        "convenio": "Apuaye",
-        "conceptos": [
-          {
-            "conceptId": 936,
-            "conceptCode": "TRANS_936",
-            "conceptName": "Transitorio 936",
-            "conceptClass": "transitorio",
-            "value": 4,
-            "formulaUsed": "CONSTANTE(\"4\")"
-          }
-        ],
-        "total": 0
-      },
-      {
-        "legajoId": "legajo_5_0w45t1",
-        "legajoNro": "520",
-        "legajoNombre": "Gastón",
-        "convenio": "Luz y Fuerza",
-        "conceptos": [
-          {
-            "conceptId": 937,
-            "conceptCode": "BÁSICO",
-            "conceptName": "Concepto definitivo 937",
-            "conceptClass": "definitivo",
-            "value": 200,
-            "formulaUsed": "VALOR_FIJO(\"Básico\")"
-          },
-          {
-            "conceptId": 909,
-            "conceptCode": "DEF_909",
-            "conceptName": "Concepto definitivo 909",
-            "conceptClass": "definitivo",
-            "value": 4,
-            "formulaUsed": "[SI|CONSTANTE(\"1\")|CONSTANTE(\"1\")|CONSTANTE(\"0\")] MATH(\"+\") CONSTANTE(\"3\")"
-          },
-          {
-            "conceptId": 927,
-            "conceptCode": "DEF_927",
-            "conceptName": "Concepto definitivo 927",
-            "conceptClass": "definitivo",
-            "value": 5,
-            "formulaUsed": "CONSTANTE(\"5\")"
-          },
-          {
-            "conceptId": 915,
-            "conceptCode": "DEF_915",
-            "conceptName": "Concepto definitivo 915",
-            "conceptClass": "definitivo",
-            "value": 5,
-            "formulaUsed": "VALOR_FIJO(\"A\")"
-          },
-          {
-            "conceptId": 934,
-            "conceptCode": "TRANS_934",
-            "conceptName": "Transitorio 934",
-            "conceptClass": "transitorio",
-            "value": 2,
-            "formulaUsed": "CONSTANTE(\"2\")"
-          },
-          {
-            "conceptId": 935,
-            "conceptCode": "TRANS_935",
-            "conceptName": "Transitorio 935",
-            "conceptClass": "transitorio",
-            "value": 1,
-            "formulaUsed": "CONSTANTE(\"1\")"
+            "formulaUsed": ""
           }
         ],
         "total": 214

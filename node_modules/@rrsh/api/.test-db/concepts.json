@@ -160,5 +160,21 @@
     "conceptClass": "definitivo",
     "formula": "VALOR_FIJO(\"Básico\")",
     "tags": []
+  },
+  {
+    "id": 942,
+    "code": "DEF_942",
+    "name": "Concepto definitivo 942",
+    "conceptClass": "definitivo",
+    "formula": "VALOR_FIJO(\"Básico\")",
+    "tags": []
+  },
+  {
+    "id": 943,
+    "code": "DEF_943",
+    "name": "Concepto definitivo 943",
+    "conceptClass": "definitivo",
+    "formula": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")",
+    "tags": []
   }
 ]

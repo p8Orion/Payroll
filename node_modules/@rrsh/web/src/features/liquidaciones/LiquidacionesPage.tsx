@@ -40,6 +40,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
   const [liquidaciones, setLiquidaciones] = useState<LiquidacionRecord[]>([]);
   const [selectedLiquidacionId, setSelectedLiquidacionId] = useState<string>("");
   const [selectedLegajoId, setSelectedLegajoId] = useState<string>("");
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<(typeof LIQUIDATION_TYPES)[number]>("Normal");
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
@@ -198,6 +199,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
     setLiquidaciones((prev) => [payload, ...prev]);
     setSelectedLiquidacionId(payload.id);
     setSelectedLegajoId(payload.legajos[0]?.legajoId ?? "");
+    setCreateModalOpen(false);
   };
 
   const deleteLiquidacion = async () => {
@@ -272,6 +274,13 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
         </div>
         <div className="panel-actions">
           <button
+            className="add-button"
+            onClick={() => setCreateModalOpen(true)}
+            title="Crear una nueva liquidación"
+          >
+            Nueva liquidación
+          </button>
+          <button
             className="remove-inline-button"
             onClick={deleteLiquidacion}
             disabled={!selectedLiquidacion}
@@ -295,63 +304,14 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
           ))}
         </ul>
         </article>
-
-        <article className="panel">
-        <h2>Nueva liquidación</h2>
-        <div className="receipt-toolbar">
-          <div>
-            <label>Tipo</label>
-            <select value={selectedType} onChange={(e) => setSelectedType(e.target.value as (typeof LIQUIDATION_TYPES)[number])}>
-              {LIQUIDATION_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label>Mes</label>
-            <input type="number" min={1} max={12} value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value || 1))} />
-          </div>
-          <div>
-            <label>Año</label>
-            <input type="number" min={2000} max={2100} value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value || new Date().getFullYear()))} />
-          </div>
-        </div>
-        <div className="panel-actions">
-          <button className="add-button" onClick={toggleAllLegajos}>
-            {selectedLegajoIds.length === legajos.length ? "Quitar todos" : "Seleccionar todos"}
-          </button>
-          <button className="add-button" onClick={createLiquidacion}>
-            Ejecutar liquidación
-          </button>
-        </div>
-        <ul className="concept-list">
-          {legajos.map((legajo) => (
-            <li key={legajo.id} className="concept-item">
-              <label style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
-                <input
-                  type="checkbox"
-                  checked={selectedLegajoIds.includes(legajo.id)}
-                  onChange={() => toggleLegajo(legajo.id)}
-                />
-                <span>
-                  <strong>{legajo.nroLegajo || "S/N"}</strong> - {legajo.nombre || "Sin nombre"} ({legajo.convenio || "Sin convenio"})
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
-        </article>
       </div>
 
-      <article className="panel liquidaciones-detail-panel">
-        <h2>Detalle</h2>
-        {!selectedLiquidacion ? (
-          <p>No hay liquidaciones registradas.</p>
-        ) : (
-          <>
-            <h3>Legajos liquidados</h3>
+      <div className="liquidaciones-right-column">
+        <article className="panel liquidaciones-detail-panel">
+          <h2>Legajos Liquidados</h2>
+          {!selectedLiquidacion ? (
+            <p>No hay liquidaciones registradas.</p>
+          ) : (
             <ul className="concept-list">
               {selectedLiquidacion.legajos.map((item) => (
                 <li
@@ -359,90 +319,186 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                   className={item.legajoId === selectedLegajoLiquidado?.legajoId ? "concept-item selected" : "concept-item"}
                   onClick={() => setSelectedLegajoId(item.legajoId)}
                 >
-                  <strong>{item.legajoNro || "S/N"}</strong> - {item.legajoNombre || "Sin nombre"}
+                  <div>
+                    <strong>{item.legajoNro || "S/N"}</strong> - {item.legajoNombre || "Sin nombre"}
+                  </div>
+                  <span
+                    className={`liquidacion-valor ${
+                      typeof item.total === "number" ? (item.total < 0 ? "negativo" : "positivo") : ""
+                    }`}
+                  >
+                    {typeof item.total === "number"
+                      ? `$${item.total.toLocaleString("es-AR", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}`
+                      : "$0,00"}
+                  </span>
                 </li>
               ))}
             </ul>
-            {selectedLegajoLiquidado ? (
-              <>
-                <h3 className="liquidaciones-concepts-title">
-                  Conceptos liquidados - {selectedLegajoLiquidado.legajoNombre || "Sin nombre"} (
-                  {selectedLegajoLiquidado.legajoNro || "S/N"}) - {selectedLiquidacion.liquidationType}{" "}
-                  {selectedLiquidacion.month}/{selectedLiquidacion.year}
-                </h3>
-                <ul className="concept-list">
-                  {definitiveConceptRows.map((row) => (
-                    <li key={`${selectedLegajoLiquidado.legajoId}-${row.conceptId}`} className="concept-item">
-                      <div>
-                        <strong>{row.conceptCode}</strong> - {row.conceptName}
-                      </div>
-                      <span
-                        className={`liquidacion-valor ${
-                          typeof row.value === "number"
-                            ? row.value < 0
-                              ? "negativo"
-                              : "positivo"
-                            : ""
-                        }`}
-                      >
-                        {typeof row.value === "number"
-                          ? `$${row.value.toLocaleString("es-AR", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}`
-                          : String(row.value)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                {transitoryConceptRows.length ? (
-                  <>
-                    <hr />
-                    <h3>Conceptos transitorios</h3>
-                    <ul className="concept-list">
-                      {transitoryConceptRows.map((row) => (
-                        <li
-                          key={`${selectedLegajoLiquidado.legajoId}-${row.conceptId}`}
-                          className="concept-item transitorio-item"
-                        >
-                          <div>
-                            <strong>{row.conceptCode}</strong> - {row.conceptName}
-                          </div>
-                          <span
-                            className={`liquidacion-valor ${
-                              typeof row.value === "number"
-                                ? row.value < 0
-                                  ? "negativo"
-                                  : "positivo"
-                                : ""
-                            }`}
-                          >
-                            {typeof row.value === "number"
-                              ? `$${row.value.toLocaleString("es-AR", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2
-                                })}`
-                              : String(row.value)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : null}
-                <p>
-                  <strong>
-                    Total: $
+          )}
+        </article>
+
+        <article className="panel liquidaciones-detail-panel">
+          <h2>Conceptos Liquidados</h2>
+          {!selectedLiquidacion ? (
+            <p>Seleccioná una liquidación para ver los conceptos.</p>
+          ) : selectedLegajoLiquidado ? (
+            <>
+              <h3 className="liquidaciones-concepts-title">
+                {selectedLegajoLiquidado.legajoNombre || "Sin nombre"} ({selectedLegajoLiquidado.legajoNro || "S/N"}) -{" "}
+                {selectedLiquidacion.liquidationType} {selectedLiquidacion.month}/{selectedLiquidacion.year}
+              </h3>
+              <ul className="concept-list">
+                {definitiveConceptRows.map((row) => (
+                  <li key={`${selectedLegajoLiquidado.legajoId}-${row.conceptId}`} className="concept-item">
+                    <div>
+                      <strong>{row.conceptCode}</strong> - {row.conceptName}
+                    </div>
+                    <span
+                      className={`liquidacion-valor ${
+                        typeof row.value === "number"
+                          ? row.value < 0
+                            ? "negativo"
+                            : "positivo"
+                          : ""
+                      }`}
+                    >
+                      {typeof row.value === "number"
+                        ? `$${row.value.toLocaleString("es-AR", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          })}`
+                        : String(row.value)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {definitiveConceptRows.length ? (
+                <div className="concept-item liquidaciones-total-row">
+                  <div>
+                    <strong>Total</strong>
+                  </div>
+                  <span className="liquidacion-valor positivo">
+                    $
                     {selectedLegajoLiquidado.total.toLocaleString("es-AR", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2
                     })}
-                  </strong>
-                </p>
-              </>
-            ) : null}
-          </>
-        )}
-      </article>
+                  </span>
+                </div>
+              ) : null}
+              {transitoryConceptRows.length ? (
+                <>
+                  <hr />
+                  <h3>Conceptos transitorios</h3>
+                  <ul className="concept-list">
+                    {transitoryConceptRows.map((row) => (
+                      <li
+                        key={`${selectedLegajoLiquidado.legajoId}-${row.conceptId}`}
+                        className="concept-item transitorio-item"
+                      >
+                        <div>
+                          <strong>{row.conceptCode}</strong> - {row.conceptName}
+                        </div>
+                        <span
+                          className={`liquidacion-valor ${
+                            typeof row.value === "number"
+                              ? row.value < 0
+                                ? "negativo"
+                                : "positivo"
+                              : ""
+                          }`}
+                        >
+                          {typeof row.value === "number"
+                            ? `$${row.value.toLocaleString("es-AR", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}`
+                            : String(row.value)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+            </>
+          ) : (
+            <p>Seleccioná un legajo para ver sus conceptos liquidados.</p>
+          )}
+        </article>
+      </div>
+      {createModalOpen ? (
+        <div className="modal-backdrop" onClick={() => setCreateModalOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Nueva liquidación</h3>
+            <div className="receipt-toolbar">
+              <div>
+                <label>Tipo</label>
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value as (typeof LIQUIDATION_TYPES)[number])}
+                >
+                  {LIQUIDATION_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label>Mes</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value || 1))}
+                />
+              </div>
+              <div>
+                <label>Año</label>
+                <input
+                  type="number"
+                  min={2000}
+                  max={2100}
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value || new Date().getFullYear()))}
+                />
+              </div>
+            </div>
+            <div className="panel-actions">
+              <button className="add-button" onClick={toggleAllLegajos}>
+                {selectedLegajoIds.length === legajos.length ? "Quitar todos" : "Seleccionar todos"}
+              </button>
+              <button className="add-button" onClick={createLiquidacion}>
+                Ejecutar liquidación
+              </button>
+              <button className="remove-inline-button" onClick={() => setCreateModalOpen(false)}>
+                Cerrar
+              </button>
+            </div>
+            <ul className="concept-list">
+              {legajos.map((legajo) => (
+                <li key={legajo.id} className="concept-item">
+                  <label style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedLegajoIds.includes(legajo.id)}
+                      onChange={() => toggleLegajo(legajo.id)}
+                    />
+                    <span>
+                      <strong>{legajo.nroLegajo || "S/N"}</strong> - {legajo.nombre || "Sin nombre"} (
+                      {legajo.convenio || "Sin convenio"})
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
