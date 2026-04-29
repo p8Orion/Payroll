@@ -193,6 +193,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
           ...legajo,
           composicionValoresFijos: composicion?.valoresFijos ?? []
         },
+        liquidacionesHistory: liquidaciones,
         receiptOrderIds: [...(receipt?.definitiveOrder ?? []), ...(receipt?.transitoryOrder ?? [])],
         asOfMonth: selectedMonth,
         asOfYear: selectedYear
@@ -267,17 +268,11 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
       `¿Anular liquidación ${selectedLiquidacion.liquidationType} ${selectedLiquidacion.month}/${selectedLiquidacion.year}?`
     );
     if (!ok) return;
-    let response = await fetch(`${apiBaseUrl}/liquidaciones/${selectedLiquidacion.id}/estado`, {
+    const response = await fetch(`${apiBaseUrl}/liquidaciones/${selectedLiquidacion.id}/estado`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ estado: "Anulada" })
     });
-    if (!response.ok) {
-      // Compatibilidad con servidor previo (sin endpoint /estado).
-      response = await fetch(`${apiBaseUrl}/liquidaciones/${selectedLiquidacion.id}`, {
-        method: "DELETE"
-      });
-    }
     if (!response.ok) {
       window.alert("No se pudo anular la liquidación. Reintentá en unos segundos.");
       return;

@@ -118,9 +118,12 @@ export function useFormulaEditor({
     insertTokenAt(token(formatConstDisplayValue(value), buildConstExpression(value), "function"), index);
   };
 
-  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE", index: number) => {
+  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR", index: number) => {
     const current = [...selectedFormulaTokens];
-    const expr = serializeFunctionBlock(name, Array(getFunctionBlockArity(name)).fill(""));
+    const expr =
+      name === "MES_ANTERIOR"
+        ? serializeFunctionBlock(name, ["", buildConstExpression("Normal"), buildConstExpression("0")])
+        : serializeFunctionBlock(name, Array(getFunctionBlockArity(name)).fill(""));
     current.splice(index, 0, token(name, expr, "block"));
     updateFormulaTokens(current);
   };
@@ -175,9 +178,12 @@ export function useFormulaEditor({
     if (
       fnTemplate === "SI" ||
       fnTemplate === "BLOQUE" ||
-      fnTemplate === "TOPE"
+      fnTemplate === "TOPE" ||
+      fnTemplate === "MES_ANTERIOR"
     ) {
-      return serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill(""));
+      return fnTemplate === "MES_ANTERIOR"
+        ? serializeFunctionBlock(fnTemplate, ["", buildConstExpression("Normal"), buildConstExpression("0")])
+        : serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill(""));
     }
     return "";
   };
@@ -234,6 +240,7 @@ export function useFormulaEditor({
       fnTemplate === "SI" ||
       fnTemplate === "BLOQUE" ||
       fnTemplate === "TOPE" ||
+      fnTemplate === "MES_ANTERIOR" ||
       fnTemplate === "CONSTANTE" ||
       fnTemplate.startsWith("MATH:")
     ) {
@@ -243,14 +250,19 @@ export function useFormulaEditor({
         if (
           fnTemplate === "SI" ||
           fnTemplate === "BLOQUE" ||
-          fnTemplate === "TOPE"
+          fnTemplate === "TOPE" ||
+          fnTemplate === "MES_ANTERIOR"
         ) {
+          const defaultArgs =
+            fnTemplate === "MES_ANTERIOR"
+              ? ["", buildConstExpression("Normal"), buildConstExpression("0")]
+              : Array(getFunctionBlockArity(fnTemplate)).fill("");
           next.splice(
             safeInsertAt,
             0,
             token(
-              fnTemplate as "SI" | "BLOQUE" | "TOPE",
-              serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill("")),
+              fnTemplate as "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR",
+              serializeFunctionBlock(fnTemplate, defaultArgs),
               "block"
             )
           );
@@ -327,15 +339,17 @@ export function useFormulaEditor({
       ifTemplate === "SI" ||
       ifTemplate === "BLOQUE" ||
       ifTemplate === "TOPE" ||
+      ifTemplate === "MES_ANTERIOR" ||
       ifTemplate === "CONSTANTE" ||
       ifTemplate.startsWith("MATH:")
     ) {
       if (
         ifTemplate === "SI" ||
         ifTemplate === "BLOQUE" ||
-        ifTemplate === "TOPE"
+        ifTemplate === "TOPE" ||
+        ifTemplate === "MES_ANTERIOR"
       ) {
-        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE", targetIndex);
+        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR", targetIndex);
       } else if (ifTemplate === "CONSTANTE") {
         insertTokenAt(token("const", buildConstExpression("0"), "function"), targetIndex);
       } else {

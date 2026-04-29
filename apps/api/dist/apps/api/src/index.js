@@ -81,18 +81,22 @@ const legajosDbPath = process.env.LEGAJOS_DB_FILE ??
     (0, node_path_1.resolve)(process.cwd(), ".test-db", "legajos.json");
 const liquidacionesDbPath = process.env.LIQUIDACIONES_DB_FILE ??
     (0, node_path_1.resolve)(process.cwd(), ".test-db", "liquidaciones.json");
+const receiptsDbPath = process.env.RECEIPTS_DB_FILE ??
+    (0, node_path_1.resolve)(process.cwd(), ".test-db", "receipts.json");
 const conveniosDbPath = process.env.CONVENIOS_DB_FILE ??
     (0, node_path_1.resolve)(process.cwd(), ".test-db", "convenios.json");
 const composicionesDbPath = process.env.COMPOSICIONES_DB_FILE ??
     (0, node_path_1.resolve)(process.cwd(), ".test-db", "composiciones-salariales.json");
+const f1359FieldsDbPath = process.env.F1359_FIELDS_DB_FILE ??
+    (0, node_path_1.resolve)(process.cwd(), ".test-db", "f1359-fields.json");
 const fixedConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"];
-const repo = process.env.NODE_ENV === "production"
-    ? new domain_1.InMemoryConceptRepository()
-    : new FileBackedConceptRepository(new domain_1.InMemoryConceptRepository(), diskDbPath);
+const repo = new FileBackedConceptRepository(new domain_1.InMemoryConceptRepository(), diskDbPath);
 let legajosStore = [];
 let liquidacionesStore = [];
+let receiptsStore = [];
 let conveniosStore = [...fixedConvenios];
 let composicionesStore = [];
+let f1359FieldsStore = [];
 async function initLegajosStore() {
     try {
         const raw = await (0, promises_1.readFile)(legajosDbPath, "utf8");
@@ -129,6 +133,21 @@ async function persistLiquidacionesStore() {
     await (0, promises_1.mkdir)((0, node_path_1.dirname)(liquidacionesDbPath), { recursive: true });
     await (0, promises_1.writeFile)(liquidacionesDbPath, JSON.stringify(liquidacionesStore, null, 2), "utf8");
 }
+async function initReceiptsStore() {
+    try {
+        const raw = await (0, promises_1.readFile)(receiptsDbPath, "utf8");
+        const parsed = JSON.parse(raw);
+        receiptsStore = Array.isArray(parsed) ? parsed : [];
+    }
+    catch {
+        receiptsStore = [];
+        await persistReceiptsStore();
+    }
+}
+async function persistReceiptsStore() {
+    await (0, promises_1.mkdir)((0, node_path_1.dirname)(receiptsDbPath), { recursive: true });
+    await (0, promises_1.writeFile)(receiptsDbPath, JSON.stringify(receiptsStore, null, 2), "utf8");
+}
 async function initConveniosStore() {
     try {
         const raw = await (0, promises_1.readFile)(conveniosDbPath, "utf8");
@@ -158,6 +177,21 @@ async function initComposicionesStore() {
 async function persistComposicionesStore() {
     await (0, promises_1.mkdir)((0, node_path_1.dirname)(composicionesDbPath), { recursive: true });
     await (0, promises_1.writeFile)(composicionesDbPath, JSON.stringify(composicionesStore, null, 2), "utf8");
+}
+async function initF1359FieldsStore() {
+    try {
+        const raw = await (0, promises_1.readFile)(f1359FieldsDbPath, "utf8");
+        const parsed = JSON.parse(raw);
+        f1359FieldsStore = Array.isArray(parsed) ? parsed : [];
+    }
+    catch {
+        f1359FieldsStore = [];
+        await persistF1359FieldsStore();
+    }
+}
+async function persistF1359FieldsStore() {
+    await (0, promises_1.mkdir)((0, node_path_1.dirname)(f1359FieldsDbPath), { recursive: true });
+    await (0, promises_1.writeFile)(f1359FieldsDbPath, JSON.stringify(f1359FieldsStore, null, 2), "utf8");
 }
 app.get("/health", async () => ({ ok: true }));
 app.get("/concepts", async () => repo.list());
@@ -202,11 +236,23 @@ app.delete("/liquidaciones/:id", async (req) => {
     await persistLiquidacionesStore();
     return { ok: true };
 });
+app.get("/receipts", async () => receiptsStore);
+app.put("/receipts", async (req) => {
+    receiptsStore = Array.isArray(req.body) ? req.body : [];
+    await persistReceiptsStore();
+    return { ok: true };
+});
 app.get("/convenios", async () => conveniosStore);
 app.get("/composiciones-salariales", async () => composicionesStore);
 app.put("/composiciones-salariales", async (req) => {
     composicionesStore = Array.isArray(req.body) ? req.body : [];
     await persistComposicionesStore();
+    return { ok: true };
+});
+app.get("/f1359-fields", async () => f1359FieldsStore);
+app.put("/f1359-fields", async (req) => {
+    f1359FieldsStore = Array.isArray(req.body) ? req.body : [];
+    await persistF1359FieldsStore();
     return { ok: true };
 });
 app.post("/liquidaciones/run", async (req) => {
@@ -219,18 +265,20 @@ app.post("/liquidaciones/run", async (req) => {
     return out;
 });
 const start = async () => {
-    if (repo instanceof FileBackedConceptRepository) {
-        await repo.init();
-        app.log.info(`Concept DB file: ${diskDbPath}`);
-    }
+    await repo.init();
+    app.log.info(`Concept DB file: ${diskDbPath}`);
     await initLegajosStore();
     await initLiquidacionesStore();
+    await initReceiptsStore();
     await initConveniosStore();
     await initComposicionesStore();
+    await initF1359FieldsStore();
     app.log.info(`Legajos DB file: ${legajosDbPath}`);
     app.log.info(`Liquidaciones DB file: ${liquidacionesDbPath}`);
+    app.log.info(`Receipts DB file: ${receiptsDbPath}`);
     app.log.info(`Convenios DB file: ${conveniosDbPath}`);
     app.log.info(`Composiciones DB file: ${composicionesDbPath}`);
+    app.log.info(`F1359 Fields DB file: ${f1359FieldsDbPath}`);
     await app.listen({ port: 3001, host: "0.0.0.0" });
 };
 start().catch((err) => {

@@ -5,12 +5,25 @@ import {
   normalizeExcelIf
 } from "./function-blocks";
 import { formulaToExpression } from "./helpers";
-import { ConceptModel, getConceptTypeDefinition, TagAggregationOp } from "./types";
+import { ConceptModel, getConceptTypeDefinition, LiquidationType, TagAggregationOp } from "./types";
 
 export interface LegajoLike {
+  id?: string;
   valoresFijos: Array<{ clave?: string; concepto?: string; valor: number }>;
   composicionValoresFijos?: Array<{ clave?: string; concepto?: string; valor: number }>;
   fechaIngreso?: string;
+}
+
+interface HistoricalLiquidacionRecord {
+  liquidationType: LiquidationType;
+  estado?: "Generada" | "Anulada";
+  month: number;
+  year: number;
+  createdAt?: string;
+  legajos: Array<{
+    legajoId: string;
+    conceptos: Array<{ conceptId?: number; conceptCode?: string; value: unknown }>;
+  }>;
 }
 
 interface EvalParams {
@@ -22,6 +35,7 @@ interface EvalParams {
   params?: Record<string, number>;
   asOfMonth?: number;
   asOfYear?: number;
+  liquidacionesHistory?: HistoricalLiquidacionRecord[];
 }
 
 export interface EvalResult {
@@ -103,6 +117,76 @@ function resolveValorLegajoConceptCode(
   return arg;
 }
 
+function resolveLiteralArg(rawArg: string): string {
+  const arg = rawArg.trim();
+  if (!arg) return "";
+  const byConst = arg.match(/^CONSTANTE\("((?:[^"\\]|\\.)*)"\)$/);
+  if (byConst) return byConst[1].replace(/\\"/g, "\"");
+  const byQuoted = arg.match(/^"((?:[^"\\]|\\.)*)"$/);
+  if (byQuoted) return byQuoted[1].replace(/\\"/g, "\"");
+  return arg;
+}
+
+function resolveMesAnteriorConceptRef(
+  rawArg: string,
+  conceptCodeById: Record<number, string>
+): { conceptId?: number; conceptCode?: string } {
+  const arg = rawArg.trim();
+  if (!arg) return {};
+  const byId = arg.match(/^CONCEPTO\((\d+)\)$/);
+  if (byId) return { conceptId: Number(byId[1]) };
+  const byCode = arg.match(/^CCONCEPTO\("([^"]+)"\)$/);
+  if (byCode) return { conceptCode: byCode[1] };
+  const value = resolveLiteralArg(arg);
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && conceptCodeById[numeric]) return { conceptId: numeric };
+  return { conceptCode: value };
+}
+
+function subtractMonths(year: number, month: number, monthsBack: number): { year: number; month: number } {
+  const safeMonth = Math.min(12, Math.max(1, month));
+  const date = new Date(Date.UTC(year, safeMonth - 1, 1));
+  date.setUTCMonth(date.getUTCMonth() - monthsBack);
+  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1 };
+}
+
+function resolveMesAnteriorValue(
+  rawArgs: string,
+  conceptCodeById: Record<number, string>,
+  legajo: LegajoLike | null,
+  asOfMonth: number,
+  asOfYear: number,
+  liquidacionesHistory: HistoricalLiquidacionRecord[]
+): number {
+  const [rawConcept = "", rawType = "", rawMonths = "0"] = rawArgs.split("@@");
+  const conceptRef = resolveMesAnteriorConceptRef(rawConcept, conceptCodeById);
+  const liquidationType = resolveLiteralArg(rawType) as LiquidationType;
+  const monthsBack = Math.max(0, Math.floor(Number(resolveLiteralArg(rawMonths)) || 0));
+  const target = subtractMonths(asOfYear, asOfMonth, monthsBack);
+  const legajoId = (legajo?.id ?? "").trim();
+  if (!legajoId) return 0;
+  const candidates = liquidacionesHistory.filter(
+    (item) =>
+      item.estado !== "Anulada" &&
+      item.liquidationType === liquidationType &&
+      item.year === target.year &&
+      item.month === target.month
+  );
+  if (!candidates.length) return 0;
+  const sorted = [...candidates].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+  for (const liq of sorted) {
+    const legajoRow = liq.legajos.find((row) => row.legajoId === legajoId);
+    if (!legajoRow) continue;
+    const found = legajoRow.conceptos.find((row) => {
+      if (conceptRef.conceptId !== undefined && row.conceptId === conceptRef.conceptId) return true;
+      if (conceptRef.conceptCode && row.conceptCode === conceptRef.conceptCode) return true;
+      return false;
+    });
+    if (found) return toNumericOrZero(found.value);
+  }
+  return 0;
+}
+
 function resolveAntiguedadYears(
   legajo: LegajoLike | null,
   asOfMonth: number,
@@ -128,7 +212,8 @@ export function evaluateConcepts({
   selectedConceptId,
   params = { porc_antiguedad: 0.12 },
   asOfMonth = new Date().getMonth() + 1,
-  asOfYear = new Date().getFullYear()
+  asOfYear = new Date().getFullYear(),
+  liquidacionesHistory = []
 }: EvalParams): EvalResult {
   const conceptById = new Map(concepts.map((c) => [c.id, c]));
   const conceptIdByCode = new Map(concepts.map((c) => [c.code, c.id]));
@@ -249,6 +334,18 @@ export function evaluateConcepts({
           const code = resolveValorLegajoConceptCode(rawArg, concept.code, conceptCodeById);
           return String(getValorLegajo(legajo, code, concept.code));
         })
+        .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+          String(
+            resolveMesAnteriorValue(
+              rawArgs,
+              conceptCodeById,
+              legajo,
+              asOfMonth,
+              asOfYear,
+              liquidacionesHistory
+            )
+          )
+        )
         .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, conceptoRaw: string) =>
           String(getValorLegajo(legajo, conceptoRaw, concept.code))
         )

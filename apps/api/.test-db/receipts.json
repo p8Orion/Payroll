@@ -1,0 +1,309 @@
+[
+  {
+    "id": "(Todos)__Normal",
+    "convenio": "(Todos)",
+    "liquidationType": "Normal",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Todos)__Vacaciones",
+    "convenio": "(Todos)",
+    "liquidationType": "Vacaciones",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Todos)__BAE",
+    "convenio": "(Todos)",
+    "liquidationType": "BAE",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Todos)__SAC",
+    "convenio": "(Todos)",
+    "liquidationType": "SAC",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Todos)__Final",
+    "convenio": "(Todos)",
+    "liquidationType": "Final",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Todos)__Anual",
+    "convenio": "(Todos)",
+    "liquidationType": "Anual",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Todos)__Ticket",
+    "convenio": "(Todos)",
+    "liquidationType": "Ticket",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Luz y Fuerza__Normal",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "Normal",
+    "definitiveOrder": [
+      100,
+      120,
+      904,
+      945,
+      958
+    ],
+    "transitoryOrder": [
+      900
+    ]
+  },
+  {
+    "id": "Luz y Fuerza__Vacaciones",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "Vacaciones",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Luz y Fuerza__BAE",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "BAE",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Luz y Fuerza__SAC",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "SAC",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Luz y Fuerza__Final",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "Final",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Luz y Fuerza__Anual",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "Anual",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Luz y Fuerza__Ticket",
+    "convenio": "Luz y Fuerza",
+    "liquidationType": "Ticket",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Apuaye__Normal",
+    "convenio": "Apuaye",
+    "liquidationType": "Normal",
+    "definitiveOrder": [
+      945,
+      946,
+      952,
+      947,
+      948,
+      949,
+      950,
+      951,
+      959
+    ],
+    "transitoryOrder": [
+      936,
+      955,
+      956,
+      957
+    ]
+  },
+  {
+    "id": "Apuaye__Vacaciones",
+    "convenio": "Apuaye",
+    "liquidationType": "Vacaciones",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Apuaye__BAE",
+    "convenio": "Apuaye",
+    "liquidationType": "BAE",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Apuaye__SAC",
+    "convenio": "Apuaye",
+    "liquidationType": "SAC",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Apuaye__Final",
+    "convenio": "Apuaye",
+    "liquidationType": "Final",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Apuaye__Anual",
+    "convenio": "Apuaye",
+    "liquidationType": "Anual",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Apuaye__Ticket",
+    "convenio": "Apuaye",
+    "liquidationType": "Ticket",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__Normal",
+    "convenio": "Comercio",
+    "liquidationType": "Normal",
+    "definitiveOrder": [
+      904,
+      945
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__Vacaciones",
+    "convenio": "Comercio",
+    "liquidationType": "Vacaciones",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__BAE",
+    "convenio": "Comercio",
+    "liquidationType": "BAE",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__SAC",
+    "convenio": "Comercio",
+    "liquidationType": "SAC",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__Final",
+    "convenio": "Comercio",
+    "liquidationType": "Final",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__Anual",
+    "convenio": "Comercio",
+    "liquidationType": "Anual",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "Comercio__Ticket",
+    "convenio": "Comercio",
+    "liquidationType": "Ticket",
+    "definitiveOrder": [
+      904
+    ],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__Normal",
+    "convenio": "(Por defecto)",
+    "liquidationType": "Normal",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__Vacaciones",
+    "convenio": "(Por defecto)",
+    "liquidationType": "Vacaciones",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__BAE",
+    "convenio": "(Por defecto)",
+    "liquidationType": "BAE",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__SAC",
+    "convenio": "(Por defecto)",
+    "liquidationType": "SAC",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__Final",
+    "convenio": "(Por defecto)",
+    "liquidationType": "Final",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__Anual",
+    "convenio": "(Por defecto)",
+    "liquidationType": "Anual",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  },
+  {
+    "id": "(Por defecto)__Ticket",
+    "convenio": "(Por defecto)",
+    "liquidationType": "Ticket",
+    "definitiveOrder": [],
+    "transitoryOrder": []
+  }
+]

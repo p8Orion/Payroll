@@ -1,12 +1,13 @@
 import { DragEvent } from "react";
 import { token } from "../../model/helpers";
 import { buildConstExpression } from "../../model/formula-ui";
+import { serializeFunctionBlock } from "../../model/function-blocks";
 
 interface FormulaToolsPanelProps {
   allTags: string[];
   fixedValueKeys: string[];
   insertAt: number;
-  onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE", index: number) => void;
+  onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR", index: number) => void;
   onInsertConst: (index: number) => void;
   onInsertAntiguedad: (index: number) => void;
   onInsertAnteriores: (index: number) => void;
@@ -31,19 +32,21 @@ export function FormulaToolsPanel({
 }: FormulaToolsPanelProps) {
   const functionItems: Array<{
     label: string;
+    detailedLabel?: string;
     onClick: () => void;
     onDragStart: (e: DragEvent<HTMLElement>) => void;
   }> = [
     {
-      label: "ANTERIORES",
+      label: "PREVIOS",
+      detailedLabel: "Suma de Conceptos Previos del Recibo",
       onClick: () => onInsertAnteriores(insertAt),
       onDragStart: (e: DragEvent<HTMLElement>) => {
         e.dataTransfer.effectAllowed = "copyMove";
-        e.dataTransfer.setData("text/plain", "ANTERIORES");
-        setCursorGhost(e, "ANTERIORES");
+        e.dataTransfer.setData("text/plain", "PREVIOS");
+        setCursorGhost(e, "PREVIOS");
         e.dataTransfer.setData(
           "text/token-json",
-          JSON.stringify(token("Suma de Anteriores", "ANTERIORES()", "function"))
+          JSON.stringify(token("Suma de Conceptos Previos del Recibo", "ANTERIORES()", "function"))
         );
       }
     },
@@ -57,6 +60,26 @@ export function FormulaToolsPanel({
         e.dataTransfer.setData(
           "text/token-json",
           JSON.stringify(token("Antigüedad", "ANTIGUEDAD()", "function"))
+        );
+      }
+    },
+    {
+      label: "MES-ANTERIOR",
+      detailedLabel: "Valor de un concepto en una liquidación previa",
+      onClick: () => onInsertBlockTemplate("MES_ANTERIOR", insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "MES-ANTERIOR");
+        setCursorGhost(e, "MES-ANTERIOR");
+        e.dataTransfer.setData(
+          "text/token-json",
+          JSON.stringify(
+            token(
+              "MES-ANTERIOR",
+              serializeFunctionBlock("MES_ANTERIOR", ["", buildConstExpression("Normal"), buildConstExpression("1")]),
+              "block"
+            )
+          )
         );
       }
     },
@@ -118,6 +141,7 @@ export function FormulaToolsPanel({
           <button
             key={fn.label}
             className="chip"
+            title={fn.detailedLabel}
             draggable
             onDragStart={fn.onDragStart}
             onClick={fn.onClick}

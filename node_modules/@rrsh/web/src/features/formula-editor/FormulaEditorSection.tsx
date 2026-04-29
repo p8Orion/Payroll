@@ -14,6 +14,7 @@ interface FormulaEditorSectionProps {
   previewValue: unknown | null;
   previewError: string | null;
   hasCycle: boolean;
+  hidePreview?: boolean;
 }
 
 export function FormulaEditorSection({
@@ -27,7 +28,8 @@ export function FormulaEditorSection({
   onFormulaTextChange,
   previewValue,
   previewError,
-  hasCycle
+  hasCycle,
+  hidePreview = false
 }: FormulaEditorSectionProps) {
   const [showFormulaText, setShowFormulaText] = useState(false);
   const formatPreviewValue = (value: unknown): string =>
@@ -78,18 +80,20 @@ export function FormulaEditorSection({
           />
         ) : null}
       </div>
-      <div className="preview">
-        <h3>Pre-cálculo de prueba</h3>
-        <p>
-          <strong>
-            {hasCycle
-              ? "Error (ciclo DAG)"
-              : previewValue === null
-                ? `Error: ${previewError ?? "error de compilacion"}`
-                : formatPreviewValue(previewValue)}
-          </strong>
-        </p>
-      </div>
+      {!hidePreview ? (
+        <div className="preview">
+          <h3>Pre-cálculo de prueba</h3>
+          <p>
+            <strong>
+              {hasCycle
+                ? "Error (ciclo DAG)"
+                : previewValue === null
+                  ? `Error: ${previewError ?? "error de compilacion"}`
+                  : formatPreviewValue(previewValue)}
+            </strong>
+          </p>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -370,6 +370,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0;
+  row-gap: 6px;
   width: 100%;
   min-width: 100%;
   border-radius: 8px;
@@ -782,6 +783,61 @@
   min-height: 26px;
 }
 
+.mes-anterior-block {
+  min-width: 0;
+  width: fit-content;
+  --mes-anterior-tipo-width: 130px;
+  --mes-anterior-meses-width: 88px;
+  --mes-anterior-controls-gap: 8px;
+  --mes-anterior-row-width: calc(
+    var(--mes-anterior-tipo-width) + var(--mes-anterior-meses-width) + var(--mes-anterior-controls-gap)
+  );
+}
+
+.mes-anterior-concept-row,
+.mes-anterior-controls {
+  width: var(--mes-anterior-row-width);
+  max-width: var(--mes-anterior-row-width);
+}
+
+.mes-anterior-controls {
+  display: flex;
+  align-items: end;
+  gap: var(--mes-anterior-controls-gap);
+}
+
+.mes-anterior-control {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mes-anterior-controls .mes-anterior-control:first-child {
+  flex: 0 0 var(--mes-anterior-tipo-width);
+  max-width: var(--mes-anterior-tipo-width);
+}
+
+.mes-anterior-controls .mes-anterior-control:last-child {
+  flex: 0 0 var(--mes-anterior-meses-width);
+  max-width: var(--mes-anterior-meses-width);
+}
+
+.mes-anterior-control strong {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.mes-anterior-control select,
+.mes-anterior-control input {
+  border: 1px solid #c6d0ea;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font: inherit;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .formula-slot.slot-cond {
   background: #fef3c7;
   border-color: #f59e0b;
@@ -818,9 +874,9 @@
 
 .receipt-toolbar {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
 }
 
 .liquidaciones-filter-toolbar {

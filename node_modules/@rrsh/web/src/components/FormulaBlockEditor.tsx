@@ -8,7 +8,7 @@ import {
 } from "../model/function-blocks";
 import { tokenizeFormulaExpression, token, getShapeGlyph } from "../model/helpers";
 import { formatConstDisplayValue } from "../model/formula-ui";
-import { FormulaToken } from "../model/types";
+import { FormulaToken, LIQUIDATION_TYPES } from "../model/types";
 
 interface FormulaBlockEditorProps {
   blockExpr: string;
@@ -470,7 +470,10 @@ export function FormulaBlockEditor({
   };
 
   return (
-    <div className="si-block" style={scopePastelStyle(parsed.name, level)}>
+    <div
+      className={parsed.name === "MES_ANTERIOR" ? "si-block mes-anterior-block" : "si-block"}
+      style={scopePastelStyle(parsed.name, level)}
+    >
       {onRemove ? (
         <button
           type="button"
@@ -484,8 +487,58 @@ export function FormulaBlockEditor({
           -
         </button>
       ) : null}
-      <div className="si-block-title">{parsed.name}</div>
-      {parsed.name === "SI" ? (
+      <div className="si-block-title">{parsed.name === "MES_ANTERIOR" ? "MES-ANTERIOR" : parsed.name}</div>
+      {parsed.name === "MES_ANTERIOR" ? (
+        <>
+          <div className="mes-anterior-concept-row">
+            {renderBranchEditor(args[0] ?? "", 0, "CONCEPTO", "slot-cond")}
+          </div>
+          <div className="mes-anterior-controls">
+            <label className="mes-anterior-control">
+              <strong>TIPO</strong>
+              <select
+                value={(() => {
+                  const raw = (args[1] ?? "").trim();
+                  const parsedType = isConstExpression(raw) ? parseConstValue(raw) : raw.replace(/^"|"$/g, "");
+                  return LIQUIDATION_TYPES.includes(parsedType as (typeof LIQUIDATION_TYPES)[number])
+                    ? parsedType
+                    : LIQUIDATION_TYPES[0];
+                })()}
+                onChange={(e) => {
+                  const nextArgs = [...args];
+                  nextArgs[1] = buildConstExpression(e.target.value);
+                  onChange(serializeFunctionBlock(parsed.name, nextArgs));
+                }}
+              >
+                {LIQUIDATION_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="mes-anterior-control">
+              <strong>MESES ATRÁS</strong>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={(() => {
+                  const raw = (args[2] ?? "").trim();
+                  const parsedMonths = Number(isConstExpression(raw) ? parseConstValue(raw) : raw);
+                  return Number.isFinite(parsedMonths) && parsedMonths >= 0 ? Math.floor(parsedMonths) : 0;
+                })()}
+                onChange={(e) => {
+                  const parsedMonths = Math.max(0, Math.floor(Number(e.target.value || "0")));
+                  const nextArgs = [...args];
+                  nextArgs[2] = buildConstExpression(String(parsedMonths));
+                  onChange(serializeFunctionBlock(parsed.name, nextArgs));
+                }}
+              />
+            </label>
+          </div>
+        </>
+      ) : parsed.name === "SI" ? (
         <>
           {Array.from({ length: Math.max(1, Math.floor((args.length - 1) / 2)) }, (_, pairIndex) => {
             const conditionIndex = pairIndex * 2;

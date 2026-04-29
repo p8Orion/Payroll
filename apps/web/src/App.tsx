@@ -32,6 +32,7 @@ import {
 import { initialConcepts, initialReceipts } from "./model/seed";
 import {
   CONCEPT_TYPE_DEFINITIONS,
+  F1359FieldModel,
   ConceptShape,
   ConceptModel,
   ConceptTypeId,
@@ -49,15 +50,63 @@ interface ApiConcept {
   name: string;
   conceptClass: "definitivo" | "transitorio";
   conceptType?: ConceptTypeId;
+  f1359FieldId?: string;
   formula?: string;
   tags: string[];
 }
 
+interface ApiReceipt {
+  id: string;
+  convenio: string;
+  liquidationType: string;
+  definitiveOrder: number[];
+  transitoryOrder: number[];
+}
+
+interface ApiF1359Field {
+  id: string;
+  registro: string;
+  campo: string;
+  descripcion: string;
+  posicionInicial: number;
+  posicionFinal: number;
+  longitud: number;
+}
+
+interface HistoricalLiquidacionRecord {
+  liquidationType: LiquidationType;
+  estado?: "Generada" | "Anulada";
+  month: number;
+  year: number;
+  createdAt?: string;
+  legajos: Array<{
+    legajoId: string;
+    conceptos: Array<{ conceptId?: number; conceptCode?: string; value: unknown }>;
+  }>;
+}
+
 const apiBaseUrl = "http://localhost:3001";
-const receiptsStorageKey = "rrsh.receipts.v1";
+const legacyReceiptsStorageKey = "rrsh.receipts.v1";
+const receiptF1359FilterStorageKey = "rrsh.receipt-f1359-filter.v1";
+const receiptTagFilterStorageKey = "rrsh.receipt-tag-filter.v1";
 const maxHistoryEntries = 200;
 const defaultConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"];
-const virtualAllConvenio = "(Todos)";
+const genericDefaultConvenio = "(Por defecto)";
+const filterAllOption = "(Todos)";
+const simulationMonthOptions = [
+  { value: 1, label: "Enero" },
+  { value: 2, label: "Febrero" },
+  { value: 3, label: "Marzo" },
+  { value: 4, label: "Abril" },
+  { value: 5, label: "Mayo" },
+  { value: 6, label: "Junio" },
+  { value: 7, label: "Julio" },
+  { value: 8, label: "Agosto" },
+  { value: 9, label: "Septiembre" },
+  { value: 10, label: "Octubre" },
+  { value: 11, label: "Noviembre" },
+  { value: 12, label: "Diciembre" }
+] as const;
 const implicitTypeTagValues = new Set<string>([
   "remunerativo",
   "no_remunerativo",
@@ -88,10 +137,18 @@ function receiptId(convenio: string, liquidationType: LiquidationType): string {
 }
 
 function normalizeReceipt(
-  receipt: Partial<ReceiptModel> & { id?: string; convenio?: string; name?: string; liquidationType?: string },
+  receipt: {
+    id?: string;
+    convenio?: string;
+    name?: string;
+    liquidationType?: string;
+    definitiveOrder?: number[];
+    transitoryOrder?: number[];
+  },
   fallbackOrder: number[]
 ): ReceiptModel | null {
-  const convenio = (receipt.convenio ?? "").trim();
+  const rawConvenio = (receipt.convenio ?? "").trim();
+  const convenio = rawConvenio === "(Todos)" ? genericDefaultConvenio : rawConvenio;
   if (!convenio) return null;
   const liquid = LIQUIDATION_TYPES.includes(receipt.liquidationType as LiquidationType)
     ? (receipt.liquidationType as LiquidationType)
@@ -136,6 +193,22 @@ function ensureReceiptMatrix(
   return next;
 }
 
+function parseApiReceipt(
+  receipt: ApiReceipt,
+  fallbackOrder: number[]
+): ReceiptModel | null {
+  return normalizeReceipt(
+    {
+      id: receipt.id,
+      convenio: receipt.convenio,
+      liquidationType: receipt.liquidationType,
+      definitiveOrder: receipt.definitiveOrder,
+      transitoryOrder: receipt.transitoryOrder
+    },
+    fallbackOrder
+  );
+}
+
 function applyImplicitPlusBetweenValues(expression: string): string {
   return expression.replace(
     /(\)|-?\d+(?:\.\d+)?)(\s+)(?=(?:\(|-?\d+(?:\.\d+)?|IF\s*\())/g,
@@ -150,6 +223,7 @@ function toApiConcept(concept: ConceptModel): ApiConcept {
     name: concept.name,
     conceptClass: concept.conceptClass,
     conceptType: concept.conceptType,
+    f1359FieldId: concept.f1359FieldId,
     formula: formulaToExpression(astToTokens(concept.formulaAst ?? [])),
     tags: concept.tags
   };
@@ -165,6 +239,7 @@ function fromApiConcept(
     name: concept.name,
     conceptClass: concept.conceptClass,
     conceptType: concept.conceptType ?? "remunerativo",
+    f1359FieldId: concept.f1359FieldId ?? "",
     color: colorPalette30[(concept.id - 1) % colorPalette30.length],
     shape: shapeCycle[(concept.id - 1) % shapeCycle.length],
     tags: concept.tags ?? [],
@@ -187,41 +262,45 @@ export function App() {
   const [liquidacionesMenuOpen, setLiquidacionesMenuOpen] = useState(false);
   const [concepts, setConcepts] = useState<ConceptModel[]>(initialConcepts);
   const defaultReceiptOrder = useMemo(() => [] as number[], []);
-  const [receipts, setReceipts] = useState<ReceiptModel[]>(() => {
-    const fallbackOrder = initialConcepts
-      .filter((c) => c.conceptClass === "definitivo")
-      .map((c) => c.id);
-    if (typeof window === "undefined") return initialReceipts;
-    try {
-      const raw = window.localStorage.getItem(receiptsStorageKey);
-      if (!raw) {
-        return ensureReceiptMatrix(initialReceipts, defaultConvenios, fallbackOrder);
-      }
-      const parsed = JSON.parse(raw) as ReceiptModel[];
-      const base = parsed.length ? parsed : initialReceipts;
-      return ensureReceiptMatrix(base, defaultConvenios, fallbackOrder);
-    } catch {
-      return ensureReceiptMatrix(initialReceipts, defaultConvenios, fallbackOrder);
-    }
-  });
+  const [receipts, setReceipts] = useState<ReceiptModel[]>(() =>
+    ensureReceiptMatrix(initialReceipts, defaultConvenios, [])
+  );
+  const [receiptsLoaded, setReceiptsLoaded] = useState(false);
   const [activeReceiptId, setActiveReceiptId] = useState("");
-  const [activeConvenio, setActiveConvenio] = useState("Luz y Fuerza");
+  const [receiptConvenioFilter, setReceiptConvenioFilter] = useState(genericDefaultConvenio);
+  const [receiptLiquidationTypeFilter, setReceiptLiquidationTypeFilter] = useState<string>("Normal");
   const [convenioOptions, setConvenioOptions] = useState<string[]>(defaultConvenios);
   const [legajos, setLegajos] = useState<LegajoModel[]>(() => {
     return [];
   });
   const [composiciones, setComposiciones] = useState<ComposicionSalarialModel[]>([]);
   const [simLegajoId, setSimLegajoId] = useState<string>("");
+  const [simMonth, setSimMonth] = useState<number>(new Date().getMonth() + 1);
+  const [simYear, setSimYear] = useState<number>(new Date().getFullYear());
+  const [liquidacionesHistory, setLiquidacionesHistory] = useState<HistoricalLiquidacionRecord[]>([]);
   const [newTagDraft, setNewTagDraft] = useState("");
   const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [conceptCodeDraft, setConceptCodeDraft] = useState("");
   const [conceptNameDraft, setConceptNameDraft] = useState("");
   const [conceptTypeDraft, setConceptTypeDraft] = useState<ConceptTypeId>("remunerativo");
-  const [showReceiptConceptDetail, setShowReceiptConceptDetail] = useState(true);
+  const [membershipTypeDropdownOpen, setMembershipTypeDropdownOpen] = useState(false);
+  const [membershipConvenioDropdownOpen, setMembershipConvenioDropdownOpen] = useState(false);
+  const [showReceiptConceptDetail, setShowReceiptConceptDetail] = useState(false);
+  const [f1359Fields, setF1359Fields] = useState<F1359FieldModel[]>([]);
+  const [receiptF1359Filter, setReceiptF1359Filter] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem(receiptF1359FilterStorageKey) ?? "";
+  });
+  const [receiptTagFilter, setReceiptTagFilter] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem(receiptTagFilterStorageKey) ?? "";
+  });
   const [conceptsLoaded, setConceptsLoaded] = useState(false);
   const [legajosLoaded, setLegajosLoaded] = useState(false);
   const appearanceRef = useRef<HTMLDivElement | null>(null);
   const liquidacionesMenuRef = useRef<HTMLDivElement | null>(null);
+  const membershipTypeComboRef = useRef<HTMLDivElement | null>(null);
+  const membershipConvenioComboRef = useRef<HTMLDivElement | null>(null);
   const [tagModal, setTagModal] = useState<{
     open: boolean;
     tag: string;
@@ -290,16 +369,40 @@ export function App() {
     () =>
       Array.from(
         new Set([
-          virtualAllConvenio,
+          filterAllOption,
           ...convenioOptions,
           ...receipts.map((r) => r.convenio),
-          activeConvenio
+          receiptConvenioFilter
         ])
       ),
-    [receipts, convenioOptions, activeConvenio]
+    [receipts, convenioOptions, receiptConvenioFilter]
   );
-  const receiptsByConvenio = receipts.filter((r) => r.convenio === activeConvenio);
-  const allTags = [...new Set(concepts.flatMap((c) => c.tags))];
+  const receiptsByConvenio = useMemo(
+    () =>
+      receiptConvenioFilter === filterAllOption
+        ? receipts
+        : receipts.filter((r) => r.convenio === receiptConvenioFilter),
+    [receipts, receiptConvenioFilter]
+  );
+  const receiptLiquidationTypeOptions = useMemo(
+    () =>
+      Array.from(
+        new Set([filterAllOption, ...receiptsByConvenio.map((receipt) => receipt.liquidationType)])
+      ),
+    [receiptsByConvenio]
+  );
+  const receiptsByScreenFilter = useMemo(
+    () =>
+      receiptLiquidationTypeFilter === filterAllOption
+        ? receiptsByConvenio
+        : receiptsByConvenio.filter((receipt) => receipt.liquidationType === receiptLiquidationTypeFilter),
+    [receiptsByConvenio, receiptLiquidationTypeFilter]
+  );
+  const hidePrecalculationPreview =
+    receiptConvenioFilter === filterAllOption || receiptLiquidationTypeFilter === filterAllOption;
+  const allTags = [...new Set(concepts.flatMap((c) => c.tags))].sort((a, b) =>
+    a.localeCompare(b, "es", { sensitivity: "base" })
+  );
   const fixedValueKeys = useMemo(
     () =>
       Array.from(
@@ -316,15 +419,76 @@ export function App() {
       tag.toLowerCase().includes(newTagDraft.trim().toLowerCase())
   );
   const [editingId, setEditingId] = useState<number>(definitivos[0].id);
-  const activeReceipt = receipts.find((r) => r.id === activeReceiptId) ?? receiptsByConvenio[0] ?? receipts[0];
-  const definitivosEnRecibo = activeReceipt.definitiveOrder
+  const activeReceipt = receipts.find((r) => r.id === activeReceiptId) ?? receiptsByScreenFilter[0] ?? receipts[0];
+  const definitiveOrderForScreen = Array.from(
+    new Set(receiptsByScreenFilter.flatMap((receipt) => receipt.definitiveOrder))
+  );
+  const transitoryOrderForScreen = Array.from(
+    new Set(receiptsByScreenFilter.flatMap((receipt) => receipt.transitoryOrder))
+  );
+  const definitivosEnReciboBase = definitiveOrderForScreen
     .map((id) => concepts.find((c) => c.id === id))
     .filter((c): c is ConceptModel => Boolean(c));
-  const transitoriosEnRecibo = activeReceipt.transitoryOrder
+  const transitoriosEnReciboBase = transitoryOrderForScreen
     .map((id) => concepts.find((c) => c.id === id))
-    .filter((c): c is ConceptModel => Boolean(c));
+    .filter((c): c is ConceptModel => Boolean(c))
+    .sort((a, b) => a.code.localeCompare(b.code, "es", { sensitivity: "base" }));
+  const definitivosEnRecibo = receiptF1359Filter
+    ? definitivosEnReciboBase.filter((concept) => (concept.f1359FieldId ?? "") === receiptF1359Filter)
+    : definitivosEnReciboBase;
+  const transitoriosEnRecibo = receiptF1359Filter
+    ? transitoriosEnReciboBase.filter((concept) => (concept.f1359FieldId ?? "") === receiptF1359Filter)
+    : transitoriosEnReciboBase;
+  const normalizedReceiptTagFilter = receiptTagFilter.trim().toLowerCase();
+  const definitivosEnReciboFiltrados = normalizedReceiptTagFilter
+    ? definitivosEnRecibo.filter((concept) =>
+        (concept.tags ?? []).some((tag) => tag.trim().toLowerCase() === normalizedReceiptTagFilter)
+      )
+    : definitivosEnRecibo;
+  const transitoriosEnReciboFiltrados = normalizedReceiptTagFilter
+    ? transitoriosEnRecibo.filter((concept) =>
+        (concept.tags ?? []).some((tag) => tag.trim().toLowerCase() === normalizedReceiptTagFilter)
+      )
+    : transitoriosEnRecibo;
 
   const selectedConcept = concepts.find((c) => c.id === editingId) ?? concepts[0];
+  const conceptReceiptMembership = useMemo(
+    () =>
+      receipts.map((receipt) => ({
+        receiptId: receipt.id,
+        convenio: receipt.convenio,
+        liquidationType: receipt.liquidationType,
+        belongs:
+          selectedConcept.conceptClass === "definitivo"
+            ? receipt.definitiveOrder.includes(selectedConcept.id)
+            : receipt.transitoryOrder.includes(selectedConcept.id)
+      })),
+    [receipts, selectedConcept]
+  );
+  const membershipConvenioOptions = useMemo(
+    () => Array.from(new Set(conceptReceiptMembership.map((item) => item.convenio))),
+    [conceptReceiptMembership]
+  );
+  const membershipLiquidationTypeOptions = useMemo(
+    () => Array.from(new Set(conceptReceiptMembership.map((item) => item.liquidationType))),
+    [conceptReceiptMembership]
+  );
+  const selectedConveniosForIntersection = useMemo(
+    () =>
+      membershipConvenioOptions.filter((convenio) =>
+        conceptReceiptMembership.some((item) => item.convenio === convenio && item.belongs)
+      ),
+    [membershipConvenioOptions, conceptReceiptMembership]
+  );
+  const selectedLiquidationTypesForIntersection = useMemo(
+    () =>
+      membershipLiquidationTypeOptions.filter((liquidationType) =>
+        conceptReceiptMembership.some(
+          (item) => item.liquidationType === liquidationType && item.belongs
+        )
+      ),
+    [membershipLiquidationTypeOptions, conceptReceiptMembership]
+  );
   const selectedFormulaAst = selectedConcept.formulaAst ?? [];
   const conceptTokens = (concept: ConceptModel): FormulaToken[] => astToTokens(concept.formulaAst ?? []);
   const conceptExpression = (concept: ConceptModel): string => formulaToExpression(conceptTokens(concept));
@@ -342,10 +506,10 @@ export function App() {
   );
   const simLegajosForConvenio = useMemo(
     () =>
-      (activeConvenio ?? "").trim() === virtualAllConvenio
+      (receiptConvenioFilter ?? "").trim() === filterAllOption
         ? legajos
-        : legajos.filter((l) => (l.convenio ?? "").trim() === (activeConvenio ?? "").trim()),
-    [legajos, activeConvenio]
+        : legajos.filter((l) => (l.convenio ?? "").trim() === (activeReceipt?.convenio ?? "").trim()),
+    [legajos, receiptConvenioFilter, activeReceipt]
   );
   const resolveComposicionLegajo = (legajo: LegajoModel | null): ComposicionSalarialModel | undefined => {
     if (!legajo) return undefined;
@@ -388,12 +552,67 @@ export function App() {
     const ingresoYear = Number(parsed[1]);
     const ingresoMonth = Number(parsed[2]);
     if (!Number.isFinite(ingresoYear) || !Number.isFinite(ingresoMonth)) return 0;
-    const now = new Date();
-    const asOfYear = now.getFullYear();
-    const asOfMonth = now.getMonth() + 1;
-    const months = (asOfYear - ingresoYear) * 12 + (asOfMonth - ingresoMonth);
+    const months = (simYear - ingresoYear) * 12 + (simMonth - ingresoMonth);
     if (!Number.isFinite(months) || months <= 0) return 0;
     return Math.floor(months / 12);
+  };
+  const resolveLiteralArg = (rawArg: string): string => {
+    const arg = rawArg.trim();
+    if (!arg) return "";
+    const byConst = arg.match(/^CONSTANTE\("((?:[^"\\]|\\.)*)"\)$/);
+    if (byConst) return byConst[1].replace(/\\"/g, "\"");
+    const byQuoted = arg.match(/^"((?:[^"\\]|\\.)*)"$/);
+    if (byQuoted) return byQuoted[1].replace(/\\"/g, "\"");
+    return arg;
+  };
+  const resolveMesAnteriorConceptRef = (
+    rawArg: string
+  ): { conceptId?: number; conceptCode?: string } => {
+    const arg = rawArg.trim();
+    if (!arg) return {};
+    const byId = arg.match(/^CONCEPTO\((\d+)\)$/);
+    if (byId) return { conceptId: Number(byId[1]) };
+    const byCode = arg.match(/^CCONCEPTO\("([^"]+)"\)$/);
+    if (byCode) return { conceptCode: byCode[1] };
+    const value = resolveLiteralArg(arg);
+    const numeric = Number(value);
+    if (Number.isFinite(numeric) && conceptCodeById[numeric]) return { conceptId: numeric };
+    return { conceptCode: value };
+  };
+  const subtractMonths = (year: number, month: number, monthsBack: number): { year: number; month: number } => {
+    const safeMonth = Math.min(12, Math.max(1, month));
+    const date = new Date(Date.UTC(year, safeMonth - 1, 1));
+    date.setUTCMonth(date.getUTCMonth() - monthsBack);
+    return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1 };
+  };
+  const resolveMesAnteriorValue = (rawArgs: string): number => {
+    const [rawConcept = "", rawType = "", rawMonths = "0"] = rawArgs.split("@@");
+    const conceptRef = resolveMesAnteriorConceptRef(rawConcept);
+    const liquidationType = resolveLiteralArg(rawType) as LiquidationType;
+    const monthsBack = Math.max(0, Math.floor(Number(resolveLiteralArg(rawMonths)) || 0));
+    const target = subtractMonths(simYear, simMonth, monthsBack);
+    const legajoId = (simLegajo?.id ?? "").trim();
+    if (!legajoId) return 0;
+    const candidates = liquidacionesHistory.filter(
+      (item) =>
+        item.estado !== "Anulada" &&
+        item.liquidationType === liquidationType &&
+        item.year === target.year &&
+        item.month === target.month
+    );
+    if (!candidates.length) return 0;
+    const sorted = [...candidates].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+    for (const liq of sorted) {
+      const legajoRow = liq.legajos.find((row) => row.legajoId === legajoId);
+      if (!legajoRow) continue;
+      const found = legajoRow.conceptos.find((row) => {
+        if (conceptRef.conceptId !== undefined && row.conceptId === conceptRef.conceptId) return true;
+        if (conceptRef.conceptCode && row.conceptCode === conceptRef.conceptCode) return true;
+        return false;
+      });
+      if (found) return toNumericOrZero(found.value);
+    }
+    return 0;
   };
   const getAnterioresByType = (
     conceptId: number,
@@ -530,6 +749,9 @@ export function App() {
         const code = resolveValorLegajoConceptCode(rawArg, "");
         return String(getValorLegajo(code, ""));
       })
+      .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+        String(resolveMesAnteriorValue(rawArgs))
+      )
       .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) => String(getValorLegajo(concepto, "")))
       .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) => String(getValorLegajo(concepto, "")))
       .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) =>
@@ -581,6 +803,7 @@ export function App() {
   };
   const cacheByExpression = new Map<string, string | null>();
   const getFormulaPillTitle = (tk: FormulaToken): string | null => {
+    if (hidePrecalculationPreview) return null;
     if (tk.expression === 'MATH("+")') return null;
     const fromCache = cacheByExpression.get(tk.expression);
     if (fromCache !== undefined) return fromCache;
@@ -740,6 +963,9 @@ export function App() {
               const code = resolveValorLegajoConceptCode(rawArg, concept.code);
               return String(getValorLegajo(code, concept.code));
             })
+            .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+              String(resolveMesAnteriorValue(rawArgs))
+            )
             .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
               String(getValorLegajo(concepto, concept.code))
             )
@@ -840,6 +1066,9 @@ export function App() {
     participatingConcepts,
     simLegajo,
     simLegajoId,
+    simMonth,
+    simYear,
+    liquidacionesHistory,
     activeReceipt.definitiveOrder,
     activeReceipt.transitoryOrder
   ]);
@@ -931,7 +1160,16 @@ export function App() {
       }
     }
     return orderById;
-  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
+  }, [
+    participatingConcepts,
+    simLegajo,
+    simLegajoId,
+    simMonth,
+    simYear,
+    liquidacionesHistory,
+    activeReceipt.definitiveOrder,
+    activeReceipt.transitoryOrder
+  ]);
   const cycleConceptIds = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
@@ -1007,7 +1245,16 @@ export function App() {
     }
 
     return new Set(ids.filter((id) => (incoming.get(id) ?? 0) > 0));
-  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
+  }, [
+    participatingConcepts,
+    simLegajo,
+    simLegajoId,
+    simMonth,
+    simYear,
+    liquidacionesHistory,
+    activeReceipt.definitiveOrder,
+    activeReceipt.transitoryOrder
+  ]);
   const formulaErrorById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
@@ -1111,6 +1358,9 @@ export function App() {
             const code = resolveValorLegajoConceptCode(rawArg, concept.code);
             return String(getValorLegajo(code, concept.code));
           })
+          .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+            String(resolveMesAnteriorValue(rawArgs))
+          )
           .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
             String(getValorLegajo(concepto, concept.code))
           )
@@ -1180,7 +1430,16 @@ export function App() {
     }
 
     return errors;
-  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
+  }, [
+    participatingConcepts,
+    simLegajo,
+    simLegajoId,
+    simMonth,
+    simYear,
+    liquidacionesHistory,
+    activeReceipt.definitiveOrder,
+    activeReceipt.transitoryOrder
+  ]);
   const previewValueById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
@@ -1282,6 +1541,9 @@ export function App() {
             const code = resolveValorLegajoConceptCode(rawArg, concept.code);
             return String(getValorLegajo(code, concept.code));
           })
+          .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+            String(resolveMesAnteriorValue(rawArgs))
+          )
           .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
             String(getValorLegajo(concepto, concept.code))
           )
@@ -1349,7 +1611,16 @@ export function App() {
     }
 
     return values;
-  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
+  }, [
+    participatingConcepts,
+    simLegajo,
+    simLegajoId,
+    simMonth,
+    simYear,
+    liquidacionesHistory,
+    activeReceipt.definitiveOrder,
+    activeReceipt.transitoryOrder
+  ]);
 
   const reorderDefinitivo = (dragId: number, dropId: number) => {
     const dragConcept = concepts.find((c) => c.id === dragId);
@@ -1416,6 +1687,101 @@ export function App() {
     setEditingId(newId);
   };
 
+  const setSelectedConceptReceiptMembership = (receiptId: string, shouldBelong: boolean) => {
+    const conceptId = selectedConcept.id;
+    const isDefinitive = selectedConcept.conceptClass === "definitivo";
+    setReceipts((prev) =>
+      prev.map((receipt) => {
+        if (receipt.id !== receiptId) return receipt;
+        if (isDefinitive) {
+          const exists = receipt.definitiveOrder.includes(conceptId);
+          if (shouldBelong && !exists) {
+            return { ...receipt, definitiveOrder: [...receipt.definitiveOrder, conceptId] };
+          }
+          if (!shouldBelong && exists) {
+            return { ...receipt, definitiveOrder: receipt.definitiveOrder.filter((id) => id !== conceptId) };
+          }
+          return receipt;
+        }
+        const exists = receipt.transitoryOrder.includes(conceptId);
+        if (shouldBelong && !exists) {
+          return { ...receipt, transitoryOrder: [...receipt.transitoryOrder, conceptId] };
+        }
+        if (!shouldBelong && exists) {
+          return { ...receipt, transitoryOrder: receipt.transitoryOrder.filter((id) => id !== conceptId) };
+        }
+        return receipt;
+      })
+    );
+  };
+
+  const setSelectedConceptMembershipByLiquidationType = (
+    liquidationType: string,
+    shouldBelong: boolean
+  ) => {
+    const conceptId = selectedConcept.id;
+    const isDefinitive = selectedConcept.conceptClass === "definitivo";
+    const conveniosScope = selectedConveniosForIntersection.length
+      ? new Set(selectedConveniosForIntersection)
+      : null;
+    setReceipts((prev) =>
+      prev.map((receipt) => {
+        if (receipt.liquidationType !== liquidationType) return receipt;
+        if (conveniosScope && !conveniosScope.has(receipt.convenio)) return receipt;
+        if (isDefinitive) {
+          const exists = receipt.definitiveOrder.includes(conceptId);
+          if (shouldBelong && !exists) {
+            return { ...receipt, definitiveOrder: [...receipt.definitiveOrder, conceptId] };
+          }
+          if (!shouldBelong && exists) {
+            return { ...receipt, definitiveOrder: receipt.definitiveOrder.filter((id) => id !== conceptId) };
+          }
+          return receipt;
+        }
+        const exists = receipt.transitoryOrder.includes(conceptId);
+        if (shouldBelong && !exists) {
+          return { ...receipt, transitoryOrder: [...receipt.transitoryOrder, conceptId] };
+        }
+        if (!shouldBelong && exists) {
+          return { ...receipt, transitoryOrder: receipt.transitoryOrder.filter((id) => id !== conceptId) };
+        }
+        return receipt;
+      })
+    );
+  };
+
+  const setSelectedConceptMembershipByConvenio = (convenio: string, shouldBelong: boolean) => {
+    const conceptId = selectedConcept.id;
+    const isDefinitive = selectedConcept.conceptClass === "definitivo";
+    const liquidationTypesScope = selectedLiquidationTypesForIntersection.length
+      ? new Set(selectedLiquidationTypesForIntersection)
+      : null;
+    setReceipts((prev) =>
+      prev.map((receipt) => {
+        if (receipt.convenio !== convenio) return receipt;
+        if (liquidationTypesScope && !liquidationTypesScope.has(receipt.liquidationType)) return receipt;
+        if (isDefinitive) {
+          const exists = receipt.definitiveOrder.includes(conceptId);
+          if (shouldBelong && !exists) {
+            return { ...receipt, definitiveOrder: [...receipt.definitiveOrder, conceptId] };
+          }
+          if (!shouldBelong && exists) {
+            return { ...receipt, definitiveOrder: receipt.definitiveOrder.filter((id) => id !== conceptId) };
+          }
+          return receipt;
+        }
+        const exists = receipt.transitoryOrder.includes(conceptId);
+        if (shouldBelong && !exists) {
+          return { ...receipt, transitoryOrder: [...receipt.transitoryOrder, conceptId] };
+        }
+        if (!shouldBelong && exists) {
+          return { ...receipt, transitoryOrder: receipt.transitoryOrder.filter((id) => id !== conceptId) };
+        }
+        return receipt;
+      })
+    );
+  };
+
   const addTagToSelectedConcept = (tagInput: string) => {
     const normalized = tagInput.trim().toLowerCase();
     if (!normalized) return;
@@ -1464,6 +1830,16 @@ export function App() {
       prev.map((c) =>
         c.id === selectedConcept.id
           ? { ...c, conceptType: nextType, tags: normalizeTagsWithImplicitType(c.tags, nextType) }
+          : c
+      )
+    );
+  };
+
+  const updateSelectedConceptF1359Field = (f1359FieldId: string) => {
+    setConcepts((prev) =>
+      prev.map((c) =>
+        c.id === selectedConcept.id
+          ? { ...c, f1359FieldId: f1359FieldId.trim() }
           : c
       )
     );
@@ -1584,6 +1960,19 @@ export function App() {
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [liquidacionesMenuOpen]);
+
+  useEffect(() => {
+    if (!membershipTypeDropdownOpen && !membershipConvenioDropdownOpen) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (membershipTypeComboRef.current?.contains(target)) return;
+      if (membershipConvenioComboRef.current?.contains(target)) return;
+      setMembershipTypeDropdownOpen(false);
+      setMembershipConvenioDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [membershipTypeDropdownOpen, membershipConvenioDropdownOpen]);
 
   useEffect(() => {
     const loadConcepts = async () => {
@@ -1715,6 +2104,88 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    const loadF1359Fields = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/f1359-fields`);
+        if (!response.ok) return;
+        const parsed = (await response.json()) as ApiF1359Field[];
+        setF1359Fields(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        // noop
+      }
+    };
+    void loadF1359Fields();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(receiptF1359FilterStorageKey, receiptF1359Filter);
+  }, [receiptF1359Filter]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(receiptTagFilterStorageKey, receiptTagFilter);
+  }, [receiptTagFilter]);
+
+  useEffect(() => {
+    const loadReceipts = async () => {
+      const fallbackOrder = initialConcepts
+        .filter((concept) => concept.conceptClass === "definitivo")
+        .map((concept) => concept.id);
+      try {
+        const response = await fetch(`${apiBaseUrl}/receipts`);
+        if (!response.ok) {
+          setReceiptsLoaded(true);
+          return;
+        }
+        const parsed = (await response.json()) as ApiReceipt[];
+        const normalizedFromApi = (Array.isArray(parsed) ? parsed : [])
+          .map((item) => parseApiReceipt(item, fallbackOrder))
+          .filter((item): item is ReceiptModel => Boolean(item));
+
+        if (normalizedFromApi.length > 0) {
+          setReceipts(ensureReceiptMatrix(normalizedFromApi, defaultConvenios, fallbackOrder));
+          return;
+        }
+
+        if (typeof window !== "undefined") {
+          const rawLegacy = window.localStorage.getItem(legacyReceiptsStorageKey);
+          if (rawLegacy) {
+            const legacyParsed = JSON.parse(rawLegacy) as ReceiptModel[];
+            const normalizedLegacy = ensureReceiptMatrix(
+              Array.isArray(legacyParsed) ? legacyParsed : [],
+              defaultConvenios,
+              fallbackOrder
+            );
+            if (normalizedLegacy.length > 0) {
+              setReceipts(normalizedLegacy);
+            }
+          }
+        }
+      } catch {
+        // Mantiene estado inicial en memoria si API no esta disponible.
+      } finally {
+        setReceiptsLoaded(true);
+      }
+    };
+    void loadReceipts();
+  }, []);
+
+  useEffect(() => {
+    const loadLiquidaciones = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/liquidaciones`);
+        if (!response.ok) return;
+        const parsed = (await response.json()) as HistoricalLiquidacionRecord[];
+        setLiquidacionesHistory(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        // noop
+      }
+    };
+    void loadLiquidaciones();
+  }, []);
+
+  useEffect(() => {
     if (!conceptsLoaded) return;
     const timeout = setTimeout(() => {
       void Promise.allSettled(concepts.map((concept) => persistConcept(concept)));
@@ -1723,9 +2194,23 @@ export function App() {
   }, [concepts, conceptsLoaded]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.setItem(receiptsStorageKey, JSON.stringify(receipts));
-  }, [receipts]);
+    if (!receiptsLoaded) return;
+    const timeout = setTimeout(() => {
+      const payload: ApiReceipt[] = receipts.map((receipt) => ({
+        id: receipt.id,
+        convenio: receipt.convenio,
+        liquidationType: receipt.liquidationType,
+        definitiveOrder: receipt.definitiveOrder,
+        transitoryOrder: receipt.transitoryOrder
+      }));
+      void fetch(`${apiBaseUrl}/receipts`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    }, 250);
+    return () => clearTimeout(timeout);
+  }, [receipts, receiptsLoaded]);
 
   useEffect(() => {
     setReceipts((prev) => {
@@ -1782,18 +2267,14 @@ export function App() {
 
   useEffect(() => {
     if (!receipts.length) return;
-    const active = receipts.find((r) => r.id === activeReceiptId);
-    if (active) {
-      if (activeConvenio !== active.convenio) setActiveConvenio(active.convenio);
+    const active = receiptsByScreenFilter.find((r) => r.id === activeReceiptId);
+    if (active) return;
+    if (receiptsByScreenFilter.length) {
+      setActiveReceiptId(receiptsByScreenFilter[0].id);
       return;
     }
-    const firstForConvenio = receipts.find((r) => r.convenio === activeConvenio);
-    if (firstForConvenio) {
-      setActiveReceiptId(firstForConvenio.id);
-      return;
-    }
-    setActiveReceiptId(receipts[0].id);
-  }, [receipts, activeReceiptId, activeConvenio]);
+    setActiveReceiptId(receipts[0]?.id ?? "");
+  }, [receipts, receiptsByScreenFilter, activeReceiptId]);
 
   useEffect(() => {
     if (!conceptsLoaded) return;
@@ -1974,12 +2455,10 @@ export function App() {
                   <label htmlFor="convenio">Convenio</label>
                   <select
                     id="convenio"
-                    value={activeConvenio}
+                    value={receiptConvenioFilter}
                     onChange={(e) => {
                       const convenio = e.target.value;
-                      setActiveConvenio(convenio);
-                      const nextReceipt = receipts.find((r) => r.convenio === convenio);
-                      if (nextReceipt) setActiveReceiptId(nextReceipt.id);
+                      setReceiptConvenioFilter(convenio);
                     }}
                   >
                     {convenios.map((convenio) => (
@@ -1993,21 +2472,53 @@ export function App() {
                   <label htmlFor="receipt">Tipo de liquidación</label>
                   <select
                     id="receipt"
-                    value={activeReceiptId}
+                    value={receiptLiquidationTypeFilter}
                     onChange={(e) => {
-                      const nextId = e.target.value;
-                      setActiveReceiptId(nextId);
-                      const next = receipts.find((r) => r.id === nextId);
-                      if (next) setActiveConvenio(next.convenio);
+                      setReceiptLiquidationTypeFilter(e.target.value);
                     }}
                   >
-                    {receiptsByConvenio.map((receipt) => (
-                      <option key={receipt.id} value={receipt.id}>
-                        {receipt.liquidationType}
+                    {receiptLiquidationTypeOptions.map((liquidationType) => (
+                      <option key={liquidationType} value={liquidationType}>
+                        {liquidationType}
                       </option>
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label htmlFor="f1359-filter">Filtro campo F1359</label>
+                  <select
+                    id="f1359-filter"
+                    value={receiptF1359Filter}
+                    onChange={(e) => setReceiptF1359Filter(e.target.value)}
+                  >
+                    <option value="">Sin filtro</option>
+                    {f1359Fields.map((field) => (
+                      <option key={field.id} value={field.id}>
+                        {`Reg ${field.registro} - Campo ${field.campo} - ${field.descripcion}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="receipt-tag-filter">Filtro por tag</label>
+                  <select
+                    id="receipt-tag-filter"
+                    value={receiptTagFilter}
+                    onChange={(e) => setReceiptTagFilter(e.target.value)}
+                  >
+                    <option value="">Sin filtro</option>
+                    {allTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div
+                className="receipt-toolbar"
+                style={{ marginTop: 8, borderTop: "1px dashed #d5deee", paddingTop: 10 }}
+              >
                 <div>
                   <label htmlFor="sim-legajo">Legajo (simulación)</label>
                   <select
@@ -2027,6 +2538,36 @@ export function App() {
                     )}
                   </select>
                 </div>
+                <div>
+                  <label htmlFor="sim-month">Mes simulación</label>
+                  <select
+                    id="sim-month"
+                    value={simMonth}
+                    onChange={(e) => setSimMonth(Number(e.target.value))}
+                  >
+                    {simulationMonthOptions.map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="sim-year">Año simulación</label>
+                  <input
+                    id="sim-year"
+                    type="number"
+                    min={1970}
+                    max={2200}
+                    step={1}
+                    value={simYear}
+                    onChange={(e) => {
+                      const parsedYear = Math.floor(Number(e.target.value || String(simYear)));
+                      if (!Number.isFinite(parsedYear)) return;
+                      setSimYear(Math.min(2200, Math.max(1970, parsedYear)));
+                    }}
+                  />
+                </div>
               </div>
               <div className="panel-actions">
                 <button className="add-button" onClick={addDefinitiveToReceipt}>
@@ -2041,7 +2582,7 @@ export function App() {
                 </button>
               </div>
               <ul className="concept-list">
-                {definitivosEnRecibo.map((concept) => (
+                {definitivosEnReciboFiltrados.map((concept) => (
                   <li
                     key={concept.id}
                     draggable
@@ -2079,14 +2620,18 @@ export function App() {
                       </span>
                       {showReceiptConceptDetail ? (
                         <span className="concept-meta-inline">
-                          {cycleConceptIds.has(concept.id) ? (
-                            <span className="concept-error-inline">CICLO</span>
+                          {!hidePrecalculationPreview ? (
+                            <>
+                              {cycleConceptIds.has(concept.id) ? (
+                                <span className="concept-error-inline">CICLO</span>
+                              ) : null}
+                              {formulaErrorById.get(concept.id) ? (
+                                <span className="concept-error-inline">ERROR</span>
+                              ) : null}
+                              #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
+                              {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
+                            </>
                           ) : null}
-                          {formulaErrorById.get(concept.id) ? (
-                            <span className="concept-error-inline">ERROR</span>
-                          ) : null}
-                          #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
-                          {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
                           {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
                         </span>
                       ) : null}
@@ -2100,7 +2645,7 @@ export function App() {
                 </button>
               </div>
               <ul className="concept-list">
-                {transitoriosEnRecibo.map((concept) => (
+                {transitoriosEnReciboFiltrados.map((concept) => (
                   <li
                     key={concept.id}
                     draggable
@@ -2137,14 +2682,18 @@ export function App() {
                       </span>
                       {showReceiptConceptDetail ? (
                         <span className="concept-meta-inline">
-                          {cycleConceptIds.has(concept.id) ? (
-                            <span className="concept-error-inline">CICLO</span>
+                          {!hidePrecalculationPreview ? (
+                            <>
+                              {cycleConceptIds.has(concept.id) ? (
+                                <span className="concept-error-inline">CICLO</span>
+                              ) : null}
+                              {formulaErrorById.get(concept.id) ? (
+                                <span className="concept-error-inline">ERROR</span>
+                              ) : null}
+                              #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
+                              {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
+                            </>
                           ) : null}
-                          {formulaErrorById.get(concept.id) ? (
-                            <span className="concept-error-inline">ERROR</span>
-                          ) : null}
-                          #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
-                          {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
                           {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
                         </span>
                       ) : null}
@@ -2174,17 +2723,6 @@ export function App() {
                     placeholder="Descripcion"
                     title="Descripcion del concepto"
                   />
-                  <select
-                    value={conceptTypeDraft}
-                    onChange={(e) => updateSelectedConceptType(e.target.value as ConceptTypeId)}
-                    title="Tipo de concepto"
-                  >
-                    {CONCEPT_TYPE_DEFINITIONS.map((definition) => (
-                      <option key={definition.id} value={definition.id}>
-                        {definition.label} (Col {definition.column}, {definition.sign > 0 ? "+" : "-"})
-                      </option>
-                    ))}
-                  </select>
                   <button
                     type="button"
                     className="remove-inline-button concept-delete-button"
@@ -2244,6 +2782,180 @@ export function App() {
                 </div>
               </div>
               <div className="tags-editor">
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8 }}>
+                    <div style={{ position: "relative", minWidth: 0 }} ref={membershipTypeComboRef}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMembershipTypeDropdownOpen((prev) => !prev);
+                          setMembershipConvenioDropdownOpen(false);
+                        }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          border: "1px solid #c9d4ea",
+                          background: "#fff",
+                          cursor: "pointer"
+                        }}
+                      >
+                        <span>Tipo de Liquidación</span>
+                        <span>{membershipTypeDropdownOpen ? "▲" : "▼"}</span>
+                      </button>
+                      {membershipTypeDropdownOpen ? (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 4px)",
+                            left: 0,
+                            right: 0,
+                            zIndex: 20,
+                            maxHeight: 220,
+                            overflow: "auto",
+                            padding: 8,
+                            borderRadius: 8,
+                            border: "1px solid #c9d4ea",
+                            background: "#fff",
+                            boxShadow: "0 8px 24px rgba(18, 30, 58, 0.15)"
+                          }}
+                        >
+                          <ul className="concept-list">
+                            {membershipLiquidationTypeOptions.map((liquidationType) => {
+                              const rows = conceptReceiptMembership.filter(
+                                (item) => item.liquidationType === liquidationType
+                              );
+                              const checked = rows.some((item) => item.belongs);
+                              return (
+                                <li key={`${selectedConcept.id}-liq-${liquidationType}`} className="concept-item">
+                                  <label style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={(e) =>
+                                        setSelectedConceptMembershipByLiquidationType(
+                                          liquidationType,
+                                          e.target.checked
+                                        )
+                                      }
+                                    />
+                                    <span>{liquidationType}</span>
+                                  </label>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </div>
+                    <div style={{ position: "relative", minWidth: 0 }} ref={membershipConvenioComboRef}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMembershipConvenioDropdownOpen((prev) => !prev);
+                          setMembershipTypeDropdownOpen(false);
+                        }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          border: "1px solid #c9d4ea",
+                          background: "#fff",
+                          cursor: "pointer"
+                        }}
+                      >
+                        <span>Convenio</span>
+                        <span>{membershipConvenioDropdownOpen ? "▲" : "▼"}</span>
+                      </button>
+                      {membershipConvenioDropdownOpen ? (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 4px)",
+                            left: 0,
+                            right: 0,
+                            zIndex: 20,
+                            maxHeight: 220,
+                            overflow: "auto",
+                            padding: 8,
+                            borderRadius: 8,
+                            border: "1px solid #c9d4ea",
+                            background: "#fff",
+                            boxShadow: "0 8px 24px rgba(18, 30, 58, 0.15)"
+                          }}
+                        >
+                          <ul className="concept-list">
+                            {membershipConvenioOptions.map((convenio) => {
+                              const rows = conceptReceiptMembership.filter((item) => item.convenio === convenio);
+                              const checked = rows.some((item) => item.belongs);
+                              return (
+                                <li key={`${selectedConcept.id}-conv-${convenio}`} className="concept-item">
+                                  <label style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={(e) =>
+                                        setSelectedConceptMembershipByConvenio(convenio, e.target.checked)
+                                      }
+                                    />
+                                    <span>{convenio}</span>
+                                  </label>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </div>
+                    <div style={{ position: "relative", minWidth: 0 }}>
+                      <select
+                        value={conceptTypeDraft}
+                        onChange={(e) => updateSelectedConceptType(e.target.value as ConceptTypeId)}
+                        title="Tipo de concepto"
+                        style={{
+                          width: "100%",
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          border: "1px solid #c9d4ea",
+                          background: "#fff"
+                        }}
+                      >
+                        {CONCEPT_TYPE_DEFINITIONS.map((definition) => (
+                          <option key={definition.id} value={definition.id}>
+                            {definition.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div style={{ position: "relative", minWidth: 0 }}>
+                      <select
+                        value={selectedConcept.f1359FieldId ?? ""}
+                        onChange={(e) => updateSelectedConceptF1359Field(e.target.value)}
+                        title="Campo F1359"
+                        style={{
+                          width: "100%",
+                          padding: "8px 10px",
+                          borderRadius: 8,
+                          border: "1px solid #c9d4ea",
+                          background: "#fff"
+                        }}
+                      >
+                        <option value="">Campo F1359 (sin asignar)</option>
+                        {f1359Fields.map((field) => (
+                          <option key={field.id} value={field.id}>
+                            {`Reg ${field.registro} - Campo ${field.campo} - ${field.descripcion}`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
                 <div className="chip-wrap">
                   {selectedConcept.tags.map((tag) => {
                     const isImplicitTypeTag = implicitTypeTagValues.has(tag);
@@ -2294,6 +3006,7 @@ export function App() {
                 previewValue={previewInfo.value}
                 previewError={previewInfo.error}
                 hasCycle={cycleConceptIds.has(selectedConcept.id)}
+                hidePreview={hidePrecalculationPreview}
               />
             </article>
 
@@ -2309,7 +3022,7 @@ export function App() {
                 insertTokenAt(token("Antigüedad", "ANTIGUEDAD()", "function"), index)
               }
               onInsertAnteriores={(index) =>
-                insertTokenAt(token("Suma de Anteriores", "ANTERIORES()", "function"), index)
+                insertTokenAt(token("Suma de Conceptos Previos del Recibo", "ANTERIORES()", "function"), index)
               }
               onInsertFixedValue={(key, index) =>
                 insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)

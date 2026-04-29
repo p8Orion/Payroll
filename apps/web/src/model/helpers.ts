@@ -37,7 +37,8 @@ function isSingleBracketBlockStart(expression: string, index: number): boolean {
 function parseBlockToken(value: string): FormulaToken | null {
   const parsed = parseFunctionBlock(value);
   if (!parsed) return null;
-  return token(parsed.name, value.trim(), "block");
+  const label = parsed.name === "MES_ANTERIOR" ? "MES-ANTERIOR" : parsed.name;
+  return token(label, value.trim(), "block");
 }
 
 function pushChunkTokens(chunk: string, out: FormulaToken[]): void {
@@ -134,7 +135,9 @@ function labelForKnownExpression(
   if (param) return { label: `Parametro ${param[1]}`, kind: "param" };
 
   if (expression === "ANTIGUEDAD()") return { label: "Antigüedad", kind: "function" };
-  if (expression === "ANTERIORES()") return { label: "Suma de Anteriores", kind: "function" };
+  if (expression === "ANTERIORES()") {
+    return { label: "Suma de Conceptos Previos del Recibo", kind: "function" };
+  }
 
   const valorFijo = expression.match(/^(?:VALOR_FIJO|VALOR_LEGAJO)\("([^"]*)"\)$/);
   if (valorFijo)

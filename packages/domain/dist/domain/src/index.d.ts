@@ -8,9 +8,13 @@ export interface Legajo {
 export interface ConceptRepository {
     list(): Promise<ConceptDefinition[]>;
     save(concept: ConceptDefinition): Promise<void>;
+    delete(id: number): Promise<void>;
+    replaceAll(concepts: ConceptDefinition[]): Promise<void>;
 }
 export declare class InMemoryConceptRepository implements ConceptRepository {
     private concepts;
     list(): Promise<ConceptDefinition[]>;
     save(concept: ConceptDefinition): Promise<void>;
+    delete(id: number): Promise<void>;
+    replaceAll(concepts: ConceptDefinition[]): Promise<void>;
 }

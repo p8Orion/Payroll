@@ -74,10 +74,21 @@ export interface ConceptModel {
   name: string;
   conceptClass: ConceptClass;
   conceptType: ConceptTypeId;
+  f1359FieldId?: string;
   color: string;
   shape: ConceptShape;
   tags: string[];
   formulaAst: FormulaAstNode[];
+}
+
+export interface F1359FieldModel {
+  id: string;
+  registro: string;
+  campo: string;
+  descripcion: string;
+  posicionInicial: number;
+  posicionFinal: number;
+  longitud: number;
 }
 
 export interface ReceiptModel {

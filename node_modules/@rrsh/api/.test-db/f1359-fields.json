@@ -1,0 +1,1136 @@
+[
+  {
+    "id": "REG01_CAMPO01",
+    "registro": "01",
+    "campo": "01",
+    "descripcion": "Tipo De Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG01_CAMPO02",
+    "registro": "01",
+    "campo": "02",
+    "descripcion": "CUIT Agente de Retención",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG01_CAMPO03",
+    "registro": "01",
+    "campo": "03",
+    "descripcion": "Periodo Informado",
+    "posicionInicial": 14,
+    "posicionFinal": 19,
+    "longitud": 6
+  },
+  {
+    "id": "REG01_CAMPO04",
+    "registro": "01",
+    "campo": "04",
+    "descripcion": "Secuencia",
+    "posicionInicial": 20,
+    "posicionFinal": 21,
+    "longitud": 2
+  },
+  {
+    "id": "REG01_CAMPO05",
+    "registro": "01",
+    "campo": "05",
+    "descripcion": "Código De Impuesto",
+    "posicionInicial": 22,
+    "posicionFinal": 25,
+    "longitud": 4
+  },
+  {
+    "id": "REG01_CAMPO06",
+    "registro": "01",
+    "campo": "06",
+    "descripcion": "Código De Concepto",
+    "posicionInicial": 26,
+    "posicionFinal": 28,
+    "longitud": 3
+  },
+  {
+    "id": "REG01_CAMPO07",
+    "registro": "01",
+    "campo": "07",
+    "descripcion": "Numero De Formulario",
+    "posicionInicial": 29,
+    "posicionFinal": 32,
+    "longitud": 4
+  },
+  {
+    "id": "REG01_CAMPO08",
+    "registro": "01",
+    "campo": "08",
+    "descripcion": "Tipo De Presentación",
+    "posicionInicial": 33,
+    "posicionFinal": 33,
+    "longitud": 1
+  },
+  {
+    "id": "REG01_CAMPO09",
+    "registro": "01",
+    "campo": "09",
+    "descripcion": "Versión Del Sistema",
+    "posicionInicial": 34,
+    "posicionFinal": 38,
+    "longitud": 5
+  },
+  {
+    "id": "REG02_CAMPO01",
+    "registro": "02",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG02_CAMPO02",
+    "registro": "02",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG02_CAMPO03",
+    "registro": "02",
+    "campo": "03",
+    "descripcion": "Periodo Trabajado Desde",
+    "posicionInicial": 14,
+    "posicionFinal": 21,
+    "longitud": 8
+  },
+  {
+    "id": "REG02_CAMPO04",
+    "registro": "02",
+    "campo": "04",
+    "descripcion": "Periodo Trabajado Hasta",
+    "posicionInicial": 22,
+    "posicionFinal": 29,
+    "longitud": 8
+  },
+  {
+    "id": "REG02_CAMPO05",
+    "registro": "02",
+    "campo": "05",
+    "descripcion": "Meses",
+    "posicionInicial": 30,
+    "posicionFinal": 31,
+    "longitud": 2
+  },
+  {
+    "id": "REG02_CAMPO06",
+    "registro": "02",
+    "campo": "06",
+    "descripcion": "Beneficio",
+    "posicionInicial": 32,
+    "posicionFinal": 32,
+    "longitud": 1
+  },
+  {
+    "id": "REG02_CAMPO07",
+    "registro": "02",
+    "campo": "07",
+    "descripcion": "¿El trabajador percibe sus remuneraciones en concepto de \"Personal de Pozo\" bajo el CCT 396/2004 correspondiente al personal petroleros? (Ley 26.176 - Art. 1°)",
+    "posicionInicial": 33,
+    "posicionFinal": 33,
+    "longitud": 1
+  },
+  {
+    "id": "REG02_CAMPO08",
+    "registro": "02",
+    "campo": "08",
+    "descripcion": "¿El trabajador percibe sus retribuciones por medio de la Asociación Argentina de Actores en calidad de actor? (RG 2442/08)",
+    "posicionInicial": 34,
+    "posicionFinal": 34,
+    "longitud": 1
+  },
+  {
+    "id": "REG02_CAMPO09",
+    "registro": "02",
+    "campo": "09",
+    "descripcion": "¿El trabajador se encuentra alcanzado por una medida cautelar que afecte el régimen de retención del Impuesto?",
+    "posicionInicial": 35,
+    "posicionFinal": 35,
+    "longitud": 1
+  },
+  {
+    "id": "REG02_CAMPO10",
+    "registro": "02",
+    "campo": "10",
+    "descripcion": "¿El trabajador corresponde al poder judicial, no encontrándose alcanzado por el Segundo Párrafo del inc. A) del Art. 82 de la Ley del Impuesto?",
+    "posicionInicial": 36,
+    "posicionFinal": 36,
+    "longitud": 1
+  },
+  {
+    "id": "REG03_CAMPO01",
+    "registro": "03",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG03_CAMPO02",
+    "registro": "03",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG03_CAMPO03",
+    "registro": "03",
+    "campo": "03",
+    "descripcion": "Remuneración Bruta",
+    "posicionInicial": 14,
+    "posicionFinal": 28,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO04",
+    "registro": "03",
+    "campo": "04",
+    "descripcion": "Retribuciones No Habituales",
+    "posicionInicial": 29,
+    "posicionFinal": 43,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO05",
+    "registro": "03",
+    "campo": "05",
+    "descripcion": "SAC Primera Cuota",
+    "posicionInicial": 44,
+    "posicionFinal": 58,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO06",
+    "registro": "03",
+    "campo": "06",
+    "descripcion": "SAC Segunda Cuota",
+    "posicionInicial": 59,
+    "posicionFinal": 73,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO07",
+    "registro": "03",
+    "campo": "07",
+    "descripcion": "Otros Empleos - Remuneración Bruta",
+    "posicionInicial": 74,
+    "posicionFinal": 88,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO08",
+    "registro": "03",
+    "campo": "08",
+    "descripcion": "Otros Empleos - Retribuciones No Habituales",
+    "posicionInicial": 89,
+    "posicionFinal": 103,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO09",
+    "registro": "03",
+    "campo": "09",
+    "descripcion": "Otros Empleos - SAC Primera Cuota",
+    "posicionInicial": 104,
+    "posicionFinal": 118,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO10",
+    "registro": "03",
+    "campo": "10",
+    "descripcion": "Otros Empleos - SAC Segunda Cuota",
+    "posicionInicial": 119,
+    "posicionFinal": 133,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO11",
+    "registro": "03",
+    "campo": "11",
+    "descripcion": "Ajustes de Períodos Anteriores sobre Remuneraciones Gravadas",
+    "posicionInicial": 134,
+    "posicionFinal": 148,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO12",
+    "registro": "03",
+    "campo": "12",
+    "descripcion": "Otros Empleos - Ajustes de Períodos Anteriores sobre Remuneraciones Gravadas",
+    "posicionInicial": 149,
+    "posicionFinal": 163,
+    "longitud": 15
+  },
+  {
+    "id": "REG03_CAMPO13",
+    "registro": "03",
+    "campo": "13",
+    "descripcion": "TOTAL REMUNERACIÓN GRAVADA",
+    "posicionInicial": 164,
+    "posicionFinal": 178,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO01",
+    "registro": "04",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG04_CAMPO02",
+    "registro": "04",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG04_CAMPO03",
+    "registro": "04",
+    "campo": "03",
+    "descripcion": "Asignaciones Familiares",
+    "posicionInicial": 14,
+    "posicionFinal": 28,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO04",
+    "registro": "04",
+    "campo": "04",
+    "descripcion": "Intereses por préstamos al empleador / Remuneración Judiciales",
+    "posicionInicial": 29,
+    "posicionFinal": 43,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO05",
+    "registro": "04",
+    "campo": "05",
+    "descripcion": "Indemnizaciones establecidas en los inc. c), d) y e) del Apartado \"A\" - Anexo II de la RG 4003/2017",
+    "posicionInicial": 44,
+    "posicionFinal": 58,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO06",
+    "registro": "04",
+    "campo": "06",
+    "descripcion": "Remuneraciones bajo el Art. 1° de la Ley N° 19.640 \"Territorio Nacional de Tierra del Fuego A.I.A.S.\"",
+    "posicionInicial": 59,
+    "posicionFinal": 73,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO07",
+    "registro": "04",
+    "campo": "07",
+    "descripcion": "Remuneraciones bajo el CCT 396/2204 \"Petroleros → Personal de Pozo\" - Art. 1° Ley N° 26.176",
+    "posicionInicial": 74,
+    "posicionFinal": 88,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO08",
+    "registro": "04",
+    "campo": "08",
+    "descripcion": "Cursos y Seminarios establecidos en el inc. o) del Apartado \"A\" - Anexo II de la RG 4003/2017",
+    "posicionInicial": 89,
+    "posicionFinal": 103,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO09",
+    "registro": "04",
+    "campo": "09",
+    "descripcion": "Indumentaria y equipamiento provistos por el empleador",
+    "posicionInicial": 104,
+    "posicionFinal": 118,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO10",
+    "registro": "04",
+    "campo": "10",
+    "descripcion": "Ajustes de Períodos Anteriores sobre Remuneraciones Exentas o No Alcanzadas",
+    "posicionInicial": 119,
+    "posicionFinal": 133,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO11",
+    "registro": "04",
+    "campo": "11",
+    "descripcion": "Otros Empleos → Asignaciones Familiares",
+    "posicionInicial": 134,
+    "posicionFinal": 148,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO12",
+    "registro": "04",
+    "campo": "12",
+    "descripcion": "Otros Empleos → Intereses por préstamos al empleador / Remuneración Judiciales",
+    "posicionInicial": 149,
+    "posicionFinal": 163,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO13",
+    "registro": "04",
+    "campo": "13",
+    "descripcion": "Otros Empleos → Indemnizaciones establecidas en los inc. c), d) y e) del Apartado \"A\" - Anexo II de la RG 4003/2017",
+    "posicionInicial": 164,
+    "posicionFinal": 178,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO14",
+    "registro": "04",
+    "campo": "14",
+    "descripcion": "Otros Empleos → Remuneraciones bajo el Art. 1° de la Ley N° 19.640 \"Territorio Nacional de Tierra del Fuego A.I.A.S.\"",
+    "posicionInicial": 179,
+    "posicionFinal": 193,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO15",
+    "registro": "04",
+    "campo": "15",
+    "descripcion": "Otros Empleos → Remuneraciones bajo el CCT 396/2204 \"Petroleros → Personal de Pozo\" - Art. 1° Ley N° 26.176",
+    "posicionInicial": 194,
+    "posicionFinal": 208,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO16",
+    "registro": "04",
+    "campo": "16",
+    "descripcion": "Otros Empleos → Cursos y Seminarios establecidos en el inc. o) del Apartado \"A\" - Anexo II de la RG 4003/2017",
+    "posicionInicial": 209,
+    "posicionFinal": 223,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO17",
+    "registro": "04",
+    "campo": "17",
+    "descripcion": "Otros Empleos → Indumentaria y equipamiento provistos por el empleador",
+    "posicionInicial": 224,
+    "posicionFinal": 238,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO18",
+    "registro": "04",
+    "campo": "18",
+    "descripcion": "Otros Empleos → Ajustes de Períodos Anteriores sobre Remuneraciones Exentas o No Alcanzadas",
+    "posicionInicial": 239,
+    "posicionFinal": 253,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO19",
+    "registro": "04",
+    "campo": "19",
+    "descripcion": "TOTAL REMUNERACIÓN NO GRAVADA / NO ALCANZADA / EXENTA",
+    "posicionInicial": 254,
+    "posicionFinal": 268,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO20",
+    "registro": "04",
+    "campo": "20",
+    "descripcion": "TOTAL REMUNERACIONES",
+    "posicionInicial": 269,
+    "posicionFinal": 283,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO21",
+    "registro": "04",
+    "campo": "21",
+    "descripcion": "Remuneraciones del Poder Judicial no alcanzadas por el segundo párrafo del Inc a) del Art. 82 de la LIG",
+    "posicionInicial": 284,
+    "posicionFinal": 298,
+    "longitud": 15
+  },
+  {
+    "id": "REG04_CAMPO22",
+    "registro": "04",
+    "campo": "22",
+    "descripcion": "Otros Empleos → Remuneraciones del Poder Judicial no alcanzadas por el segundo párrafo del Inc a) del Art. 82 de la LIG",
+    "posicionInicial": 299,
+    "posicionFinal": 313,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO01",
+    "registro": "05",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG05_CAMPO02",
+    "registro": "05",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG05_CAMPO03",
+    "registro": "05",
+    "campo": "03",
+    "descripcion": "Aportes para fondos de Jubilaciones, retiros, pensiones o subsidios - ANSES",
+    "posicionInicial": 14,
+    "posicionFinal": 28,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO04",
+    "registro": "05",
+    "campo": "04",
+    "descripcion": "Otros Empleos - Aportes para fondos de Jubilaciones, retiros, pensiones o subsidios - ANSES",
+    "posicionInicial": 29,
+    "posicionFinal": 43,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO05",
+    "registro": "05",
+    "campo": "05",
+    "descripcion": "Aportes para fondos de Jubilaciones, retiros, pensiones o subsidios - Cajas Previsionales Provinciales, Municipales o para Profesionales",
+    "posicionInicial": 44,
+    "posicionFinal": 58,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO06",
+    "registro": "05",
+    "campo": "06",
+    "descripcion": "Otros Empleos - Aportes para fondos de Jubilaciones, retiros, pensiones o subsidios - Cajas Previsionales Provinciales, Municipales o para Profesionales",
+    "posicionInicial": 59,
+    "posicionFinal": 73,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO07",
+    "registro": "05",
+    "campo": "07",
+    "descripcion": "Aportes a Obras Sociales",
+    "posicionInicial": 74,
+    "posicionFinal": 88,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO08",
+    "registro": "05",
+    "campo": "08",
+    "descripcion": "Otros Empleos - Aportes a Obras Sociales",
+    "posicionInicial": 89,
+    "posicionFinal": 103,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO09",
+    "registro": "05",
+    "campo": "09",
+    "descripcion": "Cuotas Sindicales",
+    "posicionInicial": 104,
+    "posicionFinal": 118,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO10",
+    "registro": "05",
+    "campo": "10",
+    "descripcion": "Otros Empleos - Cuotas Sindicales",
+    "posicionInicial": 119,
+    "posicionFinal": 133,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO11",
+    "registro": "05",
+    "campo": "11",
+    "descripcion": "Cuotas Médico Asistenciales",
+    "posicionInicial": 134,
+    "posicionFinal": 148,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO12",
+    "registro": "05",
+    "campo": "12",
+    "descripcion": "Primas de Seguro para el caso de Muerte",
+    "posicionInicial": 149,
+    "posicionFinal": 163,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO13",
+    "registro": "05",
+    "campo": "13",
+    "descripcion": "Seguro de Muerte/Mixtos Sujetos al control de la SSN",
+    "posicionInicial": 164,
+    "posicionFinal": 178,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO14",
+    "registro": "05",
+    "campo": "14",
+    "descripcion": "Adquisición de Cuotapartes de FCI con fines de Retiro",
+    "posicionInicial": 179,
+    "posicionFinal": 193,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO15",
+    "registro": "05",
+    "campo": "15",
+    "descripcion": "Gastos de Sepelio",
+    "posicionInicial": 194,
+    "posicionFinal": 208,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO16",
+    "registro": "05",
+    "campo": "16",
+    "descripcion": "Amortización Impositiva e Intereses por adquisición de Rodados para Corredores y Viajantes de Comercio",
+    "posicionInicial": 209,
+    "posicionFinal": 223,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO17",
+    "registro": "05",
+    "campo": "17",
+    "descripcion": "Donaciones a Fiscos Nac./Prov./Mun./Inst. Art. 26 Inc e) y f) LIG",
+    "posicionInicial": 224,
+    "posicionFinal": 238,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO18",
+    "registro": "05",
+    "campo": "18",
+    "descripcion": "Alquileres de Inmuebles destinados a Casa-Habitación para Inquilinos No Propietarios - Art. 85 inc. h) - 40%",
+    "posicionInicial": 239,
+    "posicionFinal": 253,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO19",
+    "registro": "05",
+    "campo": "19",
+    "descripcion": "Descuentos Obligatorios por Ley Nacional, Provincial o Municipal",
+    "posicionInicial": 254,
+    "posicionFinal": 268,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO20",
+    "registro": "05",
+    "campo": "20",
+    "descripcion": "Honorarios por Servicios de Asistencia Sanitaria, Médica y Paramédica",
+    "posicionInicial": 269,
+    "posicionFinal": 283,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO21",
+    "registro": "05",
+    "campo": "21",
+    "descripcion": "Intereses Créditos Hipotecarios",
+    "posicionInicial": 284,
+    "posicionFinal": 298,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO22",
+    "registro": "05",
+    "campo": "22",
+    "descripcion": "Aportes al Cap. Soc./Fondo Riesgo de Socios Protectores de SGR",
+    "posicionInicial": 299,
+    "posicionFinal": 313,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO23",
+    "registro": "05",
+    "campo": "23",
+    "descripcion": "Empleados del Servicio Doméstico",
+    "posicionInicial": 314,
+    "posicionFinal": 328,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO24",
+    "registro": "05",
+    "campo": "24",
+    "descripcion": "Cajas Complementarias de Previsión",
+    "posicionInicial": 329,
+    "posicionFinal": 343,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO25",
+    "registro": "05",
+    "campo": "25",
+    "descripcion": "Fondos Compensadores de Previsión",
+    "posicionInicial": 344,
+    "posicionFinal": 358,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO26",
+    "registro": "05",
+    "campo": "26",
+    "descripcion": "Otros Aportes para fondos de Jubilaciones, retiros, pensiones o subsidios - incluido ANSES Autónomos",
+    "posicionInicial": 359,
+    "posicionFinal": 373,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO27",
+    "registro": "05",
+    "campo": "27",
+    "descripcion": "Seguros de Retiro Privados -Sujetos al Control de la SSN",
+    "posicionInicial": 374,
+    "posicionFinal": 388,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO28",
+    "registro": "05",
+    "campo": "28",
+    "descripcion": "Indumentaria/ y Equipamiento -Uso exclusivo y carácter obligatorio - Adquiridos por empleado",
+    "posicionInicial": 389,
+    "posicionFinal": 403,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO29",
+    "registro": "05",
+    "campo": "29",
+    "descripcion": "Servicios y Herramientas con Fines Educativos para Cargas de Familia",
+    "posicionInicial": 404,
+    "posicionFinal": 418,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO30",
+    "registro": "05",
+    "campo": "30",
+    "descripcion": "Alquileres de Inmuebles destinados a Casa-Habitación para Inquilinos y Propietarios - Art. 85 inc. k) - 10%",
+    "posicionInicial": 419,
+    "posicionFinal": 433,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO31",
+    "registro": "05",
+    "campo": "31",
+    "descripcion": "Antártida Argentina - Adicional remunerativo para personal civil y militar",
+    "posicionInicial": 434,
+    "posicionFinal": 448,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO32",
+    "registro": "05",
+    "campo": "32",
+    "descripcion": "Actores - Retribución pagada a los representantes - RG 2442/08",
+    "posicionInicial": 449,
+    "posicionFinal": 463,
+    "longitud": 15
+  },
+  {
+    "id": "REG05_CAMPO33",
+    "registro": "05",
+    "campo": "33",
+    "descripcion": "TOTAL DEDUCCIONES GENERALES",
+    "posicionInicial": 464,
+    "posicionFinal": 478,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO01",
+    "registro": "06",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG06_CAMPO02",
+    "registro": "06",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG06_CAMPO03",
+    "registro": "06",
+    "campo": "03",
+    "descripcion": "Ganancia No Imponible",
+    "posicionInicial": 14,
+    "posicionFinal": 28,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO04",
+    "registro": "06",
+    "campo": "04",
+    "descripcion": "Cónyuge / Unión Convivencial",
+    "posicionInicial": 29,
+    "posicionFinal": 43,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO05",
+    "registro": "06",
+    "campo": "05",
+    "descripcion": "Cantidad de Hijos / Hijastros al 50%",
+    "posicionInicial": 44,
+    "posicionFinal": 45,
+    "longitud": 2
+  },
+  {
+    "id": "REG06_CAMPO06",
+    "registro": "06",
+    "campo": "06",
+    "descripcion": "Cantidad de Hijos / Hijastros al 100%",
+    "posicionInicial": 46,
+    "posicionFinal": 47,
+    "longitud": 2
+  },
+  {
+    "id": "REG06_CAMPO07",
+    "registro": "06",
+    "campo": "07",
+    "descripcion": "Hijos / Hijastros ($)",
+    "posicionInicial": 48,
+    "posicionFinal": 62,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO08",
+    "registro": "06",
+    "campo": "08",
+    "descripcion": "Cantidad de Hijos / Hijastros incapacitados para el trabajo al 50%",
+    "posicionInicial": 63,
+    "posicionFinal": 64,
+    "longitud": 2
+  },
+  {
+    "id": "REG06_CAMPO09",
+    "registro": "06",
+    "campo": "09",
+    "descripcion": "Cantidad de Hijos / Hijastros incapacitados para el trabajo al 100%",
+    "posicionInicial": 65,
+    "posicionFinal": 66,
+    "longitud": 2
+  },
+  {
+    "id": "REG06_CAMPO10",
+    "registro": "06",
+    "campo": "10",
+    "descripcion": "Hijos / Hijastros incapacitados para el trabajo ($)",
+    "posicionInicial": 67,
+    "posicionFinal": 81,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO11",
+    "registro": "06",
+    "campo": "11",
+    "descripcion": "TOTAL DE CARGAS DE FAMILIA",
+    "posicionInicial": 82,
+    "posicionFinal": 96,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO12",
+    "registro": "06",
+    "campo": "12",
+    "descripcion": "Deducción Especial",
+    "posicionInicial": 97,
+    "posicionFinal": 111,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO13",
+    "registro": "06",
+    "campo": "13",
+    "descripcion": "Deducción Especial Adicional Doceava Parte",
+    "posicionInicial": 112,
+    "posicionFinal": 126,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO14",
+    "registro": "06",
+    "campo": "14",
+    "descripcion": "Deducción Específica",
+    "posicionInicial": 127,
+    "posicionFinal": 141,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO15",
+    "registro": "06",
+    "campo": "15",
+    "descripcion": "TOTAL DEDUCCIONES ART. 30",
+    "posicionInicial": 142,
+    "posicionFinal": 156,
+    "longitud": 15
+  },
+  {
+    "id": "REG06_CAMPO16",
+    "registro": "06",
+    "campo": "16",
+    "descripcion": "Cantidad de Hijos entre 18 y 24 años - Gastos Educación al 50%",
+    "posicionInicial": 157,
+    "posicionFinal": 158,
+    "longitud": 2
+  },
+  {
+    "id": "REG06_CAMPO17",
+    "registro": "06",
+    "campo": "17",
+    "descripcion": "Cantidad de Hijos entre 18 y 24 años - Gastos Educación al 100%",
+    "posicionInicial": 159,
+    "posicionFinal": 160,
+    "longitud": 2
+  },
+  {
+    "id": "REG07_CAMPO01",
+    "registro": "07",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG07_CAMPO02",
+    "registro": "07",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG07_CAMPO03",
+    "registro": "07",
+    "campo": "03",
+    "descripcion": "Resolución General (AFIP) 2281/2007 -Retenciones / Percepciones Aduaneras",
+    "posicionInicial": 14,
+    "posicionFinal": 28,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO04",
+    "registro": "07",
+    "campo": "04",
+    "descripcion": "Resolución General (AFIP) 2111/2006 - Impuesto sobre créditos y débitos en cuenta bancaria",
+    "posicionInicial": 29,
+    "posicionFinal": 43,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO05",
+    "registro": "07",
+    "campo": "05",
+    "descripcion": "Resolución General (AFIP) 2111/2006 - Impuesto sobre créditos y débitos - sobre movimientos de fondos propios o de terceros",
+    "posicionInicial": 44,
+    "posicionFinal": 58,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO06",
+    "registro": "07",
+    "campo": "06",
+    "descripcion": "Resolución General (AFIP) 3819/2015 - Cancelaciones en Efectivo - Servicios en el exterior por medio de agencias de viajes y turismo",
+    "posicionInicial": 59,
+    "posicionFinal": 73,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO07",
+    "registro": "07",
+    "campo": "07",
+    "descripcion": "Resolución General (AFIP) 3819/2015 - Cancelaciones en Efectivo - Servicios de transporte terrestre, aéreo y por vía acuática de pasajeros con destino fuera del país",
+    "posicionInicial": 74,
+    "posicionFinal": 88,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO08",
+    "registro": "07",
+    "campo": "08",
+    "descripcion": "Resolución General (AFIP) 5617/2024 - Ley 27.541 Art. 35 inciso a) - Compra de billetes y divisas en moneda extranjera para atesoramiento o sin destino específico.",
+    "posicionInicial": 89,
+    "posicionFinal": 103,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO09",
+    "registro": "07",
+    "campo": "09",
+    "descripcion": "Resolución General (AFIP) 5617/2024 - Ley 27.541 Art. 35 inciso b) - Adquisición de bienes o prestaciones y locaciones de servicios efectuadas en el exterior.",
+    "posicionInicial": 104,
+    "posicionFinal": 118,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO10",
+    "registro": "07",
+    "campo": "10",
+    "descripcion": "Resolución General (AFIP) 5617/2024 - Ley 27.541 Art. 35 inciso c) - Servicios prestados por sujetos no residentes en el país",
+    "posicionInicial": 119,
+    "posicionFinal": 133,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO11",
+    "registro": "07",
+    "campo": "11",
+    "descripcion": "Resolución General (AFIP) 5617/2024 - Ley 27.541 Art. 35 inciso d) - Adquisición de servicios en el exterior contratados a través de agencias de viajes y turismo",
+    "posicionInicial": 134,
+    "posicionFinal": 148,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO12",
+    "registro": "07",
+    "campo": "12",
+    "descripcion": "Resolución General (AFIP) 5617/2024 - Ley 27.541 Art. 35 inciso e) - Adquisición de servicios de transporte terrestre, aéreo y por vía acuática, de pasajeros con destino fuera del país",
+    "posicionInicial": 149,
+    "posicionFinal": 163,
+    "longitud": 15
+  },
+  {
+    "id": "REG07_CAMPO13",
+    "registro": "07",
+    "campo": "13",
+    "descripcion": "TOTAL PAGOS A CUENTA (Apartado \"G\" Anexo II)",
+    "posicionInicial": 164,
+    "posicionFinal": 178,
+    "longitud": 15
+  },
+  {
+    "id": "REG08_CAMPO01",
+    "registro": "08",
+    "campo": "01",
+    "descripcion": "Tipo de Registro",
+    "posicionInicial": 1,
+    "posicionFinal": 2,
+    "longitud": 2
+  },
+  {
+    "id": "REG08_CAMPO02",
+    "registro": "08",
+    "campo": "02",
+    "descripcion": "CUIL",
+    "posicionInicial": 3,
+    "posicionFinal": 13,
+    "longitud": 11
+  },
+  {
+    "id": "REG08_CAMPO03",
+    "registro": "08",
+    "campo": "03",
+    "descripcion": "REMUNERACION SUJETA A IMPUESTO",
+    "posicionInicial": 14,
+    "posicionFinal": 28,
+    "longitud": 15
+  },
+  {
+    "id": "REG08_CAMPO04",
+    "registro": "08",
+    "campo": "04",
+    "descripcion": "Alícuota – Art. 94 - LIG",
+    "posicionInicial": 29,
+    "posicionFinal": 30,
+    "longitud": 2
+  },
+  {
+    "id": "REG08_CAMPO05",
+    "registro": "08",
+    "campo": "05",
+    "descripcion": "Impuesto Determinado",
+    "posicionInicial": 31,
+    "posicionFinal": 45,
+    "longitud": 15
+  },
+  {
+    "id": "REG08_CAMPO06",
+    "registro": "08",
+    "campo": "06",
+    "descripcion": "Impuesto Retenido",
+    "posicionInicial": 46,
+    "posicionFinal": 60,
+    "longitud": 15
+  },
+  {
+    "id": "REG08_CAMPO07",
+    "registro": "08",
+    "campo": "07",
+    "descripcion": "Subtotal saldo determinado antes de Auto -retención / Pagos a Cuenta",
+    "posicionInicial": 61,
+    "posicionFinal": 75,
+    "longitud": 15
+  },
+  {
+    "id": "REG08_CAMPO08",
+    "registro": "08",
+    "campo": "08",
+    "descripcion": "Impuesto Auto-retenido RG 5683",
+    "posicionInicial": 76,
+    "posicionFinal": 90,
+    "longitud": 15
+  },
+  {
+    "id": "REG08_CAMPO09",
+    "registro": "08",
+    "campo": "09",
+    "descripcion": "SALDO DETERMINADO",
+    "posicionInicial": 91,
+    "posicionFinal": 105,
+    "longitud": 15
+  }
+]

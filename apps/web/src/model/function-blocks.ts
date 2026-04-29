@@ -11,6 +11,10 @@ export const functionBlockTemplates = {
     blockTitle: "TOPE",
     branches: ["VALOR", "MÁXIMO"] as const
   },
+  MES_ANTERIOR: {
+    blockTitle: "MES-ANTERIOR",
+    branches: ["CONCEPTO", "TIPO", "MESES"] as const
+  },
   VALOR_FIJO: {
     blockTitle: "VALOR_FIJO",
     branches: ["CONCEPTO"] as const
@@ -204,6 +208,11 @@ export function expandBracketBlocksToExpressions(expression: string): string {
     } else if (block.name === "VALOR_FIJO" || block.name === "VALOR_LEGAJO") {
       const arg = (block.args[0] ?? "").trim();
       out += `VALOR_FIJO_ARG[[${arg}]]`;
+    } else if (block.name === "MES_ANTERIOR") {
+      const conceptArg = (block.args[0] ?? "").trim();
+      const typeArg = (block.args[1] ?? "").trim();
+      const monthsArg = (block.args[2] ?? "").trim();
+      out += `MES_ANTERIOR_ARG[[${conceptArg}@@${typeArg}@@${monthsArg}]]`;
     } else {
       out += blockRaw;
     }
