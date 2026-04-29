@@ -77,9 +77,88 @@ class FileBackedConceptRepository {
 }
 const diskDbPath = process.env.CONCEPT_DB_FILE ??
     (0, node_path_1.resolve)(process.cwd(), ".test-db", "concepts.json");
+const legajosDbPath = process.env.LEGAJOS_DB_FILE ??
+    (0, node_path_1.resolve)(process.cwd(), ".test-db", "legajos.json");
+const liquidacionesDbPath = process.env.LIQUIDACIONES_DB_FILE ??
+    (0, node_path_1.resolve)(process.cwd(), ".test-db", "liquidaciones.json");
+const conveniosDbPath = process.env.CONVENIOS_DB_FILE ??
+    (0, node_path_1.resolve)(process.cwd(), ".test-db", "convenios.json");
+const composicionesDbPath = process.env.COMPOSICIONES_DB_FILE ??
+    (0, node_path_1.resolve)(process.cwd(), ".test-db", "composiciones-salariales.json");
+const fixedConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"];
 const repo = process.env.NODE_ENV === "production"
     ? new domain_1.InMemoryConceptRepository()
     : new FileBackedConceptRepository(new domain_1.InMemoryConceptRepository(), diskDbPath);
+let legajosStore = [];
+let liquidacionesStore = [];
+let conveniosStore = [...fixedConvenios];
+let composicionesStore = [];
+async function initLegajosStore() {
+    try {
+        const raw = await (0, promises_1.readFile)(legajosDbPath, "utf8");
+        const parsed = JSON.parse(raw);
+        legajosStore = Array.isArray(parsed) ? parsed : [];
+    }
+    catch {
+        legajosStore = [];
+        await persistLegajosStore();
+    }
+}
+async function persistLegajosStore() {
+    await (0, promises_1.mkdir)((0, node_path_1.dirname)(legajosDbPath), { recursive: true });
+    await (0, promises_1.writeFile)(legajosDbPath, JSON.stringify(legajosStore, null, 2), "utf8");
+}
+async function initLiquidacionesStore() {
+    try {
+        const raw = await (0, promises_1.readFile)(liquidacionesDbPath, "utf8");
+        const parsed = JSON.parse(raw);
+        liquidacionesStore = Array.isArray(parsed)
+            ? parsed.map((item) => ({
+                ...item,
+                estado: item.estado === "Anulada" ? "Anulada" : "Generada"
+            }))
+            : [];
+        await persistLiquidacionesStore();
+    }
+    catch {
+        liquidacionesStore = [];
+        await persistLiquidacionesStore();
+    }
+}
+async function persistLiquidacionesStore() {
+    await (0, promises_1.mkdir)((0, node_path_1.dirname)(liquidacionesDbPath), { recursive: true });
+    await (0, promises_1.writeFile)(liquidacionesDbPath, JSON.stringify(liquidacionesStore, null, 2), "utf8");
+}
+async function initConveniosStore() {
+    try {
+        const raw = await (0, promises_1.readFile)(conveniosDbPath, "utf8");
+        const parsed = JSON.parse(raw);
+        conveniosStore = Array.isArray(parsed) && parsed.length ? parsed : [...fixedConvenios];
+    }
+    catch {
+        conveniosStore = [...fixedConvenios];
+        await persistConveniosStore();
+    }
+}
+async function persistConveniosStore() {
+    await (0, promises_1.mkdir)((0, node_path_1.dirname)(conveniosDbPath), { recursive: true });
+    await (0, promises_1.writeFile)(conveniosDbPath, JSON.stringify(conveniosStore, null, 2), "utf8");
+}
+async function initComposicionesStore() {
+    try {
+        const raw = await (0, promises_1.readFile)(composicionesDbPath, "utf8");
+        const parsed = JSON.parse(raw);
+        composicionesStore = Array.isArray(parsed) ? parsed : [];
+    }
+    catch {
+        composicionesStore = [];
+        await persistComposicionesStore();
+    }
+}
+async function persistComposicionesStore() {
+    await (0, promises_1.mkdir)((0, node_path_1.dirname)(composicionesDbPath), { recursive: true });
+    await (0, promises_1.writeFile)(composicionesDbPath, JSON.stringify(composicionesStore, null, 2), "utf8");
+}
 app.get("/health", async () => ({ ok: true }));
 app.get("/concepts", async () => repo.list());
 app.post("/concepts", async (req) => {
@@ -92,6 +171,42 @@ app.put("/concepts", async (req) => {
 });
 app.delete("/concepts/:id", async (req) => {
     await repo.delete(Number(req.params.id));
+    return { ok: true };
+});
+app.get("/legajos", async () => legajosStore);
+app.put("/legajos", async (req) => {
+    legajosStore = Array.isArray(req.body) ? req.body : [];
+    await persistLegajosStore();
+    return { ok: true };
+});
+app.get("/liquidaciones", async () => liquidacionesStore);
+app.post("/liquidaciones", async (req) => {
+    if (!req.body?.id)
+        return { ok: false };
+    const normalized = {
+        ...req.body,
+        estado: req.body.estado === "Anulada" ? "Anulada" : "Generada"
+    };
+    liquidacionesStore = [normalized, ...liquidacionesStore.filter((item) => item.id !== req.body.id)];
+    await persistLiquidacionesStore();
+    return { ok: true };
+});
+app.put("/liquidaciones/:id/estado", async (req) => {
+    const nextEstado = req.body?.estado === "Anulada" ? "Anulada" : "Generada";
+    liquidacionesStore = liquidacionesStore.map((item) => item.id === req.params.id ? { ...item, estado: nextEstado } : item);
+    await persistLiquidacionesStore();
+    return { ok: true };
+});
+app.delete("/liquidaciones/:id", async (req) => {
+    liquidacionesStore = liquidacionesStore.map((item) => item.id === req.params.id ? { ...item, estado: "Anulada" } : item);
+    await persistLiquidacionesStore();
+    return { ok: true };
+});
+app.get("/convenios", async () => conveniosStore);
+app.get("/composiciones-salariales", async () => composicionesStore);
+app.put("/composiciones-salariales", async (req) => {
+    composicionesStore = Array.isArray(req.body) ? req.body : [];
+    await persistComposicionesStore();
     return { ok: true };
 });
 app.post("/liquidaciones/run", async (req) => {
@@ -108,6 +223,14 @@ const start = async () => {
         await repo.init();
         app.log.info(`Concept DB file: ${diskDbPath}`);
     }
+    await initLegajosStore();
+    await initLiquidacionesStore();
+    await initConveniosStore();
+    await initComposicionesStore();
+    app.log.info(`Legajos DB file: ${legajosDbPath}`);
+    app.log.info(`Liquidaciones DB file: ${liquidacionesDbPath}`);
+    app.log.info(`Convenios DB file: ${conveniosDbPath}`);
+    app.log.info(`Composiciones DB file: ${composicionesDbPath}`);
     await app.listen({ port: 3001, host: "0.0.0.0" });
 };
 start().catch((err) => {

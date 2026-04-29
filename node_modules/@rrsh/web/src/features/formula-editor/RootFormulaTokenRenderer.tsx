@@ -36,6 +36,8 @@ interface RootFormulaTokenRendererProps {
   parseConstValue: (expr: string) => string;
   conceptVisualForToken: (tk: FormulaToken) => ConceptModel | null;
   getShapeGlyph: (shape: ConceptShape) => string;
+  getPillTitle?: (tk: FormulaToken) => string | null;
+  onConceptClick?: (tk: FormulaToken) => void;
 }
 
 export function RootFormulaTokenRenderer({
@@ -66,12 +68,15 @@ export function RootFormulaTokenRenderer({
   isTagAggregationExpression,
   parseConstValue,
   conceptVisualForToken,
-  getShapeGlyph
+  getShapeGlyph,
+  getPillTitle,
+  onConceptClick
 }: RootFormulaTokenRendererProps) {
   if (tk.kind === "block") {
     return (
       <div
         className="formula-block-token"
+        title={getPillTitle?.(tk) ?? "Click der: quitar"}
         draggable
         onDragStart={(e) => {
           setRootDragSource(tk.id);
@@ -231,6 +236,8 @@ export function RootFormulaTokenRenderer({
             ? " math-pill"
             : isTagAggregationExpression(tk.expression)
               ? " tag-pill"
+              : /^VALOR_(?:FIJO|LEGAJO)\("/.test(tk.expression)
+                ? " fixed-value-pill"
               : ""
       }`}
       draggable
@@ -248,6 +255,10 @@ export function RootFormulaTokenRenderer({
       }}
       onClick={(e) => {
         e.stopPropagation();
+        if (tk.kind === "concept") {
+          onConceptClick?.(tk);
+          return;
+        }
         if (isConstExpression(tk.expression)) {
           setEditingConstTokenId(tk.id);
           setEditingConstDraft(parseConstValue(tk.expression));
@@ -257,7 +268,10 @@ export function RootFormulaTokenRenderer({
         e.preventDefault();
         updateFormulaTokens(selectedFormulaTokens.filter((item) => item.id !== tk.id));
       }}
-      title="Click izq: editar constante. Click der: quitar"
+      title={
+        getPillTitle?.(tk) ??
+        (isConstExpression(tk.expression) ? "Click izq: editar constante. Click der: quitar" : "Click der: quitar")
+      }
       style={{ opacity: draggingFormulaTokenId === tk.id ? 0.12 : 1 }}
     >
       {tk.kind === "concept" ? (

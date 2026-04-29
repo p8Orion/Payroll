@@ -1,4 +1,4 @@
-import { DragEvent, ReactNode } from "react";
+import { DragEvent, ReactNode, useState } from "react";
 import { FormulaInlineEditor } from "../../components/FormulaInlineEditor";
 import { FormulaToken } from "../../model/types";
 
@@ -29,6 +29,7 @@ export function FormulaEditorSection({
   previewError,
   hasCycle
 }: FormulaEditorSectionProps) {
+  const [showFormulaText, setShowFormulaText] = useState(false);
   const formatPreviewValue = (value: unknown): string =>
     typeof value === "number" ? `$${value.toLocaleString("es-AR")}` : String(value);
 
@@ -56,16 +57,29 @@ export function FormulaEditorSection({
         />
       </div>
       <div className="formula-text-section">
-        <h3>Formula</h3>
-        <input
-          className="formula-text-live-input"
-          value={formulaText}
-          onChange={(e) => onFormulaTextChange(e.target.value)}
-          placeholder='Ej: CCONCEPTO("BASICO") MATH("*") PARAM("porc_antiguedad")'
-        />
+        <div className="formula-text-header">
+          <h3>Fórmula</h3>
+          <button
+            type="button"
+            className={`formula-visibility-toggle${showFormulaText ? "" : " is-hidden"}`}
+            onClick={() => setShowFormulaText((prev) => !prev)}
+            title={showFormulaText ? "Ocultar formula" : "Mostrar formula"}
+            aria-label={showFormulaText ? "Ocultar formula" : "Mostrar formula"}
+          >
+            👁
+          </button>
+        </div>
+        {showFormulaText ? (
+          <input
+            className="formula-text-live-input"
+            value={formulaText}
+            onChange={(e) => onFormulaTextChange(e.target.value)}
+            placeholder='Ej: CCONCEPTO("BASICO") MATH("*") PARAM("porc_antiguedad")'
+          />
+        ) : null}
       </div>
       <div className="preview">
-        <h3>Pre-calculo de prueba</h3>
+        <h3>Pre-cálculo de prueba</h3>
         <p>
           <strong>
             {hasCycle

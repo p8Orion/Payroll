@@ -107,6 +107,9 @@ interface ApiLegajo {
   id: string;
   nroLegajo: string;
   nombre: string;
+  fechaNacimiento: string;
+  fechaIngreso: string;
+  fechaEgreso: string;
   convenio: string;
   composicionSalarial: string;
   valoresFijos: ApiLegajoValorFijo[];
@@ -117,6 +120,9 @@ interface ApiLiquidacionConceptoRow {
   conceptCode: string;
   conceptName: string;
   conceptClass?: "definitivo" | "transitorio";
+  conceptTypeId?: "remunerativo" | "no_remunerativo" | "descuentos" | "aportes_patronales";
+  conceptColumn?: number;
+  conceptSign?: 1 | -1;
   value: unknown;
   formulaUsed: string;
 }
@@ -133,6 +139,7 @@ interface ApiLiquidacionLegajoRow {
 interface ApiLiquidacionRecord {
   id: string;
   liquidationType: string;
+  estado: "Generada" | "Anulada";
   month: number;
   year: number;
   createdAt: string;
@@ -181,7 +188,13 @@ async function initLiquidacionesStore(): Promise<void> {
   try {
     const raw = await readFile(liquidacionesDbPath, "utf8");
     const parsed = JSON.parse(raw) as ApiLiquidacionRecord[];
-    liquidacionesStore = Array.isArray(parsed) ? parsed : [];
+    liquidacionesStore = Array.isArray(parsed)
+      ? parsed.map((item) => ({
+          ...item,
+          estado: item.estado === "Anulada" ? "Anulada" : "Generada"
+        }))
+      : [];
+    await persistLiquidacionesStore();
   } catch {
     liquidacionesStore = [];
     await persistLiquidacionesStore();
@@ -256,13 +269,31 @@ app.get("/liquidaciones", async () => liquidacionesStore);
 
 app.post<{ Body: ApiLiquidacionRecord }>("/liquidaciones", async (req) => {
   if (!req.body?.id) return { ok: false };
-  liquidacionesStore = [req.body, ...liquidacionesStore.filter((item) => item.id !== req.body.id)];
+  const normalized: ApiLiquidacionRecord = {
+    ...req.body,
+    estado: req.body.estado === "Anulada" ? "Anulada" : "Generada"
+  };
+  liquidacionesStore = [normalized, ...liquidacionesStore.filter((item) => item.id !== req.body.id)];
   await persistLiquidacionesStore();
   return { ok: true };
 });
 
+app.put<{ Params: { id: string }; Body: { estado: "Generada" | "Anulada" } }>(
+  "/liquidaciones/:id/estado",
+  async (req) => {
+    const nextEstado = req.body?.estado === "Anulada" ? "Anulada" : "Generada";
+    liquidacionesStore = liquidacionesStore.map((item) =>
+      item.id === req.params.id ? { ...item, estado: nextEstado } : item
+    );
+    await persistLiquidacionesStore();
+    return { ok: true };
+  }
+);
+
 app.delete<{ Params: { id: string } }>("/liquidaciones/:id", async (req) => {
-  liquidacionesStore = liquidacionesStore.filter((item) => item.id !== req.params.id);
+  liquidacionesStore = liquidacionesStore.map((item) =>
+    item.id === req.params.id ? { ...item, estado: "Anulada" } : item
+  );
   await persistLiquidacionesStore();
   return { ok: true };
 });

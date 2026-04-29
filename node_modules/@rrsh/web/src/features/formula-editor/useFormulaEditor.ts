@@ -22,6 +22,7 @@ import { insertRawTextIntoBlockArg, mutateBlockArgExpression } from "../../model
 import { formulaToExpression, getShapeGlyph, tokenizeFormulaExpression, token } from "../../model/helpers";
 import {
   buildConstExpression,
+  formatConstDisplayValue,
   isConstExpression,
   isMathExpression,
   isMathOperatorText,
@@ -53,6 +54,8 @@ interface UseFormulaEditorParams {
     token: FormulaToken
   ) => void;
   setCursorGhost: (event: DragEvent<HTMLElement>, label: string) => void;
+  getFormulaPillTitle?: (tk: FormulaToken) => string | null;
+  onSelectConceptFromToken?: (tk: FormulaToken) => void;
 }
 
 export function useFormulaEditor({
@@ -66,7 +69,9 @@ export function useFormulaEditor({
   formulaDragSourceRef,
   setRootDragSource,
   setNestedDragSource,
-  setCursorGhost
+  setCursorGhost,
+  getFormulaPillTitle,
+  onSelectConceptFromToken
 }: UseFormulaEditorParams) {
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   const [draggingFormulaTokenId, setDraggingFormulaTokenId] = useState<string | null>(null);
@@ -110,7 +115,7 @@ export function useFormulaEditor({
       insertTokenAt(token(value, `MATH("${value}")`, "function"), index);
       return;
     }
-    insertTokenAt(token(value, buildConstExpression(value), "function"), index);
+    insertTokenAt(token(formatConstDisplayValue(value), buildConstExpression(value), "function"), index);
   };
 
   const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE", index: number) => {
@@ -387,7 +392,11 @@ export function useFormulaEditor({
       updateFormulaTokens(
         selectedFormulaTokens.map((item) =>
           item.id === tokenId
-            ? { ...item, label: value, expression: buildConstExpression(value) }
+            ? {
+                ...item,
+                label: formatConstDisplayValue(value),
+                expression: buildConstExpression(value)
+              }
             : item
         )
       );
@@ -455,7 +464,9 @@ export function useFormulaEditor({
       buildConstExpression,
       isMathExpression,
       isTagAggregationExpression,
-      conceptVisualForToken
+      conceptVisualForToken,
+      getPillTitle: getFormulaPillTitle,
+      onConceptClick: onSelectConceptFromToken
     });
 
   const renderRootFormulaToken = (tk: FormulaToken): ReactNode =>
@@ -487,7 +498,9 @@ export function useFormulaEditor({
       isTagAggregationExpression,
       parseConstValue,
       conceptVisualForToken,
-      getShapeGlyph
+      getShapeGlyph,
+      getPillTitle: getFormulaPillTitle,
+      onConceptClick: onSelectConceptFromToken
     });
 
   const setFormulaExpressionText = (nextExpression: string) => {

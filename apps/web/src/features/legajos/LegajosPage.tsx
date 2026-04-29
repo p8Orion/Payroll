@@ -11,6 +11,9 @@ export interface LegajoModel {
   id: string;
   nroLegajo: string;
   nombre: string;
+  fechaNacimiento: string;
+  fechaIngreso: string;
+  fechaEgreso: string;
   convenio: string;
   composicionSalarial: string;
   valoresFijos: LegajoValorFijo[];
@@ -39,6 +42,9 @@ function createLegajo(): LegajoModel {
     id: nextLegajoId(),
     nroLegajo: "",
     nombre: "",
+    fechaNacimiento: "",
+    fechaIngreso: "",
+    fechaEgreso: "",
     convenio: "",
     composicionSalarial: "",
     valoresFijos: []
@@ -60,13 +66,26 @@ export function LegajosPage({
         nextId = `legajo_${index + 1}_${Math.random().toString(36).slice(2, 8)}`;
       }
       used.add(nextId);
-      return nextId === l.id ? l : { ...l, id: nextId };
+      const withDates: LegajoModel = {
+        ...l,
+        id: nextId,
+        fechaNacimiento: l.fechaNacimiento ?? "",
+        fechaIngreso: l.fechaIngreso ?? "",
+        fechaEgreso: l.fechaEgreso ?? ""
+      };
+      return withDates;
     });
   }, [legajos]);
   const needsIdMigration = useMemo(
     () =>
       normalizedLegajos.length !== legajos.length ||
-      normalizedLegajos.some((l, i) => l.id !== legajos[i]?.id),
+      normalizedLegajos.some(
+        (l, i) =>
+          l.id !== legajos[i]?.id ||
+          l.fechaNacimiento !== (legajos[i]?.fechaNacimiento ?? "") ||
+          l.fechaIngreso !== (legajos[i]?.fechaIngreso ?? "") ||
+          l.fechaEgreso !== (legajos[i]?.fechaEgreso ?? "")
+      ),
     [normalizedLegajos, legajos]
   );
 
@@ -205,6 +224,38 @@ export function LegajosPage({
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+            <div className="receipt-toolbar">
+              <div>
+                <label>Fecha de nacimiento</label>
+                <input
+                  type="date"
+                  value={selected.fechaNacimiento ?? ""}
+                  onChange={(e) =>
+                    updateSelected((current) => ({ ...current, fechaNacimiento: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <label>Fecha de ingreso</label>
+                <input
+                  type="date"
+                  value={selected.fechaIngreso ?? ""}
+                  onChange={(e) =>
+                    updateSelected((current) => ({ ...current, fechaIngreso: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <label>Fecha de egreso</label>
+                <input
+                  type="date"
+                  value={selected.fechaEgreso ?? ""}
+                  onChange={(e) =>
+                    updateSelected((current) => ({ ...current, fechaEgreso: e.target.value }))
+                  }
+                />
               </div>
             </div>
             <div className="receipt-toolbar">

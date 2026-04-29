@@ -8,6 +8,11 @@
         "id": "cvf_1",
         "clave": "Básico",
         "valor": 100
+      },
+      {
+        "id": "cvf_2",
+        "clave": "",
+        "valor": 0
       }
     ]
   },
@@ -31,7 +36,7 @@
       {
         "id": "cvf_3",
         "clave": "Básico",
-        "valor": 150
+        "valor": 2000000
       }
     ]
   },

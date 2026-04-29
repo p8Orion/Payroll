@@ -8,6 +8,29 @@ export type ConceptShape =
   | "plus"
   | "hex";
 export type TagAggregationOp = "sum" | "avg" | "max" | "min";
+export type ConceptTypeId =
+  | "remunerativo"
+  | "no_remunerativo"
+  | "descuentos"
+  | "aportes_patronales";
+
+export interface ConceptTypeDefinition {
+  id: ConceptTypeId;
+  label: string;
+  column: number;
+  sign: 1 | -1;
+}
+
+export const CONCEPT_TYPE_DEFINITIONS: ConceptTypeDefinition[] = [
+  { id: "remunerativo", label: "Remunerativo", column: 1, sign: 1 },
+  { id: "no_remunerativo", label: "No remunerativo", column: 2, sign: 1 },
+  { id: "descuentos", label: "Descuentos", column: 3, sign: -1 },
+  { id: "aportes_patronales", label: "Aportes patronales", column: 4, sign: 1 }
+];
+
+export function getConceptTypeDefinition(typeId?: ConceptTypeId): ConceptTypeDefinition {
+  return CONCEPT_TYPE_DEFINITIONS.find((definition) => definition.id === typeId) ?? CONCEPT_TYPE_DEFINITIONS[0];
+}
 export const LIQUIDATION_TYPES = [
   "Normal",
   "Vacaciones",
@@ -50,6 +73,7 @@ export interface ConceptModel {
   code: string;
   name: string;
   conceptClass: ConceptClass;
+  conceptType: ConceptTypeId;
   color: string;
   shape: ConceptShape;
   tags: string[];

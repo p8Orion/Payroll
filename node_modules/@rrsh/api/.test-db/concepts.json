@@ -4,6 +4,7 @@
     "code": "DEF_904",
     "name": "Concepto definitivo 904",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "CONSTANTE(\"100\")",
     "tags": [
       "remunerativo"
@@ -14,6 +15,7 @@
     "code": "DEF_905",
     "name": "Concepto definitivo 905",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "CONSTANTE(\"3\")",
     "tags": []
   },
@@ -22,15 +24,19 @@
     "code": "DEF_909",
     "name": "Concepto definitivo 909",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "[SI|CONSTANTE(\"1\")|CONSTANTE(\"1\")|CONSTANTE(\"0\")] MATH(\"+\") CONSTANTE(\"3\")",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 915,
     "code": "DEF_915",
     "name": "Concepto definitivo 915",
     "conceptClass": "definitivo",
-    "formula": "VALOR_FIJO(\"A\")",
+    "conceptType": "descuentos",
+    "formula": "CONSTANTE(\"55\")",
     "tags": []
   },
   {
@@ -38,6 +44,7 @@
     "code": "DEF_924",
     "name": "Concepto definitivo 924",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "CONSTANTE(\"1\")",
     "tags": []
   },
@@ -46,14 +53,16 @@
     "code": "TRANS_925",
     "name": "Transitorio 925",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
   {
     "id": 927,
-    "code": "DEF_927",
-    "name": "Concepto definitivo 927",
+    "code": "XASAS",
+    "name": "Concepto definitivo 937",
     "conceptClass": "definitivo",
+    "conceptType": "no_remunerativo",
     "formula": "CONSTANTE(\"5\")",
     "tags": []
   },
@@ -62,6 +71,7 @@
     "code": "TRANS_929",
     "name": "Transitorio 929",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "VALOR_FIJO(\"A\")",
     "tags": []
   },
@@ -70,6 +80,7 @@
     "code": "TRANS_930",
     "name": "Transitorio 930",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
@@ -78,6 +89,7 @@
     "code": "TRANS_931",
     "name": "Transitorio 931",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
@@ -86,6 +98,7 @@
     "code": "TRANS_932",
     "name": "Transitorio 932",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
@@ -94,6 +107,7 @@
     "code": "DEF_933",
     "name": "Concepto definitivo 933",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
@@ -102,6 +116,7 @@
     "code": "TRANS_934",
     "name": "Transitorio 934",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "CONSTANTE(\"2\")",
     "tags": []
   },
@@ -110,6 +125,7 @@
     "code": "TRANS_935",
     "name": "Transitorio 935",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "CONSTANTE(\"1\")",
     "tags": []
   },
@@ -118,6 +134,7 @@
     "code": "TRANS_936",
     "name": "Transitorio 936",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "CONSTANTE(\"4\")",
     "tags": []
   },
@@ -126,7 +143,8 @@
     "code": "BÁSICO",
     "name": "Concepto definitivo 937",
     "conceptClass": "definitivo",
-    "formula": "VALOR_FIJO(\"Básico\")",
+    "conceptType": "remunerativo",
+    "formula": "[BLOQUE|VALOR_FIJO(\"Básico\") MATH(\"+\") [SI|CONCEPTO(927)|CONSTANTE(\"4000000.1\")|CONSTANTE(\"1000000\")]]",
     "tags": []
   },
   {
@@ -134,6 +152,7 @@
     "code": "DEF_938",
     "name": "Concepto definitivo 938",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
@@ -142,6 +161,7 @@
     "code": "TRANS_939",
     "name": "Transitorio 939",
     "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
     "formula": "",
     "tags": []
   },
@@ -150,6 +170,7 @@
     "code": "DEF_940",
     "name": "Concepto definitivo 940",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "VALOR_FIJO(\"Básico\")",
     "tags": []
   },
@@ -158,6 +179,7 @@
     "code": "DEF_941",
     "name": "Concepto definitivo 941",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "VALOR_FIJO(\"Básico\")",
     "tags": []
   },
@@ -166,6 +188,7 @@
     "code": "DEF_942",
     "name": "Concepto definitivo 942",
     "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
     "formula": "VALOR_FIJO(\"Básico\")",
     "tags": []
   },
@@ -174,7 +197,110 @@
     "code": "DEF_943",
     "name": "Concepto definitivo 943",
     "conceptClass": "definitivo",
-    "formula": "VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")",
+    "conceptType": "remunerativo",
+    "formula": "MATH(\"-\") CONSTANTE(\"1\") MATH(\"*\") [BLOQUE|VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")]",
     "tags": []
+  },
+  {
+    "id": 944,
+    "code": "DEF_944",
+    "name": "Concepto definitivo 944",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "ANTIGUEDAD()",
+    "tags": []
+  },
+  {
+    "id": 945,
+    "code": "BASI",
+    "name": "Sueldo básico",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "VALOR_FIJO(\"Básico\")",
+    "tags": [
+      "base-tarea-profesional",
+      "base-tareas-peligrosas",
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 946,
+    "code": "ANTIG",
+    "name": "Bonificación por antigüedad",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)",
+    "tags": [
+      "base-tarea-profesional",
+      "base-tareas-peligrosas",
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 947,
+    "code": "PROF",
+    "name": "Tarea profesional",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
+    "tags": [
+      "base-tareas-peligrosas",
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 948,
+    "code": "GAS",
+    "name": "Asignación consumo de gas",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "CONSTANTE(\"5\")",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 949,
+    "code": "PELIG",
+    "name": "Tareas peligrosas",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 950,
+    "code": "ELEC",
+    "name": "Asignación consumo de electricidad",
+    "conceptClass": "definitivo",
+    "conceptType": "no_remunerativo",
+    "formula": "CONSTANTE(\"4\")",
+    "tags": [
+      "no_remunerativo"
+    ]
+  },
+  {
+    "id": 951,
+    "code": "JUB11",
+    "name": "Jubilación Ley 18037",
+    "conceptClass": "definitivo",
+    "conceptType": "descuentos",
+    "formula": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")",
+    "tags": [
+      "descuentos"
+    ]
+  },
+  {
+    "id": 952,
+    "code": "ANTIG-A",
+    "name": "Bonificación por antigüedad adicional",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "formula": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"10\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]",
+    "tags": [
+      "remunerativo"
+    ]
   }
 ]

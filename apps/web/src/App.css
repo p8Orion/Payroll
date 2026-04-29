@@ -176,6 +176,30 @@
   margin-top: 24px;
 }
 
+.liquidaciones-concept-columns {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 10px;
+}
+
+.liquidaciones-column-panel {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.liquidaciones-column-panel .concept-list {
+  flex: 1;
+  align-content: start;
+  margin-bottom: 10px;
+}
+
+.liquidaciones-column-panel .liquidaciones-total-row {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
 .legajos-header {
   display: flex;
   justify-content: space-between;
@@ -252,6 +276,15 @@
   color: #7b849a;
   font-size: 0.78rem;
   font-weight: 500;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.concept-type-inline {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
 }
 
 .liquidacion-valor {
@@ -288,6 +321,26 @@
   border-color: #9dc3b3;
   background: #eefaf4;
   box-shadow: inset 0 0 0 1px rgba(21, 128, 61, 0.08);
+}
+
+.liquidaciones-transitory-panel {
+  margin-top: 20px;
+}
+
+.liquidacion-legajo-disabled {
+  background: #e5e7eb;
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+.liquidacion-item-anulada {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.liquidacion-item-anulada.selected {
+  background: #fee2e2;
+  border-color: #fca5a5;
 }
 
 .formula-dropzone {
@@ -420,7 +473,39 @@
 }
 
 .formula-text-section h3 {
-  margin: 0 0 8px;
+  margin: 0;
+}
+
+.formula-text-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.formula-visibility-toggle {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+  position: relative;
+}
+
+.formula-visibility-toggle.is-hidden::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-28deg);
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: #475569;
+  pointer-events: none;
 }
 
 .formula-text-live-input {
@@ -491,6 +576,12 @@
   background: #f3e8ff;
   border-color: #d8b4fe;
   color: #6b21a8;
+}
+
+.formula-pill.fixed-value-pill {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #5b21b6;
 }
 
 .formula-pill.number {
@@ -628,6 +719,49 @@
   gap: 4px;
 }
 
+.si-switch-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: start;
+  position: relative;
+  padding-right: 24px;
+}
+
+.si-add-row-button {
+  justify-self: end;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.si-remove-row-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.72rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.si-remove-row-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .si-branch strong {
   font-size: 0.72rem;
 }
@@ -687,6 +821,10 @@
   grid-template-columns: 1fr 1fr auto;
   gap: 10px;
   margin-bottom: 10px;
+}
+
+.liquidaciones-filter-toolbar {
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
 }
 
 .receipt-toolbar label {
@@ -775,11 +913,17 @@
   gap: 8px;
 }
 
-.concept-edit-inline input {
+.concept-edit-inline input,
+.concept-edit-inline select {
   border: 1px solid #c6d0ea;
   border-radius: 8px;
   padding: 5px 8px;
   font-size: 0.88rem;
+}
+
+.concept-edit-inline .concept-inline-code-input,
+.concept-edit-inline .concept-inline-name-input {
+  font-size: 1.1rem;
 }
 
 .save-inline-button {
@@ -799,6 +943,18 @@
   cursor: pointer;
 }
 
+.concept-delete-button {
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 6px 10px;
+}
+
+.liquidaciones-delete-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .concept-meta-editor {
   display: grid;
   gap: 6px;
@@ -811,12 +967,14 @@
 }
 
 .appearance-trigger {
-  border: 0;
-  padding: 0;
-  background: transparent;
+  border: 1px solid #cfd7eb;
+  border-radius: 10px;
+  padding: 4px 8px;
+  background: #f1f5f9;
   display: flex;
   align-items: center;
   cursor: pointer;
+  margin-right: 8px;
 }
 
 .appearance-icon {
@@ -907,6 +1065,13 @@
   padding: 6px 10px;
   background: #f4f7ff;
   font-size: 0.85rem;
+}
+
+.implicit-type-tag-pill {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #374151;
+  cursor: default;
 }
 
 .tag-remove-inline {

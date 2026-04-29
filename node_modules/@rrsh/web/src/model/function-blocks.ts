@@ -183,10 +183,17 @@ export function expandBracketBlocksToExpressions(expression: string): string {
       continue;
     }
     if (block.name === "SI") {
-      const cond = expandBracketBlocksToExpressions(block.args[0] ?? "");
-      const whenTrue = expandBracketBlocksToExpressions(block.args[1] ?? "");
-      const whenFalse = expandBracketBlocksToExpressions(block.args[2] ?? "");
-      out += `SI(${cond};${whenTrue};${whenFalse})`;
+      const rawArgs = [...block.args];
+      while (rawArgs.length < 3) rawArgs.push("");
+      if (rawArgs.length % 2 === 0) rawArgs.push("");
+      const fallbackIndex = rawArgs.length - 1;
+      let fallback = expandBracketBlocksToExpressions(rawArgs[fallbackIndex] ?? "");
+      for (let i = fallbackIndex - 2; i >= 0; i -= 2) {
+        const cond = expandBracketBlocksToExpressions(rawArgs[i] ?? "");
+        const whenTrue = expandBracketBlocksToExpressions(rawArgs[i + 1] ?? "");
+        fallback = `SI(${cond};${whenTrue};${fallback})`;
+      }
+      out += fallback;
     } else if (block.name === "BLOQUE") {
       const inner = expandBracketBlocksToExpressions(block.args[0] ?? "");
       out += `(${inner})`;

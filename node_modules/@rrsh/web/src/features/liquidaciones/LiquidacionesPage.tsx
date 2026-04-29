@@ -2,7 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { formulaToExpression } from "../../model/helpers";
 import { astToTokens } from "../../model/formula-dnd";
 import { evaluateConcepts } from "../../model/liquidation-eval";
-import { ConceptModel, LIQUIDATION_TYPES, ReceiptModel } from "../../model/types";
+import {
+  CONCEPT_TYPE_DEFINITIONS,
+  ConceptModel,
+  ConceptTypeId,
+  getConceptTypeDefinition,
+  LIQUIDATION_TYPES,
+  ReceiptModel
+} from "../../model/types";
 import { ComposicionSalarialModel } from "../composiciones/ComposicionesSalarialesPage";
 import { LegajoModel } from "../legajos/LegajosPage";
 import { LiquidacionConceptoRow, LiquidacionRecord, LiquidacionLegajoRow } from "./types";
@@ -48,6 +55,18 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
   const [filterType, setFilterType] = useState<string>("Todos");
   const [filterMonth, setFilterMonth] = useState<string>("Todos");
   const [filterYear, setFilterYear] = useState<string>("Todos");
+  const [filterEstado, setFilterEstado] = useState<"Todos" | "Generada" | "Anulada">("Generada");
+  const blockedLegajoIdsForCreate = useMemo(() => {
+    const blocked = new Set<string>();
+    for (const liq of liquidaciones) {
+      if (liq.estado === "Anulada") continue;
+      if (liq.liquidationType !== selectedType) continue;
+      if (liq.month !== selectedMonth) continue;
+      if (liq.year !== selectedYear) continue;
+      for (const legajoRow of liq.legajos) blocked.add(legajoRow.legajoId);
+    }
+    return blocked;
+  }, [liquidaciones, selectedType, selectedMonth, selectedYear]);
 
   useEffect(() => {
     const load = async () => {
@@ -55,7 +74,14 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
         const response = await fetch(`${apiBaseUrl}/liquidaciones`);
         if (!response.ok) return;
         const parsed = (await response.json()) as LiquidacionRecord[];
-        setLiquidaciones(Array.isArray(parsed) ? parsed : []);
+        setLiquidaciones(
+          Array.isArray(parsed)
+            ? parsed.map((item) => ({
+                ...item,
+                estado: item.estado === "Anulada" ? "Anulada" : "Generada"
+              }))
+            : []
+        );
       } catch {
         // noop
       }
@@ -63,25 +89,29 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
     void load();
   }, []);
 
+  const filteredLiquidaciones = useMemo(
+    () =>
+      liquidaciones.filter((item) => {
+        if (filterEstado !== "Todos" && item.estado !== filterEstado) return false;
+        if (filterType !== "Todos" && item.liquidationType !== filterType) return false;
+        if (filterMonth !== "Todos" && String(item.month) !== filterMonth) return false;
+        if (filterYear !== "Todos" && String(item.year) !== filterYear) return false;
+        return true;
+      }),
+    [liquidaciones, filterEstado, filterType, filterMonth, filterYear]
+  );
   const selectedLiquidacion = useMemo(
-    () => liquidaciones.find((item) => item.id === selectedLiquidacionId) ?? liquidaciones[0] ?? null,
-    [liquidaciones, selectedLiquidacionId]
+    () =>
+      filteredLiquidaciones.find((item) => item.id === selectedLiquidacionId) ??
+      filteredLiquidaciones[0] ??
+      null,
+    [filteredLiquidaciones, selectedLiquidacionId]
   );
   const yearOptions = useMemo(
     () =>
       Array.from(new Set(liquidaciones.map((item) => String(item.year))))
         .sort((a, b) => Number(b) - Number(a)),
     [liquidaciones]
-  );
-  const filteredLiquidaciones = useMemo(
-    () =>
-      liquidaciones.filter((item) => {
-        if (filterType !== "Todos" && item.liquidationType !== filterType) return false;
-        if (filterMonth !== "Todos" && String(item.month) !== filterMonth) return false;
-        if (filterYear !== "Todos" && String(item.year) !== filterYear) return false;
-        return true;
-      }),
-    [liquidaciones, filterType, filterMonth, filterYear]
   );
   const selectedLegajoLiquidado = useMemo(
     () =>
@@ -92,26 +122,40 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
   );
 
   useEffect(() => {
-    if (!selectedLiquidacion) return;
-    if (!selectedLiquidacionId) setSelectedLiquidacionId(selectedLiquidacion.id);
+    if (!selectedLiquidacion) {
+      if (selectedLiquidacionId) setSelectedLiquidacionId("");
+      return;
+    }
+    if (selectedLiquidacion.id !== selectedLiquidacionId) setSelectedLiquidacionId(selectedLiquidacion.id);
   }, [selectedLiquidacion, selectedLiquidacionId]);
 
   const toggleLegajo = (legajoId: string) => {
+    if (blockedLegajoIdsForCreate.has(legajoId)) return;
     setSelectedLegajoIds((prev) =>
       prev.includes(legajoId) ? prev.filter((id) => id !== legajoId) : [...prev, legajoId]
     );
   };
 
   const toggleAllLegajos = () => {
-    if (selectedLegajoIds.length === legajos.length) {
+    const enabledLegajoIds = legajos
+      .map((legajo) => legajo.id)
+      .filter((id) => !blockedLegajoIdsForCreate.has(id));
+    if (!enabledLegajoIds.length) {
       setSelectedLegajoIds([]);
       return;
     }
-    setSelectedLegajoIds(legajos.map((legajo) => legajo.id));
+    const allEnabledSelected = enabledLegajoIds.every((id) => selectedLegajoIds.includes(id));
+    if (allEnabledSelected) {
+      setSelectedLegajoIds([]);
+      return;
+    }
+    setSelectedLegajoIds(enabledLegajoIds);
   };
 
   const createLiquidacion = async () => {
-    const targetLegajos = legajos.filter((item) => selectedLegajoIds.includes(item.id));
+    const targetLegajos = legajos.filter(
+      (item) => selectedLegajoIds.includes(item.id) && !blockedLegajoIdsForCreate.has(item.id)
+    );
     if (!targetLegajos.length) return;
     const conceptCodeById = Object.fromEntries(concepts.map((c) => [c.id, c.code])) as Record<number, string>;
     const hasUsableConcepts = (receipt: ReceiptModel | undefined): boolean =>
@@ -148,7 +192,10 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
         legajo: {
           ...legajo,
           composicionValoresFijos: composicion?.valoresFijos ?? []
-        }
+        },
+        receiptOrderIds: [...(receipt?.definitiveOrder ?? []), ...(receipt?.transitoryOrder ?? [])],
+        asOfMonth: selectedMonth,
+        asOfYear: selectedYear
       });
       const mapConceptRows = (
         ids: number[],
@@ -164,6 +211,9 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
               conceptCode: concept.code,
               conceptName: concept.name,
               conceptClass,
+              conceptTypeId: concept.conceptType,
+              conceptColumn: getConceptTypeDefinition(concept.conceptType).column,
+              conceptSign: getConceptTypeDefinition(concept.conceptType).sign,
               value,
               formulaUsed: formulaToExpression(astToTokens(concept.formulaAst ?? []))
             };
@@ -171,7 +221,10 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
       const definitiveRows = mapConceptRows(receipt?.definitiveOrder ?? [], "definitivo");
       const transitoryRows = mapConceptRows(receipt?.transitoryOrder ?? [], "transitorio");
       const conceptoRows = [...definitiveRows, ...transitoryRows];
-      const total = definitiveRows.reduce((acc, row) => acc + (typeof row.value === "number" ? row.value : 0), 0);
+      const total = conceptoRows.reduce(
+        (acc, row) => acc + (typeof row.value === "number" && Number.isFinite(row.value) ? row.value : 0),
+        0
+      );
       return {
         legajoId: legajo.id,
         legajoNro: legajo.nroLegajo,
@@ -185,6 +238,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
     const payload: LiquidacionRecord = {
       id: `liq_${selectedYear}_${selectedMonth}_${selectedType}_${Date.now()}`,
       liquidationType: selectedType,
+      estado: "Generada",
       month: selectedMonth,
       year: selectedYear,
       createdAt: new Date().toISOString(),
@@ -202,42 +256,124 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
     setCreateModalOpen(false);
   };
 
-  const deleteLiquidacion = async () => {
+  useEffect(() => {
+    setSelectedLegajoIds((prev) => prev.filter((id) => !blockedLegajoIdsForCreate.has(id)));
+  }, [blockedLegajoIdsForCreate]);
+
+  const anularLiquidacion = async () => {
     if (!selectedLiquidacion) return;
+    if (selectedLiquidacion.estado === "Anulada") return;
     const ok = window.confirm(
-      `¿Borrar liquidación ${selectedLiquidacion.liquidationType} ${selectedLiquidacion.month}/${selectedLiquidacion.year}?`
+      `¿Anular liquidación ${selectedLiquidacion.liquidationType} ${selectedLiquidacion.month}/${selectedLiquidacion.year}?`
     );
     if (!ok) return;
-    const response = await fetch(`${apiBaseUrl}/liquidaciones/${selectedLiquidacion.id}`, {
-      method: "DELETE"
+    let response = await fetch(`${apiBaseUrl}/liquidaciones/${selectedLiquidacion.id}/estado`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado: "Anulada" })
     });
-    if (!response.ok) return;
-    const next = liquidaciones.filter((item) => item.id !== selectedLiquidacion.id);
-    setLiquidaciones(next);
-    setSelectedLiquidacionId(next[0]?.id ?? "");
-    setSelectedLegajoId(next[0]?.legajos[0]?.legajoId ?? "");
+    if (!response.ok) {
+      // Compatibilidad con servidor previo (sin endpoint /estado).
+      response = await fetch(`${apiBaseUrl}/liquidaciones/${selectedLiquidacion.id}`, {
+        method: "DELETE"
+      });
+    }
+    if (!response.ok) {
+      window.alert("No se pudo anular la liquidación. Reintentá en unos segundos.");
+      return;
+    }
+    setLiquidaciones((prev) =>
+      prev.map((item) => (item.id === selectedLiquidacion.id ? { ...item, estado: "Anulada" } : item))
+    );
   };
 
   const conceptClassById = useMemo(
     () => new Map(concepts.map((concept) => [concept.id, concept.conceptClass])),
     [concepts]
   );
+  const conceptTypeById = useMemo(
+    () => new Map(concepts.map((concept) => [concept.id, concept.conceptType])),
+    [concepts]
+  );
   const selectedLegajoConceptos = selectedLegajoLiquidado?.conceptos ?? [];
-  const definitiveConceptRows = selectedLegajoConceptos.filter((row) => {
-    const resolvedClass = row.conceptClass ?? conceptClassById.get(row.conceptId);
-    return resolvedClass !== "transitorio";
-  });
-  const transitoryConceptRows = selectedLegajoConceptos.filter((row) => {
-    const resolvedClass = row.conceptClass ?? conceptClassById.get(row.conceptId);
-    return resolvedClass === "transitorio";
-  });
+  const columnLabelByNumber = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const definition of CONCEPT_TYPE_DEFINITIONS) {
+      if (!map.has(definition.column)) map.set(definition.column, definition.label);
+    }
+    return map;
+  }, []);
+  const conceptosPorColumna = useMemo(() => {
+    const grouped = new Map<
+      number,
+      { conceptId: number; conceptCode: string; conceptName: string; value: unknown; typeId: ConceptTypeId }[]
+    >();
+    for (const row of selectedLegajoConceptos) {
+      const resolvedClass = row.conceptClass ?? conceptClassById.get(row.conceptId) ?? "definitivo";
+      if (resolvedClass === "transitorio") continue;
+      const resolvedType = row.conceptTypeId ?? conceptTypeById.get(row.conceptId) ?? "remunerativo";
+      const resolvedColumn = row.conceptColumn ?? getConceptTypeDefinition(resolvedType).column;
+      const current = grouped.get(resolvedColumn) ?? [];
+      current.push({
+        conceptId: row.conceptId,
+        conceptCode: row.conceptCode,
+        conceptName: row.conceptName,
+        value: row.value,
+        typeId: resolvedType
+      });
+      grouped.set(resolvedColumn, current);
+    }
+    return Array.from(grouped.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([column, rows]) => ({ column, rows }));
+  }, [selectedLegajoConceptos, conceptTypeById, conceptClassById]);
+  const conceptosTransitorios = useMemo(
+    () =>
+      selectedLegajoConceptos.filter(
+        (row) => (row.conceptClass ?? conceptClassById.get(row.conceptId) ?? "definitivo") === "transitorio"
+      ),
+    [selectedLegajoConceptos, conceptClassById]
+  );
+  const totalPorColumna = useMemo(
+    () =>
+      new Map(
+        conceptosPorColumna.map(({ column, rows }) => [
+          column,
+          rows.reduce(
+            (acc, row) =>
+              acc + (typeof row.value === "number" && Number.isFinite(row.value) ? row.value : 0),
+            0
+          )
+        ])
+      ),
+    [conceptosPorColumna]
+  );
+  const totalGeneralConceptos = useMemo(
+    () =>
+      selectedLegajoConceptos.reduce(
+        (acc, row) => acc + (typeof row.value === "number" && Number.isFinite(row.value) ? row.value : 0),
+        0
+      ),
+    [selectedLegajoConceptos]
+  );
 
   return (
     <section className="liquidaciones-grid">
       <div className="liquidaciones-left-column">
         <article className="panel">
         <h2>Liquidaciones</h2>
-        <div className="receipt-toolbar">
+        <div className="receipt-toolbar liquidaciones-filter-toolbar">
+          <div>
+            <label>Estado</label>
+            <select
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value as "Todos" | "Generada" | "Anulada")}
+            >
+              <option value="Todos">Todos</option>
+              <option value="Generada">Generadas</option>
+              <option value="Anulada">Anuladas</option>
+            </select>
+          </div>
           <div>
             <label>Tipo</label>
             <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
@@ -281,24 +417,32 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
             Nueva liquidación
           </button>
           <button
-            className="remove-inline-button"
-            onClick={deleteLiquidacion}
-            disabled={!selectedLiquidacion}
-            title="Borrar liquidación seleccionada"
+            className="remove-inline-button liquidaciones-delete-button"
+            onClick={anularLiquidacion}
+            disabled={!selectedLiquidacion || selectedLiquidacion.estado === "Anulada"}
+            title="Anular liquidación seleccionada"
           >
-            Borrar liquidación
+            🗑 Anular liquidación
           </button>
         </div>
         <ul className="concept-list">
           {filteredLiquidaciones.map((item) => (
             <li
               key={item.id}
-              className={item.id === selectedLiquidacion?.id ? "concept-item selected" : "concept-item"}
+              className={[
+                "concept-item",
+                item.estado === "Anulada" ? "liquidacion-item-anulada" : "",
+                item.id === selectedLiquidacion?.id ? "selected" : ""
+              ]
+                .filter(Boolean)
+                .join(" ")}
               onClick={() => setSelectedLiquidacionId(item.id)}
             >
               <div>
                 <strong>{item.liquidationType}</strong> - {item.month}/{item.year}
-                <span className="concept-meta-inline">{item.legajos.length} legajos</span>
+                <span className="concept-meta-inline">
+                  {item.estado} - {item.legajos.length} legajos
+                </span>
               </div>
             </li>
           ))}
@@ -350,53 +494,80 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                 {selectedLegajoLiquidado.legajoNombre || "Sin nombre"} ({selectedLegajoLiquidado.legajoNro || "S/N"}) -{" "}
                 {selectedLiquidacion.liquidationType} {selectedLiquidacion.month}/{selectedLiquidacion.year}
               </h3>
-              <ul className="concept-list">
-                {definitiveConceptRows.map((row) => (
-                  <li key={`${selectedLegajoLiquidado.legajoId}-${row.conceptId}`} className="concept-item">
-                    <div>
-                      <strong>{row.conceptCode}</strong> - {row.conceptName}
-                    </div>
-                    <span
-                      className={`liquidacion-valor ${
-                        typeof row.value === "number"
-                          ? row.value < 0
-                            ? "negativo"
-                            : "positivo"
-                          : ""
-                      }`}
-                    >
-                      {typeof row.value === "number"
-                        ? `$${row.value.toLocaleString("es-AR", {
+              {conceptosPorColumna.length ? (
+                <div className="liquidaciones-concept-columns">
+                  {conceptosPorColumna.map(({ column, rows }) => (
+                    <article key={column} className="panel liquidaciones-column-panel">
+                      <h3>
+                        {columnLabelByNumber.get(column) ?? `Columna ${column}`}
+                      </h3>
+                      <ul className="concept-list">
+                        {rows.map((row) => (
+                          <li
+                            key={`${selectedLegajoLiquidado.legajoId}-${column}-${row.conceptId}`}
+                            className="concept-item"
+                          >
+                            <div>
+                              <strong>{row.conceptCode}</strong> - {row.conceptName}
+                            </div>
+                            <span
+                              className={`liquidacion-valor ${
+                                typeof row.value === "number"
+                                  ? row.value < 0
+                                    ? "negativo"
+                                    : "positivo"
+                                  : ""
+                              }`}
+                            >
+                              {typeof row.value === "number"
+                                ? `$${row.value.toLocaleString("es-AR", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}`
+                                : String(row.value)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="concept-item liquidaciones-total-row">
+                        <div>
+                          <strong>Total {columnLabelByNumber.get(column) ?? `columna ${column}`}</strong>
+                        </div>
+                        <span
+                          className={`liquidacion-valor ${
+                            (totalPorColumna.get(column) ?? 0) < 0 ? "negativo" : "positivo"
+                          }`}
+                        >
+                          ${(totalPorColumna.get(column) ?? 0).toLocaleString("es-AR", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
-                          })}`
-                        : String(row.value)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              {definitiveConceptRows.length ? (
-                <div className="concept-item liquidaciones-total-row">
-                  <div>
-                    <strong>Total</strong>
-                  </div>
-                  <span className="liquidacion-valor positivo">
-                    $
-                    {selectedLegajoLiquidado.total.toLocaleString("es-AR", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
-                  </span>
+                          })}
+                        </span>
+                      </div>
+                    </article>
+                  ))}
                 </div>
-              ) : null}
-              {transitoryConceptRows.length ? (
-                <>
-                  <hr />
-                  <h3>Conceptos transitorios</h3>
+              ) : (
+                <p>No hay conceptos liquidados para este legajo.</p>
+              )}
+              <div className="concept-item liquidaciones-total-row">
+                <div>
+                  <strong>Total general</strong>
+                </div>
+                <span className={`liquidacion-valor ${totalGeneralConceptos < 0 ? "negativo" : "positivo"}`}>
+                  ${totalGeneralConceptos.toLocaleString("es-AR", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </span>
+              </div>
+              {conceptosTransitorios.length ? (
+                <article className="panel liquidaciones-transitory-panel">
+                  <h3>Transitorios</h3>
                   <ul className="concept-list">
-                    {transitoryConceptRows.map((row) => (
+                    {conceptosTransitorios.map((row) => (
                       <li
-                        key={`${selectedLegajoLiquidado.legajoId}-${row.conceptId}`}
+                        key={`${selectedLegajoLiquidado.legajoId}-transitorio-${row.conceptId}`}
                         className="concept-item transitorio-item"
                       >
                         <div>
@@ -404,11 +575,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                         </div>
                         <span
                           className={`liquidacion-valor ${
-                            typeof row.value === "number"
-                              ? row.value < 0
-                                ? "negativo"
-                                : "positivo"
-                              : ""
+                            typeof row.value === "number" ? (row.value < 0 ? "negativo" : "positivo") : ""
                           }`}
                         >
                           {typeof row.value === "number"
@@ -421,7 +588,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                       </li>
                     ))}
                   </ul>
-                </>
+                </article>
               ) : null}
             </>
           ) : (
@@ -470,7 +637,10 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
             </div>
             <div className="panel-actions">
               <button className="add-button" onClick={toggleAllLegajos}>
-                {selectedLegajoIds.length === legajos.length ? "Quitar todos" : "Seleccionar todos"}
+                {selectedLegajoIds.length ===
+                legajos.map((legajo) => legajo.id).filter((id) => !blockedLegajoIdsForCreate.has(id)).length
+                  ? "Quitar todos"
+                  : "Seleccionar todos"}
               </button>
               <button className="add-button" onClick={createLiquidacion}>
                 Ejecutar liquidación
@@ -481,16 +651,25 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
             </div>
             <ul className="concept-list">
               {legajos.map((legajo) => (
-                <li key={legajo.id} className="concept-item">
+                <li
+                  key={legajo.id}
+                  className={
+                    blockedLegajoIdsForCreate.has(legajo.id)
+                      ? "concept-item liquidacion-legajo-disabled"
+                      : "concept-item"
+                  }
+                >
                   <label style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
                     <input
                       type="checkbox"
                       checked={selectedLegajoIds.includes(legajo.id)}
+                      disabled={blockedLegajoIdsForCreate.has(legajo.id)}
                       onChange={() => toggleLegajo(legajo.id)}
                     />
                     <span>
                       <strong>{legajo.nroLegajo || "S/N"}</strong> - {legajo.nombre || "Sin nombre"} (
                       {legajo.convenio || "Sin convenio"})
+                      {blockedLegajoIdsForCreate.has(legajo.id) ? " - ya liquidado" : ""}
                     </span>
                   </label>
                 </li>

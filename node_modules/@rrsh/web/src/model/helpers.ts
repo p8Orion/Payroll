@@ -1,4 +1,5 @@
 import { exampleValues } from "./constants";
+import { formatConstDisplayValue } from "./formula-ui";
 import { parseFunctionBlock, serializeFunctionBlock, splitBlockArgs } from "./function-blocks";
 import { ConceptShape, FormulaToken, TagAggregationOp } from "./types";
 
@@ -16,7 +17,7 @@ export function formulaToExpression(tokens: FormulaToken[]): string {
 }
 
 const knownExpressionRegex =
-  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|VALOR_FIJO\("[^"]*"\)|VALOR_LEGAJO\("[^"]*"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
+  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|ANTIGUEDAD\(\)|ANTERIORES\(\)|VALOR_FIJO\("[^"]*"\)|VALOR_LEGAJO\("[^"]*"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
 
 interface TokenizeOptions {
   conceptCodeById?: Record<number, string>;
@@ -132,6 +133,9 @@ function labelForKnownExpression(
   const param = expression.match(/^PARAM\("([^"]+)"\)$/);
   if (param) return { label: `Parametro ${param[1]}`, kind: "param" };
 
+  if (expression === "ANTIGUEDAD()") return { label: "Antigüedad", kind: "function" };
+  if (expression === "ANTERIORES()") return { label: "Suma de Anteriores", kind: "function" };
+
   const valorFijo = expression.match(/^(?:VALOR_FIJO|VALOR_LEGAJO)\("([^"]*)"\)$/);
   if (valorFijo)
     return {
@@ -148,7 +152,7 @@ function labelForKnownExpression(
   const constante = expression.match(/^CONSTANTE\("((?:[^"\\]|\\.)*)"\)$/);
   if (constante) {
     const value = constante[1].replace(/\\"/g, "\"");
-    return { label: value, kind: "function" };
+    return { label: formatConstDisplayValue(value), kind: "function" };
   }
 
   const math = expression.match(/^MATH\("((?:[^"\\]|\\.)*)"\)$/);

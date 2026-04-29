@@ -8,6 +8,8 @@ interface FormulaToolsPanelProps {
   insertAt: number;
   onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE", index: number) => void;
   onInsertConst: (index: number) => void;
+  onInsertAntiguedad: (index: number) => void;
+  onInsertAnteriores: (index: number) => void;
   onInsertFixedValue: (key: string, index: number) => void;
   onInsertMath: (op: string, index: number) => void;
   onOpenTagModal: (tag: string, insertAt: number) => void;
@@ -20,50 +22,109 @@ export function FormulaToolsPanel({
   insertAt,
   onInsertBlockTemplate,
   onInsertConst,
+  onInsertAntiguedad,
+  onInsertAnteriores,
   onInsertFixedValue,
   onInsertMath,
   onOpenTagModal,
   setCursorGhost
 }: FormulaToolsPanelProps) {
+  const functionItems: Array<{
+    label: string;
+    onClick: () => void;
+    onDragStart: (e: DragEvent<HTMLElement>) => void;
+  }> = [
+    {
+      label: "ANTERIORES",
+      onClick: () => onInsertAnteriores(insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "ANTERIORES");
+        setCursorGhost(e, "ANTERIORES");
+        e.dataTransfer.setData(
+          "text/token-json",
+          JSON.stringify(token("Suma de Anteriores", "ANTERIORES()", "function"))
+        );
+      }
+    },
+    {
+      label: "ANTIGÜEDAD",
+      onClick: () => onInsertAntiguedad(insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "ANTIGUEDAD");
+        setCursorGhost(e, "ANTIGUEDAD");
+        e.dataTransfer.setData(
+          "text/token-json",
+          JSON.stringify(token("Antigüedad", "ANTIGUEDAD()", "function"))
+        );
+      }
+    },
+    {
+      label: "BLOQUE",
+      onClick: () => onInsertBlockTemplate("BLOQUE", insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "BLOQUE");
+        setCursorGhost(e, "BLOQUE");
+        e.dataTransfer.setData("text/function-template", "BLOQUE");
+      }
+    },
+    {
+      label: "CONSTANTE",
+      onClick: () => onInsertConst(insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "CONSTANTE");
+        setCursorGhost(e, "CONSTANTE");
+        e.dataTransfer.setData("text/function-template", "CONSTANTE");
+        e.dataTransfer.setData(
+          "text/token-json",
+          JSON.stringify(token("0", buildConstExpression("0"), "function"))
+        );
+      }
+    },
+    {
+      label: "SI",
+      onClick: () => onInsertBlockTemplate("SI", insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "SI");
+        setCursorGhost(e, "SI");
+        e.dataTransfer.setData("text/function-template", "SI");
+      }
+    },
+    {
+      label: "TOPE",
+      onClick: () => onInsertBlockTemplate("TOPE", insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "TOPE");
+        setCursorGhost(e, "TOPE");
+        e.dataTransfer.setData("text/function-template", "TOPE");
+      }
+    }
+  ].sort((a, b) => a.label.localeCompare(b.label, "es"));
+  const sortedTags = [...allTags].sort((a, b) => a.localeCompare(b, "es"));
+  const sortedFixedValueKeys = [...fixedValueKeys].sort((a, b) => a.localeCompare(b, "es"));
+
   return (
     <article className="panel drawer">
       <h2>Herramientas</h2>
 
       <h3>Funciones</h3>
       <div className="chip-wrap">
-        {(["SI", "BLOQUE", "TOPE"] as const).map((fn) => (
+        {functionItems.map((fn) => (
           <button
-            key={fn}
+            key={fn.label}
             className="chip"
             draggable
-            onDragStart={(e) => {
-              e.dataTransfer.effectAllowed = "copyMove";
-              e.dataTransfer.setData("text/plain", fn);
-              setCursorGhost(e, fn);
-              e.dataTransfer.setData("text/function-template", fn);
-            }}
-            onClick={() => onInsertBlockTemplate(fn, insertAt)}
+            onDragStart={fn.onDragStart}
+            onClick={fn.onClick}
           >
-            {fn}
+            {fn.label}
           </button>
         ))}
-        <button
-          className="chip"
-          draggable
-          onDragStart={(e) => {
-            e.dataTransfer.effectAllowed = "copyMove";
-            e.dataTransfer.setData("text/plain", "CONSTANTE");
-            setCursorGhost(e, "CONSTANTE");
-            e.dataTransfer.setData("text/function-template", "CONSTANTE");
-            e.dataTransfer.setData(
-              "text/token-json",
-              JSON.stringify(token("0", buildConstExpression("0"), "function"))
-            );
-          }}
-          onClick={() => onInsertConst(insertAt)}
-        >
-          CONSTANTE
-        </button>
       </div>
 
       <h3>Funciones matematicas</h3>
@@ -89,7 +150,7 @@ export function FormulaToolsPanel({
 
       <h3>Tags</h3>
       <div className="chip-wrap">
-        {allTags.map((tag) => (
+        {sortedTags.map((tag) => (
           <button
             key={tag}
             className="chip"
@@ -109,7 +170,7 @@ export function FormulaToolsPanel({
 
       <h3>Valores fijos</h3>
       <div className="chip-wrap">
-        {fixedValueKeys.map((key) => (
+        {sortedFixedValueKeys.map((key) => (
           <button
             key={key}
             className="chip"

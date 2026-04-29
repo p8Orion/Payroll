@@ -1,7 +1,7 @@
 import { getFunctionBlockArity, serializeFunctionBlock, parseFunctionBlock } from "./function-blocks";
 import { formulaToExpression, token, tokenizeFormulaExpression } from "./helpers";
 import { FormulaToken } from "./types";
-import { buildConstExpression, isMathOperatorText } from "./formula-ui";
+import { buildConstExpression, formatConstDisplayValue, isMathOperatorText } from "./formula-ui";
 
 export function mutateBlockArgExpression(
   blockExpr: string,
@@ -33,7 +33,11 @@ export function insertRawTextIntoBlockArg(
     if (isMathOperatorText(value)) {
       next.splice(safeInsertAt, 0, token(value, `MATH("${value}")`, "function"));
     } else {
-      next.splice(safeInsertAt, 0, token(value, buildConstExpression(value), "function"));
+      next.splice(
+        safeInsertAt,
+        0,
+        token(formatConstDisplayValue(value), buildConstExpression(value), "function")
+      );
     }
     return next;
   });

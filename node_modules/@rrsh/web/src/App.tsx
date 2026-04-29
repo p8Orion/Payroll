@@ -31,11 +31,14 @@ import {
 } from "./features/composiciones/ComposicionesSalarialesPage";
 import { initialConcepts, initialReceipts } from "./model/seed";
 import {
+  CONCEPT_TYPE_DEFINITIONS,
   ConceptShape,
   ConceptModel,
+  ConceptTypeId,
   FormulaToken,
   LIQUIDATION_TYPES,
   LiquidationType,
+  getConceptTypeDefinition,
   ReceiptModel,
   TagAggregationOp
 } from "./model/types";
@@ -45,6 +48,7 @@ interface ApiConcept {
   code: string;
   name: string;
   conceptClass: "definitivo" | "transitorio";
+  conceptType?: ConceptTypeId;
   formula?: string;
   tags: string[];
 }
@@ -54,6 +58,25 @@ const receiptsStorageKey = "rrsh.receipts.v1";
 const maxHistoryEntries = 200;
 const defaultConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"];
 const virtualAllConvenio = "(Todos)";
+const implicitTypeTagValues = new Set<string>([
+  "remunerativo",
+  "no_remunerativo",
+  "descuentos",
+  "aportes_patronales",
+  "no-remunerativo",
+  "aportes-patronales"
+]);
+
+const implicitTagForType = (type: ConceptTypeId): string => {
+  if (type === "no_remunerativo") return "no-remunerativo";
+  if (type === "aportes_patronales") return "aportes-patronales";
+  return type;
+};
+
+const normalizeTagsWithImplicitType = (tags: string[], type: ConceptTypeId): string[] => {
+  const explicit = tags.filter((tag) => !implicitTypeTagValues.has(tag as ConceptTypeId));
+  return [...new Set([...explicit, implicitTagForType(type)])];
+};
 
 interface EditorSnapshot {
   concepts: ConceptModel[];
@@ -126,6 +149,7 @@ function toApiConcept(concept: ConceptModel): ApiConcept {
     code: concept.code,
     name: concept.name,
     conceptClass: concept.conceptClass,
+    conceptType: concept.conceptType,
     formula: formulaToExpression(astToTokens(concept.formulaAst ?? [])),
     tags: concept.tags
   };
@@ -140,6 +164,7 @@ function fromApiConcept(
     code: concept.code,
     name: concept.name,
     conceptClass: concept.conceptClass,
+    conceptType: concept.conceptType ?? "remunerativo",
     color: colorPalette30[(concept.id - 1) % colorPalette30.length],
     shape: shapeCycle[(concept.id - 1) % shapeCycle.length],
     tags: concept.tags ?? [],
@@ -189,9 +214,10 @@ export function App() {
   const [simLegajoId, setSimLegajoId] = useState<string>("");
   const [newTagDraft, setNewTagDraft] = useState("");
   const [appearanceOpen, setAppearanceOpen] = useState(false);
-  const [conceptEditOpen, setConceptEditOpen] = useState(false);
   const [conceptCodeDraft, setConceptCodeDraft] = useState("");
   const [conceptNameDraft, setConceptNameDraft] = useState("");
+  const [conceptTypeDraft, setConceptTypeDraft] = useState<ConceptTypeId>("remunerativo");
+  const [showReceiptConceptDetail, setShowReceiptConceptDetail] = useState(true);
   const [conceptsLoaded, setConceptsLoaded] = useState(false);
   const [legajosLoaded, setLegajosLoaded] = useState(false);
   const appearanceRef = useRef<HTMLDivElement | null>(null);
@@ -284,8 +310,10 @@ export function App() {
       ).sort((a, b) => a.localeCompare(b)),
     [legajos, composiciones]
   );
-  const filteredTagSuggestions = allTags.filter((tag) =>
-    tag.toLowerCase().includes(newTagDraft.trim().toLowerCase())
+  const filteredTagSuggestions = allTags.filter(
+    (tag) =>
+      !implicitTypeTagValues.has(tag) &&
+      tag.toLowerCase().includes(newTagDraft.trim().toLowerCase())
   );
   const [editingId, setEditingId] = useState<number>(definitivos[0].id);
   const activeReceipt = receipts.find((r) => r.id === activeReceiptId) ?? receiptsByConvenio[0] ?? receipts[0];
@@ -352,6 +380,38 @@ export function App() {
     );
     return foundComp?.valor ?? 0;
   };
+  const getAntiguedadYears = (): number => {
+    const rawIngreso = (simLegajo?.fechaIngreso ?? "").trim();
+    if (!rawIngreso) return 0;
+    const parsed = rawIngreso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!parsed) return 0;
+    const ingresoYear = Number(parsed[1]);
+    const ingresoMonth = Number(parsed[2]);
+    if (!Number.isFinite(ingresoYear) || !Number.isFinite(ingresoMonth)) return 0;
+    const now = new Date();
+    const asOfYear = now.getFullYear();
+    const asOfMonth = now.getMonth() + 1;
+    const months = (asOfYear - ingresoYear) * 12 + (asOfMonth - ingresoMonth);
+    if (!Number.isFinite(months) || months <= 0) return 0;
+    return Math.floor(months / 12);
+  };
+  const getAnterioresByType = (
+    conceptId: number,
+    conceptType: ConceptTypeId,
+    values: Map<number, unknown>
+  ): number => {
+    const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
+    const currentIndex = receiptOrder.indexOf(conceptId);
+    if (currentIndex === -1) return 0;
+    let sum = 0;
+    for (let i = 0; i < currentIndex; i += 1) {
+      const prevId = receiptOrder[i];
+      const prevConcept = participatingConcepts.find((c) => c.id === prevId);
+      if (!prevConcept || prevConcept.conceptType !== conceptType) continue;
+      sum += toNumericOrZero(values.get(prevId));
+    }
+    return sum;
+  };
   const resolveValorLegajoConceptCode = (rawArg: string, fallbackConcepto: string): string => {
     const arg = rawArg.trim();
     if (!arg) return fallbackConcepto;
@@ -387,8 +447,165 @@ export function App() {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : 0;
   };
+  const applyConceptSign = (concept: ConceptModel, value: unknown): unknown => {
+    if (typeof value !== "number" || !Number.isFinite(value)) return value;
+    const sign = getConceptTypeDefinition(concept.conceptType).sign;
+    return value * sign;
+  };
   const formatPreviewAmount = (value: unknown): string =>
-    typeof value === "number" ? `$${value.toLocaleString("es-AR")}` : String(value);
+    typeof value === "number"
+      ? `$${value.toLocaleString("es-AR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}`
+      : String(value);
+  const resolveTokenConceptId = (tk: FormulaToken): number | null => {
+    if (tk.kind !== "concept") return null;
+    const byId = tk.expression.match(/^CONCEPTO\((\d+)\)$/);
+    if (byId) return Number(byId[1]);
+    const byCode = tk.expression.match(/^CCONCEPTO\("([^"]+)"\)$/);
+    if (byCode) {
+      const concept = concepts.find((item) => item.code === byCode[1]);
+      return concept?.id ?? null;
+    }
+    return null;
+  };
+  const selectConceptFromFormulaToken = (tk: FormulaToken) => {
+    const targetId = resolveTokenConceptId(tk);
+    if (!targetId) return;
+    setEditingId(targetId);
+  };
+  const tokenDependsOnCycle = (expression: string): boolean => {
+    for (const match of expression.matchAll(/CONCEPTO\((\d+)\)/g)) {
+      if (cycleConceptIds.has(Number(match[1]))) return true;
+    }
+    for (const match of expression.matchAll(/CCONCEPTO\("([^"]+)"\)/g)) {
+      const depId = participatingConcepts.find((c) => c.code === match[1])?.id;
+      if (depId && cycleConceptIds.has(depId)) return true;
+    }
+    for (const match of expression.matchAll(/SUM_TAG\("([^"]+)"\)/g)) {
+      const hasCycleInTag = participatingConcepts.some(
+        (c) => c.tags.includes(match[1]) && cycleConceptIds.has(c.id)
+      );
+      if (hasCycleInTag) return true;
+    }
+    for (const match of expression.matchAll(/TAG_OP\("(sum|avg|max|min)","([^"]+)"\)/g)) {
+      const hasCycleInTag = participatingConcepts.some(
+        (c) => c.tags.includes(match[2]) && cycleConceptIds.has(c.id)
+      );
+      if (hasCycleInTag) return true;
+    }
+    return false;
+  };
+  const tokenDependsOnFormulaError = (expression: string): boolean => {
+    for (const match of expression.matchAll(/CONCEPTO\((\d+)\)/g)) {
+      if (formulaErrorById.get(Number(match[1]))) return true;
+    }
+    for (const match of expression.matchAll(/CCONCEPTO\("([^"]+)"\)/g)) {
+      const depId = participatingConcepts.find((c) => c.code === match[1])?.id;
+      if (depId && formulaErrorById.get(depId)) return true;
+    }
+    for (const match of expression.matchAll(/SUM_TAG\("([^"]+)"\)/g)) {
+      const hasErrorInTag = participatingConcepts.some(
+        (c) => c.tags.includes(match[1]) && formulaErrorById.get(c.id)
+      );
+      if (hasErrorInTag) return true;
+    }
+    for (const match of expression.matchAll(/TAG_OP\("(sum|avg|max|min)","([^"]+)"\)/g)) {
+      const hasErrorInTag = participatingConcepts.some(
+        (c) => c.tags.includes(match[2]) && formulaErrorById.get(c.id)
+      );
+      if (hasErrorInTag) return true;
+    }
+    return false;
+  };
+  const evaluateTokenPreviewValue = (expression: string): unknown => {
+    const params: Record<string, number> = { porc_antiguedad: 0.12 };
+    const normalized = expandBracketBlocksToExpressions(expression)
+      .replace(/VALOR_FIJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+        const code = resolveValorLegajoConceptCode(rawArg, "");
+        return String(getValorLegajo(code, ""));
+      })
+      .replace(/VALOR_LEGAJO_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArg: string) => {
+        const code = resolveValorLegajoConceptCode(rawArg, "");
+        return String(getValorLegajo(code, ""));
+      })
+      .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) => String(getValorLegajo(concepto, "")))
+      .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) => String(getValorLegajo(concepto, "")))
+      .replace(/CONCEPTO\((\d+)\)/g, (_, refId: string) =>
+        toExpressionLiteral(previewValueById.get(Number(refId)) ?? 0)
+      )
+      .replace(/CCONCEPTO\("([^"]+)"\)/g, (_, refCode: string) => {
+        const refId = participatingConcepts.find((c) => c.code === refCode)?.id;
+        return toExpressionLiteral(refId ? (previewValueById.get(refId) ?? 0) : 0);
+      })
+      .replace(/SUM_TAG\("([^"]+)"\)/g, (_, tag: string) => {
+        const sum = participatingConcepts
+          .filter((c) => c.tags.includes(tag))
+          .reduce((acc, c) => acc + toNumericOrZero(previewValueById.get(c.id)), 0);
+        return String(sum);
+      })
+      .replace(/PARAM\("([^"]+)"\)/g, (_, param: string) => {
+        const value = params[param];
+        if (value === undefined) throw new Error("missing PARAM");
+        return String(value);
+      })
+      .replace(/ANTERIORES\(\)/g, () =>
+        String(getAnterioresByType(selectedConcept.id, selectedConcept.conceptType, previewValueById))
+      )
+      .replace(/ANTIGUEDAD\(\)/g, () => String(getAntiguedadYears()))
+      .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
+        const tagged = participatingConcepts
+          .filter((c) => c.tags.includes(tag))
+          .map((c) => toNumericOrZero(previewValueById.get(c.id)));
+        if (!tagged.length) return "0";
+        if (op === "avg") return String(tagged.reduce((a, b) => a + b, 0) / tagged.length);
+        if (op === "max") return String(Math.max(...tagged));
+        if (op === "min") return String(Math.min(...tagged));
+        return String(tagged.reduce((a, b) => a + b, 0));
+      })
+      .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
+        const value = raw.replace(/\\"/g, "\"");
+        const normalizedNumber = value.trim().replace(/\s+/g, "").replace(/\./g, "").replace(",", ".");
+        const asNumber = Number(normalizedNumber);
+        if (!Number.isNaN(asNumber) && normalizedNumber !== "") return String(asNumber);
+        return JSON.stringify(value);
+      })
+      .replace(/MATH\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => raw.replace(/\\"/g, "\""))
+      .replace(/%\s*(-?\d+(?:\.\d+)?)/g, "* ($1) / 100")
+      .replace(/(-?\d+(?:\.\d+)?)\s*%/g, "($1 / 100)")
+      .replace(/\[/g, "(")
+      .replace(/\]/g, ")");
+    const excelLike = normalizeExcelComparators(normalizeExcelIf(applyImplicitPlusBetweenValues(normalized)));
+    return Function(`"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`)();
+  };
+  const cacheByExpression = new Map<string, string | null>();
+  const getFormulaPillTitle = (tk: FormulaToken): string | null => {
+    if (tk.expression === 'MATH("+")') return null;
+    const fromCache = cacheByExpression.get(tk.expression);
+    if (fromCache !== undefined) return fromCache;
+
+    const conceptId = resolveTokenConceptId(tk);
+    let resolved: string | null;
+    if (conceptId) {
+      if (cycleConceptIds.has(conceptId)) resolved = "Pre-cálculo: error (ciclo DAG)";
+      else if (formulaErrorById.get(conceptId)) resolved = "Pre-cálculo: error de compilacion";
+      else resolved = `Pre-cálculo: ${formatPreviewAmount(previewValueById.get(conceptId) ?? 0)}`;
+    } else if (tokenDependsOnCycle(tk.expression)) {
+      resolved = "Pre-cálculo: error (ciclo DAG)";
+    } else if (tokenDependsOnFormulaError(tk.expression)) {
+      resolved = "Pre-cálculo: error de compilacion";
+    } else {
+      try {
+        resolved = `Pre-cálculo: ${formatPreviewAmount(evaluateTokenPreviewValue(tk.expression))}`;
+      } catch {
+        resolved = "Pre-cálculo: error de compilacion";
+      }
+    }
+
+    cacheByExpression.set(tk.expression, resolved);
+    return resolved;
+  };
   const {
     rootInsertSignal,
     triggerRootInsert,
@@ -410,7 +627,9 @@ export function App() {
     formulaDragSourceRef,
     setRootDragSource,
     setNestedDragSource,
-    setCursorGhost
+    setCursorGhost,
+    getFormulaPillTitle,
+    onSelectConceptFromToken: selectConceptFromFormulaToken
   });
   const participatingConcepts = useMemo(() => {
     const inReceipt = new Set([...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder]);
@@ -425,6 +644,8 @@ export function App() {
   const previewInfo = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
+    const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
+    const receiptIndexById = new Map<number, number>(receiptOrder.map((id, index) => [id, index]));
     const incoming = new Map<number, number>();
     const outgoing = new Map<number, number[]>();
     const ids = participatingConcepts.map((c) => c.id);
@@ -466,6 +687,20 @@ export function App() {
           seenDeps.add(depConcept.id);
           outgoing.get(depConcept.id)?.push(concept.id);
           incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+        }
+      }
+      if (/ANTERIORES\(\)/.test(expression)) {
+        const currentOrder = receiptIndexById.get(concept.id);
+        if (currentOrder !== undefined) {
+          for (const depConcept of participatingConcepts) {
+            if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+            if (depConcept.conceptType !== concept.conceptType) continue;
+            const depOrder = receiptIndexById.get(depConcept.id);
+            if (depOrder === undefined || depOrder >= currentOrder) continue;
+            seenDeps.add(depConcept.id);
+            outgoing.get(depConcept.id)?.push(concept.id);
+            incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+          }
         }
       }
     }
@@ -534,6 +769,8 @@ export function App() {
               if (value === undefined) throw new Error("missing PARAM");
               return String(value);
             })
+            .replace(/ANTERIORES\(\)/g, () => String(getAnterioresByType(concept.id, concept.conceptType, values)))
+            .replace(/ANTIGUEDAD\(\)/g, () => String(getAntiguedadYears()))
             .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
               const tagged = participatingConcepts
                 .filter((c) => c.tags.includes(tag))
@@ -546,8 +783,9 @@ export function App() {
             })
             .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
               const value = raw.replace(/\\"/g, "\"");
-              const asNumber = Number(value);
-              if (!Number.isNaN(asNumber) && value.trim() !== "") return String(asNumber);
+              const normalizedNumber = value.trim().replace(/\s+/g, "").replace(/\./g, "").replace(",", ".");
+              const asNumber = Number(normalizedNumber);
+              if (!Number.isNaN(asNumber) && normalizedNumber !== "") return String(asNumber);
               return JSON.stringify(value);
             })
             .replace(/MATH\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => raw.replace(/\\"/g, "\""))
@@ -563,7 +801,7 @@ export function App() {
           result = Function(
             `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
           )();
-          values.set(id, result);
+          values.set(id, applyConceptSign(concept, result));
         } catch (error) {
           const message = error instanceof Error ? error.message : "error de compilacion";
           const compiled = normalizeExcelComparators(
@@ -596,10 +834,20 @@ export function App() {
         error: message
       };
     }
-  }, [editingId, selectedConcept, participatingConcepts, simLegajo, simLegajoId]);
+  }, [
+    editingId,
+    selectedConcept,
+    participatingConcepts,
+    simLegajo,
+    simLegajoId,
+    activeReceipt.definitiveOrder,
+    activeReceipt.transitoryOrder
+  ]);
   const dagOrderById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
+    const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
+    const receiptIndexById = new Map<number, number>(receiptOrder.map((id, index) => [id, index]));
     const incoming = new Map<number, number>();
     const outgoing = new Map<number, number[]>();
     const ids = participatingConcepts.map((c) => c.id);
@@ -641,6 +889,20 @@ export function App() {
           seenDeps.add(depConcept.id);
           outgoing.get(depConcept.id)?.push(concept.id);
           incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+        }
+      }
+      if (/ANTERIORES\(\)/.test(expression)) {
+        const currentOrder = receiptIndexById.get(concept.id);
+        if (currentOrder !== undefined) {
+          for (const depConcept of participatingConcepts) {
+            if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+            if (depConcept.conceptType !== concept.conceptType) continue;
+            const depOrder = receiptIndexById.get(depConcept.id);
+            if (depOrder === undefined || depOrder >= currentOrder) continue;
+            seenDeps.add(depConcept.id);
+            outgoing.get(depConcept.id)?.push(concept.id);
+            incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+          }
         }
       }
     }
@@ -669,10 +931,12 @@ export function App() {
       }
     }
     return orderById;
-  }, [participatingConcepts, simLegajo, simLegajoId]);
+  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
   const cycleConceptIds = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
+    const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
+    const receiptIndexById = new Map<number, number>(receiptOrder.map((id, index) => [id, index]));
     const incoming = new Map<number, number>();
     const outgoing = new Map<number, number[]>();
     const ids = participatingConcepts.map((c) => c.id);
@@ -716,6 +980,20 @@ export function App() {
           incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
         }
       }
+      if (/ANTERIORES\(\)/.test(expression)) {
+        const currentOrder = receiptIndexById.get(concept.id);
+        if (currentOrder !== undefined) {
+          for (const depConcept of participatingConcepts) {
+            if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+            if (depConcept.conceptType !== concept.conceptType) continue;
+            const depOrder = receiptIndexById.get(depConcept.id);
+            if (depOrder === undefined || depOrder >= currentOrder) continue;
+            seenDeps.add(depConcept.id);
+            outgoing.get(depConcept.id)?.push(concept.id);
+            incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+          }
+        }
+      }
     }
 
     const queue = ids.filter((id) => (incoming.get(id) ?? 0) === 0);
@@ -729,10 +1007,12 @@ export function App() {
     }
 
     return new Set(ids.filter((id) => (incoming.get(id) ?? 0) > 0));
-  }, [participatingConcepts, simLegajo, simLegajoId]);
+  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
   const formulaErrorById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
+    const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
+    const receiptIndexById = new Map<number, number>(receiptOrder.map((id, index) => [id, index]));
     const incoming = new Map<number, number>();
     const outgoing = new Map<number, number[]>();
     const ids = participatingConcepts.map((c) => c.id);
@@ -774,6 +1054,20 @@ export function App() {
           seenDeps.add(depConcept.id);
           outgoing.get(depConcept.id)?.push(concept.id);
           incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+        }
+      }
+      if (/ANTERIORES\(\)/.test(expression)) {
+        const currentOrder = receiptIndexById.get(concept.id);
+        if (currentOrder !== undefined) {
+          for (const depConcept of participatingConcepts) {
+            if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+            if (depConcept.conceptType !== concept.conceptType) continue;
+            const depOrder = receiptIndexById.get(depConcept.id);
+            if (depOrder === undefined || depOrder >= currentOrder) continue;
+            seenDeps.add(depConcept.id);
+            outgoing.get(depConcept.id)?.push(concept.id);
+            incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+          }
         }
       }
     }
@@ -846,6 +1140,8 @@ export function App() {
             if (value === undefined) throw new Error("missing PARAM");
             return String(value);
           })
+          .replace(/ANTERIORES\(\)/g, () => String(getAnterioresByType(concept.id, concept.conceptType, values)))
+          .replace(/ANTIGUEDAD\(\)/g, () => String(getAntiguedadYears()))
           .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
             const tagged = participatingConcepts
               .filter((c) => c.tags.includes(tag))
@@ -858,8 +1154,9 @@ export function App() {
           })
           .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
             const value = raw.replace(/\\"/g, "\"");
-            const asNumber = Number(value);
-            if (!Number.isNaN(asNumber) && value.trim() !== "") return String(asNumber);
+            const normalizedNumber = value.trim().replace(/\s+/g, "").replace(/\./g, "").replace(",", ".");
+            const asNumber = Number(normalizedNumber);
+            if (!Number.isNaN(asNumber) && normalizedNumber !== "") return String(asNumber);
             return JSON.stringify(value);
           })
           .replace(/MATH\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => raw.replace(/\\"/g, "\""))
@@ -874,7 +1171,7 @@ export function App() {
         const result = Function(
           `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
         )();
-        values.set(id, result);
+        values.set(id, applyConceptSign(concept, result));
         errors.set(id, false);
       } catch {
         values.set(id, 0);
@@ -883,10 +1180,12 @@ export function App() {
     }
 
     return errors;
-  }, [participatingConcepts, simLegajo, simLegajoId]);
+  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
   const previewValueById = useMemo(() => {
     const conceptById = new Map(participatingConcepts.map((c) => [c.id, c]));
     const conceptIdByCode = new Map(participatingConcepts.map((c) => [c.code, c.id]));
+    const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
+    const receiptIndexById = new Map<number, number>(receiptOrder.map((id, index) => [id, index]));
     const incoming = new Map<number, number>();
     const outgoing = new Map<number, number[]>();
     const ids = participatingConcepts.map((c) => c.id);
@@ -928,6 +1227,20 @@ export function App() {
           seenDeps.add(depConcept.id);
           outgoing.get(depConcept.id)?.push(concept.id);
           incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+        }
+      }
+      if (/ANTERIORES\(\)/.test(expression)) {
+        const currentOrder = receiptIndexById.get(concept.id);
+        if (currentOrder !== undefined) {
+          for (const depConcept of participatingConcepts) {
+            if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+            if (depConcept.conceptType !== concept.conceptType) continue;
+            const depOrder = receiptIndexById.get(depConcept.id);
+            if (depOrder === undefined || depOrder >= currentOrder) continue;
+            seenDeps.add(depConcept.id);
+            outgoing.get(depConcept.id)?.push(concept.id);
+            incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+          }
         }
       }
     }
@@ -998,6 +1311,8 @@ export function App() {
             if (value === undefined) throw new Error("missing PARAM");
             return String(value);
           })
+          .replace(/ANTERIORES\(\)/g, () => String(getAnterioresByType(concept.id, concept.conceptType, values)))
+          .replace(/ANTIGUEDAD\(\)/g, () => String(getAntiguedadYears()))
           .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
             const tagged = participatingConcepts
               .filter((c) => c.tags.includes(tag))
@@ -1010,8 +1325,9 @@ export function App() {
           })
           .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
             const value = raw.replace(/\\"/g, "\"");
-            const asNumber = Number(value);
-            if (!Number.isNaN(asNumber) && value.trim() !== "") return String(asNumber);
+            const normalizedNumber = value.trim().replace(/\s+/g, "").replace(/\./g, "").replace(",", ".");
+            const asNumber = Number(normalizedNumber);
+            if (!Number.isNaN(asNumber) && normalizedNumber !== "") return String(asNumber);
             return JSON.stringify(value);
           })
           .replace(/MATH\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => raw.replace(/\\"/g, "\""))
@@ -1026,14 +1342,14 @@ export function App() {
         const result = Function(
           `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
         )();
-        values.set(id, result);
+        values.set(id, applyConceptSign(concept, result));
       } catch {
         values.set(id, 0);
       }
     }
 
     return values;
-  }, [participatingConcepts, simLegajo, simLegajoId]);
+  }, [participatingConcepts, simLegajo, simLegajoId, activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
 
   const reorderDefinitivo = (dragId: number, dropId: number) => {
     const dragConcept = concepts.find((c) => c.id === dragId);
@@ -1059,9 +1375,10 @@ export function App() {
       code: `TRANS_${newId}`,
       name: `Transitorio ${newId}`,
       conceptClass: "transitorio",
+      conceptType: "remunerativo",
       color: colorPalette30[(newId - 1) % colorPalette30.length],
       shape: shapeCycle[(newId - 1) % shapeCycle.length],
-      tags: [],
+      tags: [implicitTagForType("remunerativo")],
       formulaAst: []
     };
     setConcepts((prev) => [...prev, newConcept]);
@@ -1082,9 +1399,10 @@ export function App() {
       code: `DEF_${newId}`,
       name: `Concepto definitivo ${newId}`,
       conceptClass: "definitivo",
+      conceptType: "remunerativo",
       color: colorPalette30[(newId - 1) % colorPalette30.length],
       shape: shapeCycle[(newId - 1) % shapeCycle.length],
-      tags: [],
+      tags: [implicitTagForType("remunerativo")],
       formulaAst: []
     };
     setConcepts((prev) => [...prev, newConcept]);
@@ -1104,34 +1422,60 @@ export function App() {
     setConcepts((prev) =>
       prev.map((c) => {
         if (c.id !== selectedConcept.id) return c;
+        if (implicitTypeTagValues.has(normalized)) {
+          return { ...c, tags: normalizeTagsWithImplicitType(c.tags, c.conceptType) };
+        }
         if (c.tags.includes(normalized)) return c;
-        return { ...c, tags: [...c.tags, normalized] };
+        return { ...c, tags: normalizeTagsWithImplicitType([...c.tags, normalized], c.conceptType) };
       })
     );
     setNewTagDraft("");
   };
 
-  const startConceptEdit = () => {
-    setConceptCodeDraft(selectedConcept.code);
-    setConceptNameDraft(selectedConcept.name);
-    setConceptEditOpen(true);
-  };
-
-  const saveConceptEdit = () => {
-    const nextCode = conceptCodeDraft.trim();
-    const nextName = conceptNameDraft.trim();
-    if (!nextCode || !nextName) return;
+  const updateSelectedConceptCode = (nextValue: string) => {
+    setConceptCodeDraft(nextValue);
+    const nextCode = nextValue.trim();
+    if (!nextCode) return;
     setConcepts((prev) =>
       prev.map((c) =>
-        c.id === selectedConcept.id ? { ...c, code: nextCode.toUpperCase(), name: nextName } : c
+        c.id === selectedConcept.id
+          ? { ...c, code: nextCode.toUpperCase() }
+          : c
       )
     );
-    setConceptEditOpen(false);
+  };
+
+  const updateSelectedConceptName = (nextValue: string) => {
+    setConceptNameDraft(nextValue);
+    const nextName = nextValue.trim();
+    if (!nextName) return;
+    setConcepts((prev) =>
+      prev.map((c) =>
+        c.id === selectedConcept.id
+          ? { ...c, name: nextName }
+          : c
+      )
+    );
+  };
+
+  const updateSelectedConceptType = (nextType: ConceptTypeId) => {
+    setConceptTypeDraft(nextType);
+    setConcepts((prev) =>
+      prev.map((c) =>
+        c.id === selectedConcept.id
+          ? { ...c, conceptType: nextType, tags: normalizeTagsWithImplicitType(c.tags, nextType) }
+          : c
+      )
+    );
   };
 
   const deleteSelectedConcept = () => {
     if (concepts.length <= 1) return;
     const removingId = selectedConcept.id;
+    const ok = window.confirm(
+      `¿Eliminar concepto ${selectedConcept.code} - ${selectedConcept.name}?`
+    );
+    if (!ok) return;
     void fetch(`${apiBaseUrl}/concepts/${removingId}`, { method: "DELETE" });
     const remaining = concepts.filter((c) => c.id !== removingId);
     setConcepts(remaining);
@@ -1146,7 +1490,6 @@ export function App() {
     if (nextSelected) {
       setEditingId(nextSelected.id);
     }
-    setConceptEditOpen(false);
   };
 
   const updateSelectedAppearance = (patch: Partial<Pick<ConceptModel, "shape" | "color">>) => {
@@ -1156,14 +1499,44 @@ export function App() {
   };
 
   const removeTagFromSelectedConcept = (tagToRemove: string) => {
+    if (tagToRemove === implicitTagForType(selectedConcept.conceptType)) return;
     setConcepts((prev) =>
       prev.map((c) =>
         c.id === selectedConcept.id
-          ? { ...c, tags: c.tags.filter((tag) => tag !== tagToRemove) }
+          ? {
+              ...c,
+              tags: normalizeTagsWithImplicitType(
+                c.tags.filter((tag) => tag !== tagToRemove),
+                c.conceptType
+              )
+            }
           : c
       )
     );
   };
+
+  const handleTagDraftChange = (nextValue: string) => {
+    setNewTagDraft(nextValue);
+    const normalized = nextValue.trim().toLowerCase();
+    if (!normalized) return;
+    if (!allTags.includes(normalized)) return;
+    addTagToSelectedConcept(nextValue);
+  };
+
+  useEffect(() => {
+    setConcepts((prev) => {
+      const next = prev.map((concept) => {
+        const normalizedTags = normalizeTagsWithImplicitType(concept.tags ?? [], concept.conceptType);
+        const currentTags = concept.tags ?? [];
+        const unchanged =
+          normalizedTags.length === currentTags.length &&
+          normalizedTags.every((tag, i) => tag === currentTags[i]);
+        return unchanged ? concept : { ...concept, tags: normalizedTags };
+      });
+      const changed = next.some((concept, i) => concept !== prev[i]);
+      return changed ? next : prev;
+    });
+  }, [setConcepts]);
 
   const applyTagAggregation = (op: TagAggregationOp) => {
     const opLabels: Record<TagAggregationOp, string> = {
@@ -1183,6 +1556,12 @@ export function App() {
     setTagModal({ open: false, tag: "", insertAt: 0 });
   };
 
+
+  useEffect(() => {
+    setConceptCodeDraft(selectedConcept.code);
+    setConceptNameDraft(selectedConcept.name);
+    setConceptTypeDraft(selectedConcept.conceptType ?? "remunerativo");
+  }, [selectedConcept.id, selectedConcept.code, selectedConcept.name, selectedConcept.conceptType]);
 
   useEffect(() => {
     if (!appearanceOpen) return;
@@ -1471,7 +1850,7 @@ export function App() {
   return (
     <div className="layout">
       <header className="topbar">
-        <h1>RRSH Payroll</h1>
+        <h1>Playadito Payroll</h1>
         <div className="history-controls">
           <button
             type="button"
@@ -1653,6 +2032,13 @@ export function App() {
                 <button className="add-button" onClick={addDefinitiveToReceipt}>
                   + Agregar concepto definitivo
                 </button>
+                <button
+                  type="button"
+                  className="save-inline-button"
+                  onClick={() => setShowReceiptConceptDetail((prev) => !prev)}
+                >
+                  {showReceiptConceptDetail ? "Ocultar detalle" : "Mostrar detalle"}
+                </button>
               </div>
               <ul className="concept-list">
                 {definitivosEnRecibo.map((concept) => (
@@ -1688,17 +2074,22 @@ export function App() {
                         {getShapeGlyph(concept.shape)}
                       </span>
                       <strong>{concept.code}</strong> - {concept.name}
-                      <span className="concept-meta-inline">
-                        {cycleConceptIds.has(concept.id) ? (
-                          <span className="concept-error-inline">CICLO</span>
-                        ) : null}
-                        {formulaErrorById.get(concept.id) ? (
-                          <span className="concept-error-inline">ERROR</span>
-                        ) : null}
-                        #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
-                        {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
-                        {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
+                      <span className="concept-type-inline">
+                        {getConceptTypeDefinition(concept.conceptType).label}
                       </span>
+                      {showReceiptConceptDetail ? (
+                        <span className="concept-meta-inline">
+                          {cycleConceptIds.has(concept.id) ? (
+                            <span className="concept-error-inline">CICLO</span>
+                          ) : null}
+                          {formulaErrorById.get(concept.id) ? (
+                            <span className="concept-error-inline">ERROR</span>
+                          ) : null}
+                          #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
+                          {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
+                          {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
+                        </span>
+                      ) : null}
                     </div>
                   </li>
                 ))}
@@ -1741,17 +2132,22 @@ export function App() {
                         {getShapeGlyph(concept.shape)}
                       </span>
                       <strong>{concept.code}</strong> - {concept.name}
-                      <span className="concept-meta-inline">
-                        {cycleConceptIds.has(concept.id) ? (
-                          <span className="concept-error-inline">CICLO</span>
-                        ) : null}
-                        {formulaErrorById.get(concept.id) ? (
-                          <span className="concept-error-inline">ERROR</span>
-                        ) : null}
-                        #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
-                        {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
-                        {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
+                      <span className="concept-type-inline">
+                        {getConceptTypeDefinition(concept.conceptType).label}
                       </span>
+                      {showReceiptConceptDetail ? (
+                        <span className="concept-meta-inline">
+                          {cycleConceptIds.has(concept.id) ? (
+                            <span className="concept-error-inline">CICLO</span>
+                          ) : null}
+                          {formulaErrorById.get(concept.id) ? (
+                            <span className="concept-error-inline">ERROR</span>
+                          ) : null}
+                          #{dagOrderById.get(concept.id) ?? "-"} ·{" "}
+                          {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
+                          {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
+                        </span>
+                      ) : null}
                     </div>
                   </li>
                 ))}
@@ -1760,50 +2156,44 @@ export function App() {
 
             <article className="panel">
               <div className="concept-header">
-                <h2>Editor de concepto</h2>
+                <h2>Editor de Concepto</h2>
               </div>
               <div className="concept-subheader">
-                {conceptEditOpen ? (
-                  <div className="concept-edit-inline">
-                    <input
-                      value={conceptCodeDraft}
-                      onChange={(e) => setConceptCodeDraft(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveConceptEdit();
-                        if (e.key === "Escape") setConceptEditOpen(false);
-                      }}
-                      placeholder="Codigo"
-                    />
-                    <input
-                      value={conceptNameDraft}
-                      onChange={(e) => setConceptNameDraft(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveConceptEdit();
-                        if (e.key === "Escape") setConceptEditOpen(false);
-                      }}
-                      placeholder="Descripcion"
-                    />
-                    <button type="button" className="save-inline-button" onClick={saveConceptEdit} title="Guardar">
-                      💾
-                    </button>
-                    <button
-                      type="button"
-                      className="remove-inline-button"
-                      onClick={deleteSelectedConcept}
-                      title="Eliminar concepto"
-                    >
-                      -
-                    </button>
-                  </div>
-                ) : (
-                  <h3
-                    className="concept-edit-trigger"
-                    onClick={startConceptEdit}
-                    title="Click para editar codigo y descripcion"
+                <div className="concept-edit-inline">
+                  <input
+                    className="concept-inline-code-input"
+                    value={conceptCodeDraft}
+                    onChange={(e) => updateSelectedConceptCode(e.target.value)}
+                    placeholder="Codigo"
+                    title="Codigo del concepto"
+                  />
+                  <input
+                    className="concept-inline-name-input"
+                    value={conceptNameDraft}
+                    onChange={(e) => updateSelectedConceptName(e.target.value)}
+                    placeholder="Descripcion"
+                    title="Descripcion del concepto"
+                  />
+                  <select
+                    value={conceptTypeDraft}
+                    onChange={(e) => updateSelectedConceptType(e.target.value as ConceptTypeId)}
+                    title="Tipo de concepto"
                   >
-                    {selectedConcept.code} - {selectedConcept.name} ({selectedConcept.conceptClass}).
-                  </h3>
-                )}
+                    {CONCEPT_TYPE_DEFINITIONS.map((definition) => (
+                      <option key={definition.id} value={definition.id}>
+                        {definition.label} (Col {definition.column}, {definition.sign > 0 ? "+" : "-"})
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    className="remove-inline-button concept-delete-button"
+                    onClick={deleteSelectedConcept}
+                    title="Eliminar concepto"
+                  >
+                    🗑
+                  </button>
+                </div>
                 <div className="appearance-selector" ref={appearanceRef}>
                   <button
                     className="appearance-trigger"
@@ -1855,22 +2245,27 @@ export function App() {
               </div>
               <div className="tags-editor">
                 <div className="chip-wrap">
-                  {selectedConcept.tags.map((tag) => (
-                    <div key={tag} className="tag-pill">
-                      <span>#{tag}</span>
-                      <button
-                        className="tag-remove-inline"
-                        onClick={() => removeTagFromSelectedConcept(tag)}
-                        title="Quitar tag"
-                      >
-                        -
-                      </button>
-                    </div>
-                  ))}
+                  {selectedConcept.tags.map((tag) => {
+                    const isImplicitTypeTag = implicitTypeTagValues.has(tag);
+                    return (
+                      <div key={tag} className={isImplicitTypeTag ? "tag-pill implicit-type-tag-pill" : "tag-pill"}>
+                        <span>#{tag}</span>
+                        {isImplicitTypeTag ? null : (
+                          <button
+                            className="tag-remove-inline"
+                            onClick={() => removeTagFromSelectedConcept(tag)}
+                            title="Quitar tag"
+                          >
+                            -
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                   <input
                     className="tag-input-pill"
                     value={newTagDraft}
-                    onChange={(e) => setNewTagDraft(e.target.value)}
+                    onChange={(e) => handleTagDraftChange(e.target.value)}
                     placeholder="Nuevo tag"
                     list="existing-tags"
                     onKeyDown={(e) => {
@@ -1909,6 +2304,12 @@ export function App() {
               onInsertBlockTemplate={insertBlockTemplateAt}
               onInsertConst={(index) =>
                 insertTokenAt(token("const", buildConstExpression("0"), "function"), index)
+              }
+              onInsertAntiguedad={(index) =>
+                insertTokenAt(token("Antigüedad", "ANTIGUEDAD()", "function"), index)
+              }
+              onInsertAnteriores={(index) =>
+                insertTokenAt(token("Suma de Anteriores", "ANTERIORES()", "function"), index)
               }
               onInsertFixedValue={(key, index) =>
                 insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)

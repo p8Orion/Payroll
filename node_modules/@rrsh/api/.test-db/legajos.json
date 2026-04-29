@@ -16,7 +16,10 @@
         "clave": "B",
         "valor": 2
       }
-    ]
+    ],
+    "fechaNacimiento": "1984-02-05",
+    "fechaIngreso": "2017-02-15",
+    "fechaEgreso": ""
   },
   {
     "id": "legajo_2",
@@ -24,7 +27,10 @@
     "nombre": "Juan",
     "convenio": "Luz y Fuerza",
     "composicionSalarial": "comp_1",
-    "valoresFijos": []
+    "valoresFijos": [],
+    "fechaNacimiento": "",
+    "fechaIngreso": "2000-01-01",
+    "fechaEgreso": ""
   },
   {
     "id": "legajo_3",
@@ -32,7 +38,10 @@
     "nombre": "Pablo",
     "convenio": "Luz y Fuerza",
     "composicionSalarial": "comp_2",
-    "valoresFijos": []
+    "valoresFijos": [],
+    "fechaNacimiento": "",
+    "fechaIngreso": "",
+    "fechaEgreso": ""
   },
   {
     "id": "legajo_4_xt9uhw",
@@ -40,7 +49,10 @@
     "nombre": "Sergio",
     "convenio": "Apuaye",
     "composicionSalarial": "comp_3",
-    "valoresFijos": []
+    "valoresFijos": [],
+    "fechaNacimiento": "",
+    "fechaIngreso": "1996-01-01",
+    "fechaEgreso": ""
   },
   {
     "id": "legajo_5_0w45t1",
@@ -54,7 +66,10 @@
         "clave": "A",
         "valor": 5
       }
-    ]
+    ],
+    "fechaNacimiento": "",
+    "fechaIngreso": "",
+    "fechaEgreso": ""
   },
   {
     "id": "legajo_6_ih1vqz",
@@ -62,6 +77,9 @@
     "nombre": "Diego",
     "convenio": "Apuaye",
     "composicionSalarial": "comp_3",
-    "valoresFijos": []
+    "valoresFijos": [],
+    "fechaNacimiento": "",
+    "fechaIngreso": "2013-01-01",
+    "fechaEgreso": ""
   }
 ]

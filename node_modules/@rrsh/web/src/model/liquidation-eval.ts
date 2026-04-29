@@ -5,19 +5,23 @@ import {
   normalizeExcelIf
 } from "./function-blocks";
 import { formulaToExpression } from "./helpers";
-import { ConceptModel, TagAggregationOp } from "./types";
+import { ConceptModel, getConceptTypeDefinition, TagAggregationOp } from "./types";
 
 export interface LegajoLike {
   valoresFijos: Array<{ clave?: string; concepto?: string; valor: number }>;
   composicionValoresFijos?: Array<{ clave?: string; concepto?: string; valor: number }>;
+  fechaIngreso?: string;
 }
 
 interface EvalParams {
   concepts: ConceptModel[];
   conceptCodeById: Record<number, string>;
   legajo: LegajoLike | null;
+  receiptOrderIds?: number[];
   selectedConceptId?: number;
   params?: Record<string, number>;
+  asOfMonth?: number;
+  asOfYear?: number;
 }
 
 export interface EvalResult {
@@ -59,6 +63,12 @@ function toNumericOrZero(value: unknown): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function applyConceptSign(concept: ConceptModel, value: unknown): unknown {
+  if (typeof value !== "number" || !Number.isFinite(value)) return value;
+  const sign = getConceptTypeDefinition(concept.conceptType).sign;
+  return value * sign;
+}
+
 function getValorLegajo(legajo: LegajoLike | null, concepto: string, fallbackConcepto: string): number {
   if (!legajo) return 0;
   const requested = concepto.trim();
@@ -93,12 +103,32 @@ function resolveValorLegajoConceptCode(
   return arg;
 }
 
+function resolveAntiguedadYears(
+  legajo: LegajoLike | null,
+  asOfMonth: number,
+  asOfYear: number
+): number {
+  const rawIngreso = (legajo?.fechaIngreso ?? "").trim();
+  if (!rawIngreso) return 0;
+  const parsed = rawIngreso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parsed) return 0;
+  const ingresoYear = Number(parsed[1]);
+  const ingresoMonth = Number(parsed[2]);
+  if (!Number.isFinite(ingresoYear) || !Number.isFinite(ingresoMonth)) return 0;
+  const months = (asOfYear - ingresoYear) * 12 + (asOfMonth - ingresoMonth);
+  if (!Number.isFinite(months) || months <= 0) return 0;
+  return Math.floor(months / 12);
+}
+
 export function evaluateConcepts({
   concepts,
   conceptCodeById,
   legajo,
+  receiptOrderIds,
   selectedConceptId,
-  params = { porc_antiguedad: 0.12 }
+  params = { porc_antiguedad: 0.12 },
+  asOfMonth = new Date().getMonth() + 1,
+  asOfYear = new Date().getFullYear()
 }: EvalParams): EvalResult {
   const conceptById = new Map(concepts.map((c) => [c.id, c]));
   const conceptIdByCode = new Map(concepts.map((c) => [c.code, c.id]));
@@ -114,6 +144,10 @@ export function evaluateConcepts({
   const conceptCodeRefs = /CCONCEPTO\("([^"]+)"\)/g;
   const sumTagRefs = /SUM_TAG\("([^"]+)"\)/g;
   const tagOpRefs = /TAG_OP\("(sum|avg|max|min)","([^"]+)"\)/g;
+  const receiptOrder = (receiptOrderIds ?? concepts.map((c) => c.id)).filter((id, index, array) =>
+    array.indexOf(id) === index
+  );
+  const receiptIndexById = new Map<number, number>(receiptOrder.map((id, index) => [id, index]));
 
   for (const concept of concepts) {
     const expression = conceptExpression(concept);
@@ -142,6 +176,20 @@ export function evaluateConcepts({
         seenDeps.add(depConcept.id);
         outgoing.get(depConcept.id)?.push(concept.id);
         incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+      }
+    }
+    if (/ANTERIORES\(\)/.test(expression)) {
+      const currentOrder = receiptIndexById.get(concept.id);
+      if (currentOrder !== undefined) {
+        for (const depConcept of concepts) {
+          if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+          if (depConcept.conceptType !== concept.conceptType) continue;
+          const depOrder = receiptIndexById.get(depConcept.id);
+          if (depOrder === undefined || depOrder >= currentOrder) continue;
+          seenDeps.add(depConcept.id);
+          outgoing.get(depConcept.id)?.push(concept.id);
+          incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+        }
       }
     }
   }
@@ -173,6 +221,19 @@ export function evaluateConcepts({
     const concept = conceptById.get(id);
     if (!concept) continue;
     const expression = conceptExpression(concept);
+    const anterioresValue = (() => {
+      const currentOrder = receiptIndexById.get(concept.id);
+      if (currentOrder === undefined) return 0;
+      let sum = 0;
+      for (const depId of receiptOrder) {
+        const depOrder = receiptIndexById.get(depId);
+        if (depOrder === undefined || depOrder >= currentOrder) continue;
+        const depConcept = conceptById.get(depId);
+        if (!depConcept || depConcept.conceptType !== concept.conceptType) continue;
+        sum += toNumericOrZero(values.get(depId));
+      }
+      return sum;
+    })();
     if (!expression.trim()) {
       values.set(id, 0);
       errors.set(id, false);
@@ -217,6 +278,8 @@ export function evaluateConcepts({
           if (value === undefined) throw new Error("missing PARAM");
           return String(value);
         })
+        .replace(/ANTERIORES\(\)/g, () => String(anterioresValue))
+        .replace(/ANTIGUEDAD\(\)/g, () => String(resolveAntiguedadYears(legajo, asOfMonth, asOfYear)))
         .replace(/TAG_OP\("([^"]+)","([^"]+)"\)/g, (_, op: TagAggregationOp, tag: string) => {
           const tagged = concepts
             .filter((c) => c.tags.includes(tag))
@@ -229,8 +292,9 @@ export function evaluateConcepts({
         })
         .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
           const value = raw.replace(/\\"/g, "\"");
-          const asNumber = Number(value);
-          if (!Number.isNaN(asNumber) && value.trim() !== "") return String(asNumber);
+          const normalizedNumber = value.trim().replace(/\s+/g, "").replace(/\./g, "").replace(",", ".");
+          const asNumber = Number(normalizedNumber);
+          if (!Number.isNaN(asNumber) && normalizedNumber !== "") return String(asNumber);
           return JSON.stringify(value);
         })
         .replace(/MATH\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => raw.replace(/\\"/g, "\""))
@@ -245,7 +309,7 @@ export function evaluateConcepts({
       const result = Function(
         `"use strict"; const IF = (cond, v, f) => (cond ? v : f); return (${excelLike});`
       )();
-      values.set(id, result);
+      values.set(id, applyConceptSign(concept, result));
       errors.set(id, false);
     } catch (error) {
       values.set(id, 0);
