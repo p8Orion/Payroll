@@ -6,6 +6,13 @@ export type ConceptShape =
   | "triangle"
   | "diamond"
   | "plus"
+  | "moon"
+  | "clover"
+  | "xmark"
+  | "spark"
+  | "exclamation"
+  | "question"
+  | "bolt"
   | "hex";
 export type TagAggregationOp = "sum" | "avg" | "max" | "min";
 export type ConceptTypeId =

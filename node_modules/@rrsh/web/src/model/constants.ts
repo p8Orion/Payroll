@@ -13,7 +13,12 @@ export const shapeCycle: ConceptShape[] = [
   "triangle",
   "diamond",
   "plus",
-  "hex"
+  "moon",
+  "clover",
+  "xmark",
+  "exclamation",
+  "question",
+  "bolt"
 ];
 
 export const exampleValues = {

@@ -14,8 +14,8 @@ export interface LegajoLike {
   fechaIngreso?: string;
 }
 
-interface HistoricalLiquidacionRecord {
-  liquidationType: LiquidationType;
+export interface HistoricalLiquidacionRecord {
+  liquidationType: string;
   estado?: "Generada" | "Anulada";
   month: number;
   year: number;
@@ -58,7 +58,7 @@ function applyImplicitPlusBetweenValues(expression: string): string {
   );
 }
 
-function toExpressionLiteral(value: unknown): string {
+export function toExpressionLiteral(value: unknown): string {
   if (typeof value === "number") return Number.isFinite(value) ? String(value) : "0";
   if (typeof value === "string") return JSON.stringify(value);
   if (typeof value === "boolean") return value ? "true" : "false";
@@ -70,7 +70,7 @@ function toExpressionLiteral(value: unknown): string {
   }
 }
 
-function toNumericOrZero(value: unknown): number {
+export function toNumericOrZero(value: unknown): number {
   if (typeof value === "number") return Number.isFinite(value) ? value : 0;
   if (typeof value === "boolean") return value ? 1 : 0;
   const parsed = Number(value);
@@ -117,7 +117,7 @@ function resolveValorLegajoConceptCode(
   return arg;
 }
 
-function resolveLiteralArg(rawArg: string): string {
+export function resolveLiteralArg(rawArg: string): string {
   const arg = rawArg.trim();
   if (!arg) return "";
   const byConst = arg.match(/^CONSTANTE\("((?:[^"\\]|\\.)*)"\)$/);
@@ -127,7 +127,7 @@ function resolveLiteralArg(rawArg: string): string {
   return arg;
 }
 
-function resolveMesAnteriorConceptRef(
+export function resolveMesAnteriorConceptRef(
   rawArg: string,
   conceptCodeById: Record<number, string>
 ): { conceptId?: number; conceptCode?: string } {
@@ -150,7 +150,7 @@ function subtractMonths(year: number, month: number, monthsBack: number): { year
   return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1 };
 }
 
-function resolveMesAnteriorValue(
+export function resolveMesAnteriorValue(
   rawArgs: string,
   conceptCodeById: Record<number, string>,
   legajo: LegajoLike | null,
@@ -189,7 +189,7 @@ function resolveMesAnteriorValue(
 
 const annualAllLiquidationTypes = "(Todos)";
 
-function resolveSumaAnualValue(
+export function resolveSumaAnualValue(
   rawArgs: string,
   conceptCodeById: Record<number, string>,
   legajo: LegajoLike | null,
@@ -228,7 +228,7 @@ function resolveSumaAnualValue(
   return sum;
 }
 
-function resolveAntiguedadYears(
+export function resolveAntiguedadYears(
   legajo: LegajoLike | null,
   asOfMonth: number,
   asOfYear: number

@@ -223,6 +223,13 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
 }
 
 export function getShapeGlyph(shape: ConceptShape): string {
+  if (shape === "xmark") return "✕";
+  if (shape === "exclamation") return "❗";
+  if (shape === "question") return "❓";
+  if (shape === "bolt") return "⚡";
+  if (shape === "moon") return "☾";
+  if (shape === "clover") return "♣";
+  if (shape === "spark") return "✦";
   if (shape === "triangle") return "▲";
   if (shape === "diamond") return "◆";
   if (shape === "plus") return "✚";

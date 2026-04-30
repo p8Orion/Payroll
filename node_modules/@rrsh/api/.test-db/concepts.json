@@ -229,7 +229,7 @@
     "name": "Sueldo básico",
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
-    "f1359FieldId": "REG03_CAMPO03",
+    "f1359FieldId": "REG07_CAMPO11",
     "formula": "VALOR_FIJO(\"Básico\")",
     "tags": [
       "base-tarea-profesional",
@@ -319,7 +319,7 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
-    "formula": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"10\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]",
+    "formula": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]",
     "tags": [
       "remunerativo"
     ]
@@ -418,6 +418,57 @@
     "f1359FieldId": "",
     "formula": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]",
     "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 961,
+    "code": "DEF_961",
+    "name": "Concepto definitivo 961",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "f1359FieldId": "",
+    "formula": "",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 100,
+    "code": "BASICO",
+    "name": "Sueldo Basico",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "f1359FieldId": "",
+    "formula": "300000",
+    "tags": [
+      "basico",
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 120,
+    "code": "ANTIGUEDAD",
+    "name": "Antiguedad",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "f1359FieldId": "",
+    "formula": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")",
+    "tags": [
+      "antiguedad",
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 900,
+    "code": "BASE_REMU",
+    "name": "Base Remunerativa",
+    "conceptClass": "transitorio",
+    "conceptType": "remunerativo",
+    "f1359FieldId": "",
+    "formula": "SUM_TAG(\"remunerativo\")",
+    "tags": [
+      "base",
       "remunerativo"
     ]
   }

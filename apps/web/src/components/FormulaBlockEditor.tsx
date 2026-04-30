@@ -62,7 +62,21 @@ interface FormulaBlockEditorProps {
   isTagAggregationExpression: (expr: string) => boolean;
   conceptVisualForToken: (tk: FormulaToken) => {
     color: string;
-    shape: "circle" | "square" | "star" | "triangle" | "diamond" | "plus" | "hex";
+    shape:
+      | "circle"
+      | "square"
+      | "star"
+      | "triangle"
+      | "diamond"
+      | "plus"
+      | "moon"
+      | "clover"
+      | "xmark"
+      | "spark"
+      | "exclamation"
+      | "question"
+      | "bolt"
+      | "hex";
   } | null;
   getPillTitle?: (tk: FormulaToken) => string | null;
   onConceptClick?: (tk: FormulaToken) => void;

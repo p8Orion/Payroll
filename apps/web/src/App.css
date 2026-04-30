@@ -1086,7 +1086,8 @@
 }
 
 .shape-options {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(34px, 1fr));
   gap: 8px;
 }
 
