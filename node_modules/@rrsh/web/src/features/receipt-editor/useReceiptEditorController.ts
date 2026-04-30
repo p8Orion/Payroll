@@ -5,7 +5,7 @@ import { buildConstExpression } from "../../model/formula-ui";
 import { useFormulaDragSource } from "../../hooks/useFormulaDragSource";
 import { useFormulaEditor } from "../formula-editor/useFormulaEditor";
 import { evaluateConcepts, resolveAntiguedadYears, resolveMesAnteriorValue, resolveSumaAnualValue, toNumericOrZero } from "../../model/liquidation-eval";
-import { ConceptModel, ConceptTypeId, F1359FieldModel, FormulaToken, ReceiptModel, TagAggregationOp } from "../../model/types";
+import { ConceptModel, ConceptTypeId, F1359FieldModel, FormulaToken, GananciasTableModel, ReceiptModel, TagAggregationOp } from "../../model/types";
 import { ComposicionSalarialModel } from "../composiciones/ComposicionesSalarialesPage";
 import { HistoricalLiquidacionRecord } from "../informacion/F1359InfoPage";
 import { LegajoModel } from "../legajos/LegajosPage";
@@ -23,6 +23,7 @@ export function useReceiptEditorController(params: {
   legajos: LegajoModel[];
   composiciones: ComposicionSalarialModel[];
   liquidacionesHistory: HistoricalLiquidacionRecord[];
+  gananciasTables: GananciasTableModel[];
   f1359Fields: F1359FieldModel[];
   receiptConvenioFilter: string;
   receiptLiquidationTypeFilter: string;
@@ -58,7 +59,7 @@ export function useReceiptEditorController(params: {
   setCursorGhost: (event: DragEvent<HTMLElement>, label: string) => void;
 }) {
   const {
-    concepts, setConcepts, receipts, setReceipts, legajos, composiciones, liquidacionesHistory, f1359Fields,
+    concepts, setConcepts, receipts, setReceipts, legajos, composiciones, liquidacionesHistory, gananciasTables, f1359Fields,
     receiptConvenioFilter, receiptLiquidationTypeFilter, receiptF1359Filter, receiptTagFilter, activeReceiptId, setActiveReceiptId,
     simLegajoId, setSimLegajoId, simMonth, simYear, conceptCodeDraft, setConceptCodeDraft, conceptNameDraft, setConceptNameDraft,
     conceptTypeDraft, setConceptTypeDraft, newTagDraft, setNewTagDraft, appearanceOpen, setAppearanceOpen, showReceiptConceptDetail,
@@ -134,14 +135,17 @@ export function useReceiptEditorController(params: {
   const resolveValorLegajoConceptCodeResolved = (rawArg: string, fallbackConcepto: string): string => resolveValorLegajoConceptCode(rawArg, fallbackConcepto, conceptCodeById);
   const evaluation = useMemo(() => evaluateConcepts({
     concepts: participatingConcepts,
+    allConcepts: concepts,
     conceptCodeById,
     legajo: simLegajo ? { id: simLegajo.id, fechaIngreso: simLegajo.fechaIngreso, valoresFijos: simLegajo.valoresFijos, composicionValoresFijos: resolveComposicionLegajo(simLegajo, composiciones)?.valoresFijos ?? [] } : null,
     receiptOrderIds,
+    currentLiquidationType: activeReceipt?.liquidationType ?? "Normal",
     selectedConceptId: selectedConcept.id,
     asOfMonth: simMonth,
     asOfYear: simYear,
-    liquidacionesHistory
-  }), [participatingConcepts, conceptCodeById, simLegajo, receiptOrderIds, selectedConcept.id, simMonth, simYear, liquidacionesHistory, composiciones]);
+    liquidacionesHistory,
+    gananciasTables
+  }), [participatingConcepts, concepts, conceptCodeById, simLegajo, receiptOrderIds, activeReceipt?.liquidationType, selectedConcept.id, simMonth, simYear, liquidacionesHistory, gananciasTables, composiciones]);
   const previewInfo = useMemo(() => ({ value: evaluation.selectedValue, error: evaluation.selectedError }), [evaluation.selectedValue, evaluation.selectedError]);
   const { resolveTokenConceptId, getFormulaPillTitle } = useFormulaPillPreview({
     hidePrecalculationPreview,
@@ -224,6 +228,7 @@ export function useReceiptEditorController(params: {
     cycleConceptIds: evaluation.cycleIds,
     previewValueById: evaluation.values,
     formatPreviewAmount,
+    gananciasTrace: evaluation.gananciasTrace,
     actions
   };
 }

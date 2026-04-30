@@ -112,3 +112,32 @@ export interface FormulaTemplate {
   expression: string;
   kind: "function" | "param";
 }
+
+export interface GananciasScaleRow {
+  fromAmount: number;
+  toAmount: number | null;
+  fixedTax: number;
+  percentRate: number;
+  excessOver: number;
+}
+
+export interface GananciasDeducciones {
+  gananciaNoImponible: number;
+  conyuge: number;
+  hijo: number;
+  hijoIncapacitado: number;
+  deduccionEspecialGeneral: number;
+  deduccionEspecialNuevos: number;
+  deduccionEspecialIncisoD: number;
+}
+
+export interface GananciasTableModel {
+  year: number;
+  month: number;
+  sourcePeriod: string;
+  sourceUrlArt30: string;
+  sourceUrlArt94: string;
+  publishedAt: string;
+  deducciones: GananciasDeducciones;
+  escala: GananciasScaleRow[];
+}

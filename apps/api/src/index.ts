@@ -101,6 +101,9 @@ const composicionesDbPath =
 const f1359FieldsDbPath =
   process.env.F1359_FIELDS_DB_FILE ??
   resolve(process.cwd(), ".test-db", "f1359-fields.json");
+const gananciasTablesDbPath =
+  process.env.GANANCIAS_TABLES_DB_FILE ??
+  resolve(process.cwd(), ".test-db", "ganancias-tablas.json");
 const fixedConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"] as const;
 
 interface ApiLegajoValorFijo {
@@ -183,6 +186,35 @@ interface ApiF1359Field {
   longitud: number;
 }
 
+interface ApiGananciasScaleRow {
+  fromAmount: number;
+  toAmount: number | null;
+  fixedTax: number;
+  percentRate: number;
+  excessOver: number;
+}
+
+interface ApiGananciasDeducciones {
+  gananciaNoImponible: number;
+  conyuge: number;
+  hijo: number;
+  hijoIncapacitado: number;
+  deduccionEspecialGeneral: number;
+  deduccionEspecialNuevos: number;
+  deduccionEspecialIncisoD: number;
+}
+
+interface ApiGananciasTableRecord {
+  year: number;
+  month: number;
+  sourcePeriod: string;
+  sourceUrlArt30: string;
+  sourceUrlArt94: string;
+  publishedAt: string;
+  deducciones: ApiGananciasDeducciones;
+  escala: ApiGananciasScaleRow[];
+}
+
 const repo = new FileBackedConceptRepository(
   new InMemoryConceptRepository(),
   diskDbPath
@@ -193,6 +225,73 @@ let receiptsStore: ApiReceiptRecord[] = [];
 let conveniosStore: string[] = [...fixedConvenios];
 let composicionesStore: ApiComposicionSalarial[] = [];
 let f1359FieldsStore: ApiF1359Field[] = [];
+let gananciasTablesStore: ApiGananciasTableRecord[] = [];
+
+const officialArt30Url2026 =
+  "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf";
+const officialArt94Url2026 =
+  "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf";
+
+function round2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function proportionalAccumulated(annual: number, month: number): number {
+  return round2((annual / 12) * month);
+}
+
+function buildGananciasSeed2026(): ApiGananciasTableRecord[] {
+  const annualDeducciones: ApiGananciasDeducciones = {
+    gananciaNoImponible: 5151802.5,
+    conyuge: 4851964.66,
+    hijo: 2446863.48,
+    hijoIncapacitado: 4893726.96,
+    deduccionEspecialGeneral: 18031308.76,
+    deduccionEspecialNuevos: 20607210.01,
+    deduccionEspecialIncisoD: 24728652.02
+  };
+
+  const annualScale: ApiGananciasScaleRow[] = [
+    { fromAmount: 0, toAmount: 2000030.09, fixedTax: 0, percentRate: 5, excessOver: 0 },
+    { fromAmount: 2000030.09, toAmount: 4000060.17, fixedTax: 100001.5, percentRate: 9, excessOver: 2000030.09 },
+    { fromAmount: 4000060.17, toAmount: 6000090.26, fixedTax: 280004.21, percentRate: 12, excessOver: 4000060.17 },
+    { fromAmount: 6000090.26, toAmount: 9000135.4, fixedTax: 520007.82, percentRate: 15, excessOver: 6000090.26 },
+    { fromAmount: 9000135.4, toAmount: 18000270.8, fixedTax: 970014.59, percentRate: 19, excessOver: 9000135.4 },
+    { fromAmount: 18000270.8, toAmount: 27000406.2, fixedTax: 2680040.32, percentRate: 23, excessOver: 18000270.8 },
+    { fromAmount: 27000406.2, toAmount: 40500609.3, fixedTax: 4750071.46, percentRate: 27, excessOver: 27000406.2 },
+    { fromAmount: 40500609.3, toAmount: 60750913.96, fixedTax: 8395126.3, percentRate: 31, excessOver: 40500609.3 },
+    { fromAmount: 60750913.96, toAmount: null, fixedTax: 14672720.74, percentRate: 35, excessOver: 60750913.96 }
+  ];
+
+  const rows: ApiGananciasTableRecord[] = [];
+  for (let month = 1; month <= 12; month += 1) {
+    rows.push({
+      year: 2026,
+      month,
+      sourcePeriod: "2026-S1 official values projected monthly for yearly accumulation",
+      sourceUrlArt30: officialArt30Url2026,
+      sourceUrlArt94: officialArt94Url2026,
+      publishedAt: "2026-01-01",
+      deducciones: {
+        gananciaNoImponible: proportionalAccumulated(annualDeducciones.gananciaNoImponible, month),
+        conyuge: proportionalAccumulated(annualDeducciones.conyuge, month),
+        hijo: proportionalAccumulated(annualDeducciones.hijo, month),
+        hijoIncapacitado: proportionalAccumulated(annualDeducciones.hijoIncapacitado, month),
+        deduccionEspecialGeneral: proportionalAccumulated(annualDeducciones.deduccionEspecialGeneral, month),
+        deduccionEspecialNuevos: proportionalAccumulated(annualDeducciones.deduccionEspecialNuevos, month),
+        deduccionEspecialIncisoD: proportionalAccumulated(annualDeducciones.deduccionEspecialIncisoD, month)
+      },
+      escala: annualScale.map((row) => ({
+        fromAmount: proportionalAccumulated(row.fromAmount, month),
+        toAmount: row.toAmount === null ? null : proportionalAccumulated(row.toAmount, month),
+        fixedTax: proportionalAccumulated(row.fixedTax, month),
+        percentRate: row.percentRate,
+        excessOver: proportionalAccumulated(row.excessOver, month)
+      }))
+    });
+  }
+  return rows;
+}
 
 async function initLegajosStore(): Promise<void> {
   try {
@@ -296,6 +395,39 @@ async function persistF1359FieldsStore(): Promise<void> {
   await writeFile(f1359FieldsDbPath, JSON.stringify(f1359FieldsStore, null, 2), "utf8");
 }
 
+async function initGananciasTablesStore(): Promise<void> {
+  try {
+    const raw = await readFile(gananciasTablesDbPath, "utf8");
+    const parsed = JSON.parse(raw) as ApiGananciasTableRecord[];
+    gananciasTablesStore = Array.isArray(parsed) ? parsed : [];
+    const seed = buildGananciasSeed2026();
+    const byKey = new Map(gananciasTablesStore.map((row) => [`${row.year}-${row.month}`, row]));
+    for (const row of seed) {
+      const key = `${row.year}-${row.month}`;
+      const existing = byKey.get(key);
+      if (!existing) {
+        byKey.set(key, row);
+        continue;
+      }
+      if (!Array.isArray(existing.escala) || existing.escala.length === 0) {
+        byKey.set(key, { ...existing, escala: row.escala });
+      }
+    }
+    gananciasTablesStore = Array.from(byKey.values());
+    if (!gananciasTablesStore.length) gananciasTablesStore = seed;
+    await persistGananciasTablesStore();
+  } catch {
+    gananciasTablesStore = buildGananciasSeed2026();
+    await persistGananciasTablesStore();
+  }
+}
+
+async function persistGananciasTablesStore(): Promise<void> {
+  await mkdir(dirname(gananciasTablesDbPath), { recursive: true });
+  const sorted = [...gananciasTablesStore].sort((a, b) => a.year - b.year || a.month - b.month);
+  await writeFile(gananciasTablesDbPath, JSON.stringify(sorted, null, 2), "utf8");
+}
+
 app.get("/health", async () => ({ ok: true }));
 
 app.get("/concepts", async () => repo.list());
@@ -382,6 +514,14 @@ app.put<{ Body: ApiF1359Field[] }>("/f1359-fields", async (req) => {
   return { ok: true };
 });
 
+app.get("/ganancias-tablas", async () => gananciasTablesStore);
+
+app.put<{ Body: ApiGananciasTableRecord[] }>("/ganancias-tablas", async (req) => {
+  gananciasTablesStore = Array.isArray(req.body) ? req.body : [];
+  await persistGananciasTablesStore();
+  return { ok: true };
+});
+
 app.post<{
   Body: { params: Record<string, number>; fixedValuesByCode?: Record<string, number> };
 }>("/liquidaciones/run", async (req) => {
@@ -403,12 +543,14 @@ const start = async () => {
   await initConveniosStore();
   await initComposicionesStore();
   await initF1359FieldsStore();
+  await initGananciasTablesStore();
   app.log.info(`Legajos DB file: ${legajosDbPath}`);
   app.log.info(`Liquidaciones DB file: ${liquidacionesDbPath}`);
   app.log.info(`Receipts DB file: ${receiptsDbPath}`);
   app.log.info(`Convenios DB file: ${conveniosDbPath}`);
   app.log.info(`Composiciones DB file: ${composicionesDbPath}`);
   app.log.info(`F1359 Fields DB file: ${f1359FieldsDbPath}`);
+  app.log.info(`Ganancias Tables DB file: ${gananciasTablesDbPath}`);
   await app.listen({ port: 3001, host: "0.0.0.0" });
 };
 

@@ -3,10 +3,11 @@ import { ComposicionSalarialModel } from "../composiciones/ComposicionesSalarial
 import { HistoricalLiquidacionRecord } from "../informacion/F1359InfoPage";
 import { LegajoModel } from "../legajos/LegajosPage";
 import { initialConcepts } from "../../model/seed";
-import { ConceptModel, F1359FieldModel, ReceiptModel } from "../../model/types";
+import { ConceptModel, F1359FieldModel, GananciasTableModel, ReceiptModel } from "../../model/types";
 import {
   ApiConcept,
   ApiF1359Field,
+  ApiGananciasTable,
   ApiReceipt,
   apiBaseUrl,
   defaultConvenios,
@@ -41,6 +42,7 @@ interface UseReceiptEditorDataSyncParams {
   receiptF1359Filter: string;
   receiptTagFilter: string;
   setLiquidacionesHistory: Dispatch<SetStateAction<HistoricalLiquidacionRecord[]>>;
+  setGananciasTables: Dispatch<SetStateAction<GananciasTableModel[]>>;
 }
 
 export function useReceiptEditorDataSync({
@@ -64,7 +66,8 @@ export function useReceiptEditorDataSync({
   setF1359Fields,
   receiptF1359Filter,
   receiptTagFilter,
-  setLiquidacionesHistory
+  setLiquidacionesHistory,
+  setGananciasTables
 }: UseReceiptEditorDataSyncParams) {
   const [composicionesLoaded, setComposicionesLoaded] = useState(false);
   useEffect(() => {
@@ -211,6 +214,32 @@ export function useReceiptEditorDataSync({
     };
     void loadF1359Fields();
   }, [setF1359Fields]);
+
+  useEffect(() => {
+    const loadGananciasTables = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/ganancias-tablas`);
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        const parsed = (await response.json()) as ApiGananciasTable[];
+        setGananciasTables(Array.isArray(parsed) ? parsed : []);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    let cancelled = false;
+    const poll = async () => {
+      const ok = await loadGananciasTables();
+      if (cancelled || ok) return;
+      setTimeout(() => {
+        if (!cancelled) void poll();
+      }, 2000);
+    };
+    void poll();
+    return () => {
+      cancelled = true;
+    };
+  }, [setGananciasTables]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

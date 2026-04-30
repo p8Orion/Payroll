@@ -11,6 +11,7 @@ interface FormulaToolsPanelProps {
   onInsertConst: (index: number) => void;
   onInsertAntiguedad: (index: number) => void;
   onInsertAnteriores: (index: number) => void;
+  onInsertGanancias: (index: number) => void;
   onInsertFixedValue: (key: string, index: number) => void;
   onInsertMath: (op: string, index: number) => void;
   onOpenTagModal: (tag: string, insertAt: number) => void;
@@ -25,6 +26,7 @@ export function FormulaToolsPanel({
   onInsertConst,
   onInsertAntiguedad,
   onInsertAnteriores,
+  onInsertGanancias,
   onInsertFixedValue,
   onInsertMath,
   onOpenTagModal,
@@ -60,6 +62,20 @@ export function FormulaToolsPanel({
         e.dataTransfer.setData(
           "text/token-json",
           JSON.stringify(token("Antigüedad", "ANTIGUEDAD()", "function"))
+        );
+      }
+    },
+    {
+      label: "GANANCIAS",
+      detailedLabel: "Retención/reintegro final simulado de Ganancias",
+      onClick: () => onInsertGanancias(insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "GANANCIAS");
+        setCursorGhost(e, "GANANCIAS");
+        e.dataTransfer.setData(
+          "text/token-json",
+          JSON.stringify(token("Ganancias (retenido)", "GANANCIAS()", "function"))
         );
       }
     },

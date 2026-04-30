@@ -32,6 +32,31 @@ export interface ApiF1359Field {
   longitud: number;
 }
 
+export interface ApiGananciasTable {
+  year: number;
+  month: number;
+  sourcePeriod: string;
+  sourceUrlArt30: string;
+  sourceUrlArt94: string;
+  publishedAt: string;
+  deducciones: {
+    gananciaNoImponible: number;
+    conyuge: number;
+    hijo: number;
+    hijoIncapacitado: number;
+    deduccionEspecialGeneral: number;
+    deduccionEspecialNuevos: number;
+    deduccionEspecialIncisoD: number;
+  };
+  escala: Array<{
+    fromAmount: number;
+    toAmount: number | null;
+    fixedTax: number;
+    percentRate: number;
+    excessOver: number;
+  }>;
+}
+
 export interface EditorSnapshot {
   concepts: ConceptModel[];
   receipts: ReceiptModel[];

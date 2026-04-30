@@ -12,6 +12,8 @@ import {
 } from "../../model/types";
 import { FormulaEditorSection } from "../formula-editor/FormulaEditorSection";
 import { FormulaToolsPanel } from "../formula-editor/FormulaToolsPanel";
+import { GananciasTracePanel } from "../ganancias/GananciasTracePanel";
+import { GananciasTrace } from "../ganancias/gananciasEngine";
 import { LegajoModel } from "../legajos/LegajosPage";
 
 interface ReceiptEditorWorkspaceProps {
@@ -94,6 +96,7 @@ interface ReceiptEditorWorkspaceProps {
   insertBlockTemplateAt: (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR" | "SUMA_ANUAL", index: number) => void;
   insertTokenAt: (token: FormulaToken, index: number) => void;
   setTagModal: React.Dispatch<React.SetStateAction<{ open: boolean; tag: string; insertAt: number }>>;
+  gananciasTrace: GananciasTrace;
 }
 
 export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
@@ -176,7 +179,8 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
     fixedValueKeys,
     insertBlockTemplateAt,
     insertTokenAt,
-    setTagModal
+    setTagModal,
+    gananciasTrace
   } = props;
 
   return (
@@ -373,6 +377,15 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
             </li>
           ))}
         </ul>
+        <GananciasTracePanel
+          trace={gananciasTrace}
+          formatPreviewAmount={formatPreviewAmount}
+          getF1359FieldLabel={(fieldId) => {
+            const field = f1359Fields.find((item) => item.id === fieldId);
+            if (!field) return fieldId;
+            return `${field.id} - ${field.descripcion}`;
+          }}
+        />
       </article>
 
       <article className="panel">
@@ -670,6 +683,7 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
         onInsertAnteriores={(index) =>
           insertTokenAt(token("Suma de Conceptos Previos del Recibo", "ANTERIORES()", "function"), index)
         }
+        onInsertGanancias={(index) => insertTokenAt(token("Ganancias (retenido)", "GANANCIAS()", "function"), index)}
         onInsertFixedValue={(key, index) =>
           insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)
         }

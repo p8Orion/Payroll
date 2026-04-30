@@ -5,7 +5,8 @@ import {
   normalizeExcelIf
 } from "./function-blocks";
 import { formulaToExpression } from "./helpers";
-import { ConceptModel, getConceptTypeDefinition, LiquidationType, TagAggregationOp } from "./types";
+import { computeGananciasFromHistory, computeGananciasTrace, computeGananciasValue, GananciasTrace } from "../features/ganancias/gananciasEngine";
+import { ConceptModel, GananciasTableModel, getConceptTypeDefinition, LiquidationType, TagAggregationOp } from "./types";
 
 export interface LegajoLike {
   id?: string;
@@ -28,14 +29,17 @@ export interface HistoricalLiquidacionRecord {
 
 interface EvalParams {
   concepts: ConceptModel[];
+  allConcepts?: ConceptModel[];
   conceptCodeById: Record<number, string>;
   legajo: LegajoLike | null;
   receiptOrderIds?: number[];
+  currentLiquidationType?: string;
   selectedConceptId?: number;
   params?: Record<string, number>;
   asOfMonth?: number;
   asOfYear?: number;
   liquidacionesHistory?: HistoricalLiquidacionRecord[];
+  gananciasTables?: GananciasTableModel[];
 }
 
 export interface EvalResult {
@@ -45,6 +49,7 @@ export interface EvalResult {
   cycleIds: Set<number>;
   selectedValue: unknown | null;
   selectedError: string | null;
+  gananciasTrace: GananciasTrace;
 }
 
 function conceptExpression(concept: ConceptModel): string {
@@ -247,14 +252,17 @@ export function resolveAntiguedadYears(
 
 export function evaluateConcepts({
   concepts,
+  allConcepts,
   conceptCodeById,
   legajo,
   receiptOrderIds,
+  currentLiquidationType = "Normal",
   selectedConceptId,
   params = { porc_antiguedad: 0.12 },
   asOfMonth = new Date().getMonth() + 1,
   asOfYear = new Date().getFullYear(),
-  liquidacionesHistory = []
+  liquidacionesHistory = [],
+  gananciasTables = []
 }: EvalParams): EvalResult {
   const conceptById = new Map(concepts.map((c) => [c.id, c]));
   const conceptIdByCode = new Map(concepts.map((c) => [c.code, c.id]));
@@ -318,6 +326,15 @@ export function evaluateConcepts({
         }
       }
     }
+    if (/GANANCIAS\(\)/.test(expression)) {
+      for (const depConcept of concepts) {
+        if (!depConcept.f1359FieldId?.trim()) continue;
+        if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
+        seenDeps.add(depConcept.id);
+        outgoing.get(depConcept.id)?.push(concept.id);
+        incoming.set(concept.id, (incoming.get(concept.id) ?? 0) + 1);
+      }
+    }
   }
 
   const topoIncoming = new Map(incoming);
@@ -342,7 +359,6 @@ export function evaluateConcepts({
   const values = new Map<number, unknown>();
   const errors = new Map<number, boolean>();
   let selectedError: string | null = null;
-
   for (const id of topo) {
     const concept = conceptById.get(id);
     if (!concept) continue;
@@ -431,6 +447,21 @@ export function evaluateConcepts({
           if (op === "min") return String(Math.min(...tagged));
           return String(tagged.reduce((a, b) => a + b, 0));
         })
+        .replace(/GANANCIAS\(\)/g, () =>
+          String(
+            computeGananciasFromHistory({
+              allConcepts: allConcepts ?? concepts,
+              currentValues: values,
+              currentReceiptConceptIds: receiptOrder,
+              currentLiquidationType,
+              asOfMonth,
+              asOfYear,
+              legajoId: (legajo?.id ?? "").trim(),
+              liquidacionesHistory,
+              gananciasTables
+            }).totalRetenido
+          )
+        )
         .replace(/CONSTANTE\("((?:[^"\\]|\\.)*)"\)/g, (_, raw: string) => {
           const value = raw.replace(/\\"/g, "\"");
           const normalizedNumber = value.trim().replace(/\s+/g, "").replace(/\./g, "").replace(",", ".");
@@ -461,12 +492,61 @@ export function evaluateConcepts({
     }
   }
 
+  let gananciasTrace: GananciasTrace;
+  try {
+    gananciasTrace = computeGananciasFromHistory({
+      allConcepts: allConcepts ?? concepts,
+      currentValues: values,
+      currentReceiptConceptIds: receiptOrder,
+      currentLiquidationType,
+      asOfMonth,
+      asOfYear,
+      legajoId: (legajo?.id ?? "").trim(),
+      liquidacionesHistory,
+      gananciasTables
+    });
+  } catch {
+    const baseTrace = computeGananciasTrace(allConcepts ?? concepts, values);
+    gananciasTrace = {
+      ...baseTrace,
+      grouped: {
+        remuneracionGravadaItems: baseTrace.steps.map((step) => ({
+          conceptId: step.conceptId,
+          conceptCode: step.conceptCode,
+          conceptName: step.conceptName,
+          value: step.value
+        })),
+        deduccionesConceptosItems: [],
+        deduccionesTablaItems: [],
+        remuneracionGravada: baseTrace.totalRetenido,
+        deduccionesConceptos: 0,
+        deduccionesTabla: 0,
+        deduccionesF572: 0,
+        baseImponible: baseTrace.totalRetenido,
+        impuestoDeterminadoAcumulado: baseTrace.totalRetenido,
+        retencionesPrevias: 0,
+        aRetenerEnMes: baseTrace.totalRetenido,
+        escalaAplicada: {
+          fromAmount: 0,
+          toAmount: null,
+          fixedTax: 0,
+          percentRate: 0,
+          excessOver: 0,
+          excedente: 0,
+          impuestoPorExcedente: 0,
+          source: "tabla_mes"
+        }
+      }
+    };
+  }
+
   return {
     values,
     errors,
     dagOrderById,
     cycleIds,
     selectedValue: selectedConceptId ? (values.get(selectedConceptId) ?? null) : null,
-    selectedError
+    selectedError,
+    gananciasTrace
   };
 }

@@ -17,7 +17,7 @@ export function formulaToExpression(tokens: FormulaToken[]): string {
 }
 
 const knownExpressionRegex =
-  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|ANTIGUEDAD\(\)|ANTERIORES\(\)|VALOR_FIJO\("[^"]*"\)|VALOR_LEGAJO\("[^"]*"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
+  /CONCEPTO\(\d+\)|CCONCEPTO\("[^"]+"\)|SUM_TAG\("[^"]+"\)|PARAM\("[^"]+"\)|ANTIGUEDAD\(\)|ANTERIORES\(\)|GANANCIAS\(\)|VALOR_FIJO\("[^"]*"\)|VALOR_LEGAJO\("[^"]*"\)|TAG_OP\("(sum|avg|max|min)","[^"]+"\)|CONSTANTE\("([^"\\]|\\.)*"\)|MATH\("([^"\\]|\\.)*"\)/g;
 
 interface TokenizeOptions {
   conceptCodeById?: Record<number, string>;
@@ -143,6 +143,9 @@ function labelForKnownExpression(
   if (expression === "ANTERIORES()") {
     return { label: "Suma de Conceptos Previos del Recibo", kind: "function" };
   }
+  if (expression === "GANANCIAS()") {
+    return { label: "Ganancias (retenido)", kind: "function" };
+  }
 
   const valorFijo = expression.match(/^(?:VALOR_FIJO|VALOR_LEGAJO)\("([^"]*)"\)$/);
   if (valorFijo)
@@ -264,6 +267,7 @@ export function evaluatePreview(expression: string): number | null {
       if (op === "min") return String(base / 4);
       return String(base);
     })
+    .replace(/GANANCIAS\(\)/g, () => "0")
     .replace(/\[/g, "(")
     .replace(/\]/g, ")");
 

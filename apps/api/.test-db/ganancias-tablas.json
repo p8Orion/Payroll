@@ -1,0 +1,986 @@
+[
+  {
+    "year": 2026,
+    "month": 1,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 429316.88,
+      "conyuge": 404330.39,
+      "hijo": 203905.29,
+      "hijoIncapacitado": 407810.58,
+      "deduccionEspecialGeneral": 1502609.06,
+      "deduccionEspecialNuevos": 1717267.5,
+      "deduccionEspecialIncisoD": 2060721
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 166669.17,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 166669.17,
+        "toAmount": 333338.35,
+        "fixedTax": 8333.46,
+        "percentRate": 9,
+        "excessOver": 166669.17
+      },
+      {
+        "fromAmount": 333338.35,
+        "toAmount": 500007.52,
+        "fixedTax": 23333.68,
+        "percentRate": 12,
+        "excessOver": 333338.35
+      },
+      {
+        "fromAmount": 500007.52,
+        "toAmount": 750011.28,
+        "fixedTax": 43333.99,
+        "percentRate": 15,
+        "excessOver": 500007.52
+      },
+      {
+        "fromAmount": 750011.28,
+        "toAmount": 1500022.57,
+        "fixedTax": 80834.55,
+        "percentRate": 19,
+        "excessOver": 750011.28
+      },
+      {
+        "fromAmount": 1500022.57,
+        "toAmount": 2250033.85,
+        "fixedTax": 223336.69,
+        "percentRate": 23,
+        "excessOver": 1500022.57
+      },
+      {
+        "fromAmount": 2250033.85,
+        "toAmount": 3375050.78,
+        "fixedTax": 395839.29,
+        "percentRate": 27,
+        "excessOver": 2250033.85
+      },
+      {
+        "fromAmount": 3375050.78,
+        "toAmount": 5062576.16,
+        "fixedTax": 699593.86,
+        "percentRate": 31,
+        "excessOver": 3375050.78
+      },
+      {
+        "fromAmount": 5062576.16,
+        "toAmount": null,
+        "fixedTax": 1222726.73,
+        "percentRate": 35,
+        "excessOver": 5062576.16
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 2,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 858633.75,
+      "conyuge": 808660.78,
+      "hijo": 407810.58,
+      "hijoIncapacitado": 815621.16,
+      "deduccionEspecialGeneral": 3005218.13,
+      "deduccionEspecialNuevos": 3434535,
+      "deduccionEspecialIncisoD": 4121442
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 333338.35,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 333338.35,
+        "toAmount": 666676.69,
+        "fixedTax": 16666.92,
+        "percentRate": 9,
+        "excessOver": 333338.35
+      },
+      {
+        "fromAmount": 666676.69,
+        "toAmount": 1000015.04,
+        "fixedTax": 46667.37,
+        "percentRate": 12,
+        "excessOver": 666676.69
+      },
+      {
+        "fromAmount": 1000015.04,
+        "toAmount": 1500022.57,
+        "fixedTax": 86667.97,
+        "percentRate": 15,
+        "excessOver": 1000015.04
+      },
+      {
+        "fromAmount": 1500022.57,
+        "toAmount": 3000045.13,
+        "fixedTax": 161669.1,
+        "percentRate": 19,
+        "excessOver": 1500022.57
+      },
+      {
+        "fromAmount": 3000045.13,
+        "toAmount": 4500067.7,
+        "fixedTax": 446673.39,
+        "percentRate": 23,
+        "excessOver": 3000045.13
+      },
+      {
+        "fromAmount": 4500067.7,
+        "toAmount": 6750101.55,
+        "fixedTax": 791678.58,
+        "percentRate": 27,
+        "excessOver": 4500067.7
+      },
+      {
+        "fromAmount": 6750101.55,
+        "toAmount": 10125152.33,
+        "fixedTax": 1399187.72,
+        "percentRate": 31,
+        "excessOver": 6750101.55
+      },
+      {
+        "fromAmount": 10125152.33,
+        "toAmount": null,
+        "fixedTax": 2445453.46,
+        "percentRate": 35,
+        "excessOver": 10125152.33
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 3,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 1287950.63,
+      "conyuge": 1212991.17,
+      "hijo": 611715.87,
+      "hijoIncapacitado": 1223431.74,
+      "deduccionEspecialGeneral": 4507827.19,
+      "deduccionEspecialNuevos": 5151802.5,
+      "deduccionEspecialIncisoD": 6182163.01
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 500007.52,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 500007.52,
+        "toAmount": 1000015.04,
+        "fixedTax": 25000.38,
+        "percentRate": 9,
+        "excessOver": 500007.52
+      },
+      {
+        "fromAmount": 1000015.04,
+        "toAmount": 1500022.57,
+        "fixedTax": 70001.05,
+        "percentRate": 12,
+        "excessOver": 1000015.04
+      },
+      {
+        "fromAmount": 1500022.57,
+        "toAmount": 2250033.85,
+        "fixedTax": 130001.96,
+        "percentRate": 15,
+        "excessOver": 1500022.57
+      },
+      {
+        "fromAmount": 2250033.85,
+        "toAmount": 4500067.7,
+        "fixedTax": 242503.65,
+        "percentRate": 19,
+        "excessOver": 2250033.85
+      },
+      {
+        "fromAmount": 4500067.7,
+        "toAmount": 6750101.55,
+        "fixedTax": 670010.08,
+        "percentRate": 23,
+        "excessOver": 4500067.7
+      },
+      {
+        "fromAmount": 6750101.55,
+        "toAmount": 10125152.32,
+        "fixedTax": 1187517.87,
+        "percentRate": 27,
+        "excessOver": 6750101.55
+      },
+      {
+        "fromAmount": 10125152.32,
+        "toAmount": 15187728.49,
+        "fixedTax": 2098781.58,
+        "percentRate": 31,
+        "excessOver": 10125152.32
+      },
+      {
+        "fromAmount": 15187728.49,
+        "toAmount": null,
+        "fixedTax": 3668180.18,
+        "percentRate": 35,
+        "excessOver": 15187728.49
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 4,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 1717267.5,
+      "conyuge": 1617321.55,
+      "hijo": 815621.16,
+      "hijoIncapacitado": 1631243.32,
+      "deduccionEspecialGeneral": 6010436.25,
+      "deduccionEspecialNuevos": 6869070,
+      "deduccionEspecialIncisoD": 8242884.01
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 666676.7,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 666676.7,
+        "toAmount": 1333353.39,
+        "fixedTax": 33333.83,
+        "percentRate": 9,
+        "excessOver": 666676.7
+      },
+      {
+        "fromAmount": 1333353.39,
+        "toAmount": 2000030.09,
+        "fixedTax": 93334.74,
+        "percentRate": 12,
+        "excessOver": 1333353.39
+      },
+      {
+        "fromAmount": 2000030.09,
+        "toAmount": 3000045.13,
+        "fixedTax": 173335.94,
+        "percentRate": 15,
+        "excessOver": 2000030.09
+      },
+      {
+        "fromAmount": 3000045.13,
+        "toAmount": 6000090.27,
+        "fixedTax": 323338.2,
+        "percentRate": 19,
+        "excessOver": 3000045.13
+      },
+      {
+        "fromAmount": 6000090.27,
+        "toAmount": 9000135.4,
+        "fixedTax": 893346.77,
+        "percentRate": 23,
+        "excessOver": 6000090.27
+      },
+      {
+        "fromAmount": 9000135.4,
+        "toAmount": 13500203.1,
+        "fixedTax": 1583357.15,
+        "percentRate": 27,
+        "excessOver": 9000135.4
+      },
+      {
+        "fromAmount": 13500203.1,
+        "toAmount": 20250304.65,
+        "fixedTax": 2798375.43,
+        "percentRate": 31,
+        "excessOver": 13500203.1
+      },
+      {
+        "fromAmount": 20250304.65,
+        "toAmount": null,
+        "fixedTax": 4890906.91,
+        "percentRate": 35,
+        "excessOver": 20250304.65
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 5,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 2146584.38,
+      "conyuge": 2021651.94,
+      "hijo": 1019526.45,
+      "hijoIncapacitado": 2039052.9,
+      "deduccionEspecialGeneral": 7513045.32,
+      "deduccionEspecialNuevos": 8586337.5,
+      "deduccionEspecialIncisoD": 10303605.01
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 833345.87,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 833345.87,
+        "toAmount": 1666691.74,
+        "fixedTax": 41667.29,
+        "percentRate": 9,
+        "excessOver": 833345.87
+      },
+      {
+        "fromAmount": 1666691.74,
+        "toAmount": 2500037.61,
+        "fixedTax": 116668.42,
+        "percentRate": 12,
+        "excessOver": 1666691.74
+      },
+      {
+        "fromAmount": 2500037.61,
+        "toAmount": 3750056.42,
+        "fixedTax": 216669.93,
+        "percentRate": 15,
+        "excessOver": 2500037.61
+      },
+      {
+        "fromAmount": 3750056.42,
+        "toAmount": 7500112.83,
+        "fixedTax": 404172.75,
+        "percentRate": 19,
+        "excessOver": 3750056.42
+      },
+      {
+        "fromAmount": 7500112.83,
+        "toAmount": 11250169.25,
+        "fixedTax": 1116683.47,
+        "percentRate": 23,
+        "excessOver": 7500112.83
+      },
+      {
+        "fromAmount": 11250169.25,
+        "toAmount": 16875253.88,
+        "fixedTax": 1979196.44,
+        "percentRate": 27,
+        "excessOver": 11250169.25
+      },
+      {
+        "fromAmount": 16875253.88,
+        "toAmount": 25312880.82,
+        "fixedTax": 3497969.29,
+        "percentRate": 31,
+        "excessOver": 16875253.88
+      },
+      {
+        "fromAmount": 25312880.82,
+        "toAmount": null,
+        "fixedTax": 6113633.64,
+        "percentRate": 35,
+        "excessOver": 25312880.82
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 6,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 2575901.25,
+      "conyuge": 2425982.33,
+      "hijo": 1223431.74,
+      "hijoIncapacitado": 2446863.48,
+      "deduccionEspecialGeneral": 9015654.38,
+      "deduccionEspecialNuevos": 10303605.01,
+      "deduccionEspecialIncisoD": 12364326.01
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 1000015.05,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 1000015.05,
+        "toAmount": 2000030.09,
+        "fixedTax": 50000.75,
+        "percentRate": 9,
+        "excessOver": 1000015.05
+      },
+      {
+        "fromAmount": 2000030.09,
+        "toAmount": 3000045.13,
+        "fixedTax": 140002.11,
+        "percentRate": 12,
+        "excessOver": 2000030.09
+      },
+      {
+        "fromAmount": 3000045.13,
+        "toAmount": 4500067.7,
+        "fixedTax": 260003.91,
+        "percentRate": 15,
+        "excessOver": 3000045.13
+      },
+      {
+        "fromAmount": 4500067.7,
+        "toAmount": 9000135.4,
+        "fixedTax": 485007.3,
+        "percentRate": 19,
+        "excessOver": 4500067.7
+      },
+      {
+        "fromAmount": 9000135.4,
+        "toAmount": 13500203.1,
+        "fixedTax": 1340020.16,
+        "percentRate": 23,
+        "excessOver": 9000135.4
+      },
+      {
+        "fromAmount": 13500203.1,
+        "toAmount": 20250304.65,
+        "fixedTax": 2375035.73,
+        "percentRate": 27,
+        "excessOver": 13500203.1
+      },
+      {
+        "fromAmount": 20250304.65,
+        "toAmount": 30375456.98,
+        "fixedTax": 4197563.15,
+        "percentRate": 31,
+        "excessOver": 20250304.65
+      },
+      {
+        "fromAmount": 30375456.98,
+        "toAmount": null,
+        "fixedTax": 7336360.37,
+        "percentRate": 35,
+        "excessOver": 30375456.98
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 7,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 3005218.13,
+      "conyuge": 2830312.72,
+      "hijo": 1427337.03,
+      "hijoIncapacitado": 2854674.06,
+      "deduccionEspecialGeneral": 10518263.44,
+      "deduccionEspecialNuevos": 12020872.51,
+      "deduccionEspecialIncisoD": 14425047.01
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 1166684.22,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 1166684.22,
+        "toAmount": 2333368.43,
+        "fixedTax": 58334.21,
+        "percentRate": 9,
+        "excessOver": 1166684.22
+      },
+      {
+        "fromAmount": 2333368.43,
+        "toAmount": 3500052.65,
+        "fixedTax": 163335.79,
+        "percentRate": 12,
+        "excessOver": 2333368.43
+      },
+      {
+        "fromAmount": 3500052.65,
+        "toAmount": 5250078.98,
+        "fixedTax": 303337.9,
+        "percentRate": 15,
+        "excessOver": 3500052.65
+      },
+      {
+        "fromAmount": 5250078.98,
+        "toAmount": 10500157.97,
+        "fixedTax": 565841.84,
+        "percentRate": 19,
+        "excessOver": 5250078.98
+      },
+      {
+        "fromAmount": 10500157.97,
+        "toAmount": 15750236.95,
+        "fixedTax": 1563356.85,
+        "percentRate": 23,
+        "excessOver": 10500157.97
+      },
+      {
+        "fromAmount": 15750236.95,
+        "toAmount": 23625355.43,
+        "fixedTax": 2770875.02,
+        "percentRate": 27,
+        "excessOver": 15750236.95
+      },
+      {
+        "fromAmount": 23625355.43,
+        "toAmount": 35438033.14,
+        "fixedTax": 4897157.01,
+        "percentRate": 31,
+        "excessOver": 23625355.43
+      },
+      {
+        "fromAmount": 35438033.14,
+        "toAmount": null,
+        "fixedTax": 8559087.1,
+        "percentRate": 35,
+        "excessOver": 35438033.14
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 8,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 3434535,
+      "conyuge": 3234643.11,
+      "hijo": 1631242.32,
+      "hijoIncapacitado": 3262484.64,
+      "deduccionEspecialGeneral": 12020872.51,
+      "deduccionEspecialNuevos": 13738140.01,
+      "deduccionEspecialIncisoD": 16485768.01
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 1333353.39,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 1333353.39,
+        "toAmount": 2666706.78,
+        "fixedTax": 66667.67,
+        "percentRate": 9,
+        "excessOver": 1333353.39
+      },
+      {
+        "fromAmount": 2666706.78,
+        "toAmount": 4000060.17,
+        "fixedTax": 186669.47,
+        "percentRate": 12,
+        "excessOver": 2666706.78
+      },
+      {
+        "fromAmount": 4000060.17,
+        "toAmount": 6000090.27,
+        "fixedTax": 346671.88,
+        "percentRate": 15,
+        "excessOver": 4000060.17
+      },
+      {
+        "fromAmount": 6000090.27,
+        "toAmount": 12000180.53,
+        "fixedTax": 646676.39,
+        "percentRate": 19,
+        "excessOver": 6000090.27
+      },
+      {
+        "fromAmount": 12000180.53,
+        "toAmount": 18000270.8,
+        "fixedTax": 1786693.55,
+        "percentRate": 23,
+        "excessOver": 12000180.53
+      },
+      {
+        "fromAmount": 18000270.8,
+        "toAmount": 27000406.2,
+        "fixedTax": 3166714.31,
+        "percentRate": 27,
+        "excessOver": 18000270.8
+      },
+      {
+        "fromAmount": 27000406.2,
+        "toAmount": 40500609.31,
+        "fixedTax": 5596750.87,
+        "percentRate": 31,
+        "excessOver": 27000406.2
+      },
+      {
+        "fromAmount": 40500609.31,
+        "toAmount": null,
+        "fixedTax": 9781813.83,
+        "percentRate": 35,
+        "excessOver": 40500609.31
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 9,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 3863851.88,
+      "conyuge": 3638973.5,
+      "hijo": 1835147.61,
+      "hijoIncapacitado": 3670295.22,
+      "deduccionEspecialGeneral": 13523481.57,
+      "deduccionEspecialNuevos": 15455407.51,
+      "deduccionEspecialIncisoD": 18546489.02
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 1500022.57,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 1500022.57,
+        "toAmount": 3000045.13,
+        "fixedTax": 75001.13,
+        "percentRate": 9,
+        "excessOver": 1500022.57
+      },
+      {
+        "fromAmount": 3000045.13,
+        "toAmount": 4500067.7,
+        "fixedTax": 210003.16,
+        "percentRate": 12,
+        "excessOver": 3000045.13
+      },
+      {
+        "fromAmount": 4500067.7,
+        "toAmount": 6750101.55,
+        "fixedTax": 390005.87,
+        "percentRate": 15,
+        "excessOver": 4500067.7
+      },
+      {
+        "fromAmount": 6750101.55,
+        "toAmount": 13500203.1,
+        "fixedTax": 727510.94,
+        "percentRate": 19,
+        "excessOver": 6750101.55
+      },
+      {
+        "fromAmount": 13500203.1,
+        "toAmount": 20250304.65,
+        "fixedTax": 2010030.24,
+        "percentRate": 23,
+        "excessOver": 13500203.1
+      },
+      {
+        "fromAmount": 20250304.65,
+        "toAmount": 30375456.98,
+        "fixedTax": 3562553.6,
+        "percentRate": 27,
+        "excessOver": 20250304.65
+      },
+      {
+        "fromAmount": 30375456.98,
+        "toAmount": 45563185.47,
+        "fixedTax": 6296344.73,
+        "percentRate": 31,
+        "excessOver": 30375456.98
+      },
+      {
+        "fromAmount": 45563185.47,
+        "toAmount": null,
+        "fixedTax": 11004540.56,
+        "percentRate": 35,
+        "excessOver": 45563185.47
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 10,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 4293168.75,
+      "conyuge": 4043303.88,
+      "hijo": 2039052.9,
+      "hijoIncapacitado": 4078105.8,
+      "deduccionEspecialGeneral": 15026090.63,
+      "deduccionEspecialNuevos": 17172675.01,
+      "deduccionEspecialIncisoD": 20607210.02
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 1666691.74,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 1666691.74,
+        "toAmount": 3333383.47,
+        "fixedTax": 83334.58,
+        "percentRate": 9,
+        "excessOver": 1666691.74
+      },
+      {
+        "fromAmount": 3333383.47,
+        "toAmount": 5000075.22,
+        "fixedTax": 233336.84,
+        "percentRate": 12,
+        "excessOver": 3333383.47
+      },
+      {
+        "fromAmount": 5000075.22,
+        "toAmount": 7500112.83,
+        "fixedTax": 433339.85,
+        "percentRate": 15,
+        "excessOver": 5000075.22
+      },
+      {
+        "fromAmount": 7500112.83,
+        "toAmount": 15000225.67,
+        "fixedTax": 808345.49,
+        "percentRate": 19,
+        "excessOver": 7500112.83
+      },
+      {
+        "fromAmount": 15000225.67,
+        "toAmount": 22500338.5,
+        "fixedTax": 2233366.93,
+        "percentRate": 23,
+        "excessOver": 15000225.67
+      },
+      {
+        "fromAmount": 22500338.5,
+        "toAmount": 33750507.75,
+        "fixedTax": 3958392.88,
+        "percentRate": 27,
+        "excessOver": 22500338.5
+      },
+      {
+        "fromAmount": 33750507.75,
+        "toAmount": 50625761.63,
+        "fixedTax": 6995938.58,
+        "percentRate": 31,
+        "excessOver": 33750507.75
+      },
+      {
+        "fromAmount": 50625761.63,
+        "toAmount": null,
+        "fixedTax": 12227267.28,
+        "percentRate": 35,
+        "excessOver": 50625761.63
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 11,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 4722485.63,
+      "conyuge": 4447634.27,
+      "hijo": 2242958.19,
+      "hijoIncapacitado": 4485916.38,
+      "deduccionEspecialGeneral": 16528699.7,
+      "deduccionEspecialNuevos": 18889942.51,
+      "deduccionEspecialIncisoD": 22667931.02
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 1833360.92,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 1833360.92,
+        "toAmount": 3666721.82,
+        "fixedTax": 91668.04,
+        "percentRate": 9,
+        "excessOver": 1833360.92
+      },
+      {
+        "fromAmount": 3666721.82,
+        "toAmount": 5500082.74,
+        "fixedTax": 256670.53,
+        "percentRate": 12,
+        "excessOver": 3666721.82
+      },
+      {
+        "fromAmount": 5500082.74,
+        "toAmount": 8250124.12,
+        "fixedTax": 476673.84,
+        "percentRate": 15,
+        "excessOver": 5500082.74
+      },
+      {
+        "fromAmount": 8250124.12,
+        "toAmount": 16500248.23,
+        "fixedTax": 889180.04,
+        "percentRate": 19,
+        "excessOver": 8250124.12
+      },
+      {
+        "fromAmount": 16500248.23,
+        "toAmount": 24750372.35,
+        "fixedTax": 2456703.63,
+        "percentRate": 23,
+        "excessOver": 16500248.23
+      },
+      {
+        "fromAmount": 24750372.35,
+        "toAmount": 37125558.53,
+        "fixedTax": 4354232.17,
+        "percentRate": 27,
+        "excessOver": 24750372.35
+      },
+      {
+        "fromAmount": 37125558.53,
+        "toAmount": 55688337.8,
+        "fixedTax": 7695532.44,
+        "percentRate": 31,
+        "excessOver": 37125558.53
+      },
+      {
+        "fromAmount": 55688337.8,
+        "toAmount": null,
+        "fixedTax": 13449994.01,
+        "percentRate": 35,
+        "excessOver": 55688337.8
+      }
+    ]
+  },
+  {
+    "year": 2026,
+    "month": 12,
+    "sourcePeriod": "2026-S1 official values projected monthly for yearly accumulation",
+    "sourceUrlArt30": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-2026.pdf",
+    "sourceUrlArt94": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-2026.pdf",
+    "publishedAt": "2026-01-01",
+    "deducciones": {
+      "gananciaNoImponible": 5151802.5,
+      "conyuge": 4851964.66,
+      "hijo": 2446863.48,
+      "hijoIncapacitado": 4893726.96,
+      "deduccionEspecialGeneral": 18031308.76,
+      "deduccionEspecialNuevos": 20607210.01,
+      "deduccionEspecialIncisoD": 24728652.02
+    },
+    "escala": [
+      {
+        "fromAmount": 0,
+        "toAmount": 2000030.09,
+        "fixedTax": 0,
+        "percentRate": 5,
+        "excessOver": 0
+      },
+      {
+        "fromAmount": 2000030.09,
+        "toAmount": 4000060.17,
+        "fixedTax": 100001.5,
+        "percentRate": 9,
+        "excessOver": 2000030.09
+      },
+      {
+        "fromAmount": 4000060.17,
+        "toAmount": 6000090.26,
+        "fixedTax": 280004.21,
+        "percentRate": 12,
+        "excessOver": 4000060.17
+      },
+      {
+        "fromAmount": 6000090.26,
+        "toAmount": 9000135.4,
+        "fixedTax": 520007.82,
+        "percentRate": 15,
+        "excessOver": 6000090.26
+      },
+      {
+        "fromAmount": 9000135.4,
+        "toAmount": 18000270.8,
+        "fixedTax": 970014.59,
+        "percentRate": 19,
+        "excessOver": 9000135.4
+      },
+      {
+        "fromAmount": 18000270.8,
+        "toAmount": 27000406.2,
+        "fixedTax": 2680040.32,
+        "percentRate": 23,
+        "excessOver": 18000270.8
+      },
+      {
+        "fromAmount": 27000406.2,
+        "toAmount": 40500609.3,
+        "fixedTax": 4750071.46,
+        "percentRate": 27,
+        "excessOver": 27000406.2
+      },
+      {
+        "fromAmount": 40500609.3,
+        "toAmount": 60750913.96,
+        "fixedTax": 8395126.3,
+        "percentRate": 31,
+        "excessOver": 40500609.3
+      },
+      {
+        "fromAmount": 60750913.96,
+        "toAmount": null,
+        "fixedTax": 14672720.74,
+        "percentRate": 35,
+        "excessOver": 60750913.96
+      }
+    ]
+  }
+]

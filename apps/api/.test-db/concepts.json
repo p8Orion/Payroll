@@ -229,8 +229,8 @@
     "name": "Sueldo básico",
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
-    "f1359FieldId": "REG07_CAMPO11",
-    "formula": "VALOR_FIJO(\"Básico\")",
+    "f1359FieldId": "REG03_CAMPO03",
+    "formula": "VALOR_FIJO(\"Básico\") CONSTANTE(\"20.000.000\")",
     "tags": [
       "base-tarea-profesional",
       "base-tareas-peligrosas",
@@ -306,7 +306,7 @@
     "name": "Jubilación Ley 18037",
     "conceptClass": "definitivo",
     "conceptType": "descuentos",
-    "f1359FieldId": "",
+    "f1359FieldId": "REG05_CAMPO03",
     "formula": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")",
     "tags": [
       "descuentos"
@@ -422,18 +422,6 @@
     ]
   },
   {
-    "id": 961,
-    "code": "DEF_961",
-    "name": "Concepto definitivo 961",
-    "conceptClass": "definitivo",
-    "conceptType": "remunerativo",
-    "f1359FieldId": "",
-    "formula": "",
-    "tags": [
-      "remunerativo"
-    ]
-  },
-  {
     "id": 100,
     "code": "BASICO",
     "name": "Sueldo Basico",
@@ -470,6 +458,18 @@
     "tags": [
       "base",
       "remunerativo"
+    ]
+  },
+  {
+    "id": 962,
+    "code": "DEF_962",
+    "name": "Concepto definitivo 962",
+    "conceptClass": "definitivo",
+    "conceptType": "descuentos",
+    "f1359FieldId": "",
+    "formula": "GANANCIAS()",
+    "tags": [
+      "descuentos"
     ]
   }
 ]

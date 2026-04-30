@@ -55,6 +55,7 @@ import {
   LiquidationType,
   getConceptTypeDefinition,
   ReceiptModel,
+  GananciasTableModel,
   TagAggregationOp
 } from "./model/types";
 import {
@@ -130,6 +131,7 @@ export function App() {
   const [composiciones, setComposiciones] = useState<ComposicionSalarialModel[]>([]);
   const [liquidacionesHistory, setLiquidacionesHistory] = useState<HistoricalLiquidacionRecord[]>([]);
   const [f1359Fields, setF1359Fields] = useState<F1359FieldModel[]>([]);
+  const [gananciasTables, setGananciasTables] = useState<GananciasTableModel[]>([]);
   const [conceptsLoaded, setConceptsLoaded] = useState(false);
   const [legajosLoaded, setLegajosLoaded] = useState(false);
   const { dragSourceRef: formulaDragSourceRef, setRootDragSource, setNestedDragSource } =
@@ -198,7 +200,8 @@ export function App() {
     setF1359Fields,
     receiptF1359Filter,
     receiptTagFilter,
-    setLiquidacionesHistory
+    setLiquidacionesHistory,
+    setGananciasTables
   });
   const {
     allTags,
@@ -229,6 +232,7 @@ export function App() {
     formulaErrorById,
     cycleConceptIds,
     previewValueById,
+    gananciasTrace,
     formatPreviewAmount,
     actions: {
       reorderDefinitivo,
@@ -256,6 +260,7 @@ export function App() {
     legajos,
     composiciones,
     liquidacionesHistory,
+    gananciasTables,
     f1359Fields,
     receiptConvenioFilter,
     receiptLiquidationTypeFilter,
@@ -382,6 +387,7 @@ export function App() {
             dagOrderById={dagOrderById}
             formatPreviewAmount={formatPreviewAmount}
             previewValueById={previewValueById}
+            gananciasTrace={gananciasTrace}
             addTransitory={addTransitory}
             transitoriosEnReciboFiltrados={transitoriosEnReciboFiltrados}
             conceptCodeDraft={conceptCodeDraft}
