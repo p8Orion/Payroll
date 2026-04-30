@@ -25,6 +25,7 @@ import { FormulaEditorSection } from "./features/formula-editor/FormulaEditorSec
 import { FormulaToolsPanel } from "./features/formula-editor/FormulaToolsPanel";
 import { LegajoModel, LegajosPage } from "./features/legajos/LegajosPage";
 import { LiquidacionesPage } from "./features/liquidaciones/LiquidacionesPage";
+import { F1359InfoPage, HistoricalLiquidacionRecord } from "./features/informacion/F1359InfoPage";
 import {
   ComposicionSalarialModel,
   ComposicionesSalarialesPage
@@ -73,18 +74,6 @@ interface ApiF1359Field {
   longitud: number;
 }
 
-interface HistoricalLiquidacionRecord {
-  liquidationType: LiquidationType;
-  estado?: "Generada" | "Anulada";
-  month: number;
-  year: number;
-  createdAt?: string;
-  legajos: Array<{
-    legajoId: string;
-    conceptos: Array<{ conceptId?: number; conceptCode?: string; value: unknown }>;
-  }>;
-}
-
 const apiBaseUrl = "http://localhost:3001";
 const legacyReceiptsStorageKey = "rrsh.receipts.v1";
 const receiptF1359FilterStorageKey = "rrsh.receipt-f1359-filter.v1";
@@ -93,6 +82,7 @@ const maxHistoryEntries = 200;
 const defaultConvenios = ["Luz y Fuerza", "Apuaye", "Comercio"];
 const genericDefaultConvenio = "(Por defecto)";
 const filterAllOption = "(Todos)";
+const annualAllLiquidationTypes = "(Todos)";
 const simulationMonthOptions = [
   { value: 1, label: "Enero" },
   { value: 2, label: "Febrero" },
@@ -260,6 +250,7 @@ async function persistConcept(concept: ConceptModel): Promise<void> {
 export function App() {
   const [menu, setMenu] = useState("conceptos");
   const [liquidacionesMenuOpen, setLiquidacionesMenuOpen] = useState(false);
+  const [informacionMenuOpen, setInformacionMenuOpen] = useState(false);
   const [concepts, setConcepts] = useState<ConceptModel[]>(initialConcepts);
   const defaultReceiptOrder = useMemo(() => [] as number[], []);
   const [receipts, setReceipts] = useState<ReceiptModel[]>(() =>
@@ -299,6 +290,7 @@ export function App() {
   const [legajosLoaded, setLegajosLoaded] = useState(false);
   const appearanceRef = useRef<HTMLDivElement | null>(null);
   const liquidacionesMenuRef = useRef<HTMLDivElement | null>(null);
+  const informacionMenuRef = useRef<HTMLDivElement | null>(null);
   const membershipTypeComboRef = useRef<HTMLDivElement | null>(null);
   const membershipConvenioComboRef = useRef<HTMLDivElement | null>(null);
   const [tagModal, setTagModal] = useState<{
@@ -614,6 +606,38 @@ export function App() {
     }
     return 0;
   };
+  const resolveSumaAnualValue = (rawArgs: string): number => {
+    const [rawConcept = "", rawType = ""] = rawArgs.split("@@");
+    const conceptRef = resolveMesAnteriorConceptRef(rawConcept);
+    const liquidationType = resolveLiteralArg(rawType);
+    const legajoId = (simLegajo?.id ?? "").trim();
+    if (!legajoId) return 0;
+    const inYear = liquidacionesHistory.filter(
+      (item) =>
+        item.estado !== "Anulada" &&
+        item.year === simYear &&
+        (liquidationType === annualAllLiquidationTypes || item.liquidationType === liquidationType)
+    );
+    if (!inYear.length) return 0;
+    const latestByKey = new Map<string, HistoricalLiquidacionRecord>();
+    for (const liq of inYear) {
+      const key = `${liq.year}-${liq.month}-${liq.liquidationType}`;
+      const prev = latestByKey.get(key);
+      if (!prev || (liq.createdAt ?? "") > (prev.createdAt ?? "")) latestByKey.set(key, liq);
+    }
+    let sum = 0;
+    for (const liq of latestByKey.values()) {
+      const legajoRow = liq.legajos.find((row) => row.legajoId === legajoId);
+      if (!legajoRow) continue;
+      const found = legajoRow.conceptos.find((row) => {
+        if (conceptRef.conceptId !== undefined && row.conceptId === conceptRef.conceptId) return true;
+        if (conceptRef.conceptCode && row.conceptCode === conceptRef.conceptCode) return true;
+        return false;
+      });
+      if (found) sum += toNumericOrZero(found.value);
+    }
+    return sum;
+  };
   const getAnterioresByType = (
     conceptId: number,
     conceptType: ConceptTypeId,
@@ -751,6 +775,9 @@ export function App() {
       })
       .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
         String(resolveMesAnteriorValue(rawArgs))
+      )
+      .replace(/SUMA_ANUAL_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+        String(resolveSumaAnualValue(rawArgs))
       )
       .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) => String(getValorLegajo(concepto, "")))
       .replace(/VALOR_LEGAJO\("([^"]*)"\)/g, (_, concepto: string) => String(getValorLegajo(concepto, "")))
@@ -965,6 +992,9 @@ export function App() {
             })
             .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
               String(resolveMesAnteriorValue(rawArgs))
+            )
+            .replace(/SUMA_ANUAL_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+              String(resolveSumaAnualValue(rawArgs))
             )
             .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
               String(getValorLegajo(concepto, concept.code))
@@ -1361,6 +1391,9 @@ export function App() {
           .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
             String(resolveMesAnteriorValue(rawArgs))
           )
+          .replace(/SUMA_ANUAL_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+            String(resolveSumaAnualValue(rawArgs))
+          )
           .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
             String(getValorLegajo(concepto, concept.code))
           )
@@ -1543,6 +1576,9 @@ export function App() {
           })
           .replace(/MES_ANTERIOR_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
             String(resolveMesAnteriorValue(rawArgs))
+          )
+          .replace(/SUMA_ANUAL_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+            String(resolveSumaAnualValue(rawArgs))
           )
           .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, concepto: string) =>
             String(getValorLegajo(concepto, concept.code))
@@ -1962,6 +1998,17 @@ export function App() {
   }, [liquidacionesMenuOpen]);
 
   useEffect(() => {
+    if (!informacionMenuOpen) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (!informacionMenuRef.current) return;
+      if (informacionMenuRef.current.contains(event.target as Node)) return;
+      setInformacionMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [informacionMenuOpen]);
+
+  useEffect(() => {
     if (!membershipTypeDropdownOpen && !membershipConvenioDropdownOpen) return;
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -2377,6 +2424,7 @@ export function App() {
                   onClick={() => {
                     setMenu("conceptos");
                     setLiquidacionesMenuOpen(false);
+                    setInformacionMenuOpen(false);
                   }}
                 >
                   Conceptos
@@ -2386,6 +2434,7 @@ export function App() {
                   onClick={() => {
                     setMenu("composiciones");
                     setLiquidacionesMenuOpen(false);
+                    setInformacionMenuOpen(false);
                   }}
                 >
                   Composiciones Salariales
@@ -2395,6 +2444,7 @@ export function App() {
                   onClick={() => {
                     setMenu("novedades");
                     setLiquidacionesMenuOpen(false);
+                    setInformacionMenuOpen(false);
                   }}
                 >
                   Novedades
@@ -2404,9 +2454,32 @@ export function App() {
                   onClick={() => {
                     setMenu("liquidaciones");
                     setLiquidacionesMenuOpen(false);
+                    setInformacionMenuOpen(false);
                   }}
                 >
                   Liquidacion
+                </button>
+              </div>
+            ) : null}
+          </div>
+          <div className="topbar-dropdown" ref={informacionMenuRef}>
+            <button
+              className={menu === "informacion-f1359" ? "menu active" : "menu"}
+              onClick={() => setInformacionMenuOpen((prev) => !prev)}
+            >
+              Informacion
+            </button>
+            {informacionMenuOpen ? (
+              <div className="topbar-dropdown-menu">
+                <button
+                  className={menu === "informacion-f1359" ? "topbar-dropdown-item active" : "topbar-dropdown-item"}
+                  onClick={() => {
+                    setMenu("informacion-f1359");
+                    setInformacionMenuOpen(false);
+                    setLiquidacionesMenuOpen(false);
+                  }}
+                >
+                  F1359
                 </button>
               </div>
             ) : null}
@@ -2440,6 +2513,13 @@ export function App() {
             receipts={receipts}
             legajos={legajos}
             composiciones={composiciones}
+          />
+        ) : menu === "informacion-f1359" ? (
+          <F1359InfoPage
+            concepts={concepts}
+            legajos={legajos}
+            liquidaciones={liquidacionesHistory}
+            f1359Fields={f1359Fields}
           />
         ) : menu !== "conceptos" ? (
           <section className="placeholder">
@@ -2516,7 +2596,7 @@ export function App() {
                 </div>
               </div>
               <div
-                className="receipt-toolbar"
+                className="receipt-toolbar receipt-simulation-toolbar"
                 style={{ marginTop: 8, borderTop: "1px dashed #d5deee", paddingTop: 10 }}
               >
                 <div>

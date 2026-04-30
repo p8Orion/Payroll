@@ -23,6 +23,20 @@ interface LiquidacionesPageProps {
 
 const apiBaseUrl = "http://localhost:3001";
 const virtualAllConvenio = "(Todos)";
+const monthOptions = [
+  { value: 1, label: "Enero" },
+  { value: 2, label: "Febrero" },
+  { value: 3, label: "Marzo" },
+  { value: 4, label: "Abril" },
+  { value: 5, label: "Mayo" },
+  { value: 6, label: "Junio" },
+  { value: 7, label: "Julio" },
+  { value: 8, label: "Agosto" },
+  { value: 9, label: "Septiembre" },
+  { value: 10, label: "Octubre" },
+  { value: 11, label: "Noviembre" },
+  { value: 12, label: "Diciembre" }
+] as const;
 
 function normalizeConvenio(value: string | undefined): string {
   return (value ?? "").trim().toLowerCase();
@@ -384,9 +398,9 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
             <label>Mes</label>
             <select value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}>
               <option value="Todos">Todos</option>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <option key={month} value={String(month)}>
-                  {month}
+              {monthOptions.map((month) => (
+                <option key={month.value} value={String(month.value)}>
+                  {month.label}
                 </option>
               ))}
             </select>
@@ -611,13 +625,16 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
               </div>
               <div>
                 <label>Mes</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
+                <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(Number(e.target.value || 1))}
-                />
+                >
+                  {monthOptions.map((month) => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label>Año</label>

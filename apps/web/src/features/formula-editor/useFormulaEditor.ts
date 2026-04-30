@@ -118,11 +118,13 @@ export function useFormulaEditor({
     insertTokenAt(token(formatConstDisplayValue(value), buildConstExpression(value), "function"), index);
   };
 
-  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR", index: number) => {
+  const insertBlockTemplateAt = (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR" | "SUMA_ANUAL", index: number) => {
     const current = [...selectedFormulaTokens];
     const expr =
       name === "MES_ANTERIOR"
         ? serializeFunctionBlock(name, ["", buildConstExpression("Normal"), buildConstExpression("0")])
+        : name === "SUMA_ANUAL"
+          ? serializeFunctionBlock(name, ["", buildConstExpression("Normal")])
         : serializeFunctionBlock(name, Array(getFunctionBlockArity(name)).fill(""));
     current.splice(index, 0, token(name, expr, "block"));
     updateFormulaTokens(current);
@@ -179,10 +181,13 @@ export function useFormulaEditor({
       fnTemplate === "SI" ||
       fnTemplate === "BLOQUE" ||
       fnTemplate === "TOPE" ||
-      fnTemplate === "MES_ANTERIOR"
+      fnTemplate === "MES_ANTERIOR" ||
+      fnTemplate === "SUMA_ANUAL"
     ) {
       return fnTemplate === "MES_ANTERIOR"
         ? serializeFunctionBlock(fnTemplate, ["", buildConstExpression("Normal"), buildConstExpression("0")])
+        : fnTemplate === "SUMA_ANUAL"
+          ? serializeFunctionBlock(fnTemplate, ["", buildConstExpression("Normal")])
         : serializeFunctionBlock(fnTemplate, Array(getFunctionBlockArity(fnTemplate)).fill(""));
     }
     return "";
@@ -241,6 +246,7 @@ export function useFormulaEditor({
       fnTemplate === "BLOQUE" ||
       fnTemplate === "TOPE" ||
       fnTemplate === "MES_ANTERIOR" ||
+      fnTemplate === "SUMA_ANUAL" ||
       fnTemplate === "CONSTANTE" ||
       fnTemplate.startsWith("MATH:")
     ) {
@@ -251,17 +257,20 @@ export function useFormulaEditor({
           fnTemplate === "SI" ||
           fnTemplate === "BLOQUE" ||
           fnTemplate === "TOPE" ||
-          fnTemplate === "MES_ANTERIOR"
+          fnTemplate === "MES_ANTERIOR" ||
+          fnTemplate === "SUMA_ANUAL"
         ) {
           const defaultArgs =
             fnTemplate === "MES_ANTERIOR"
               ? ["", buildConstExpression("Normal"), buildConstExpression("0")]
+              : fnTemplate === "SUMA_ANUAL"
+                ? ["", buildConstExpression("Normal")]
               : Array(getFunctionBlockArity(fnTemplate)).fill("");
           next.splice(
             safeInsertAt,
             0,
             token(
-              fnTemplate as "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR",
+              fnTemplate as "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR" | "SUMA_ANUAL",
               serializeFunctionBlock(fnTemplate, defaultArgs),
               "block"
             )
@@ -340,6 +349,7 @@ export function useFormulaEditor({
       ifTemplate === "BLOQUE" ||
       ifTemplate === "TOPE" ||
       ifTemplate === "MES_ANTERIOR" ||
+      ifTemplate === "SUMA_ANUAL" ||
       ifTemplate === "CONSTANTE" ||
       ifTemplate.startsWith("MATH:")
     ) {
@@ -347,9 +357,10 @@ export function useFormulaEditor({
         ifTemplate === "SI" ||
         ifTemplate === "BLOQUE" ||
         ifTemplate === "TOPE" ||
-        ifTemplate === "MES_ANTERIOR"
+        ifTemplate === "MES_ANTERIOR" ||
+        ifTemplate === "SUMA_ANUAL"
       ) {
-        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR", targetIndex);
+        insertBlockTemplateAt(ifTemplate as "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR" | "SUMA_ANUAL", targetIndex);
       } else if (ifTemplate === "CONSTANTE") {
         insertTokenAt(token("const", buildConstExpression("0"), "function"), targetIndex);
       } else {

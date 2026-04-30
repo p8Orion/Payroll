@@ -15,6 +15,10 @@ export const functionBlockTemplates = {
     blockTitle: "MES-ANTERIOR",
     branches: ["CONCEPTO", "TIPO", "MESES"] as const
   },
+  SUMA_ANUAL: {
+    blockTitle: "SUMA-ANUAL",
+    branches: ["CONCEPTO", "TIPO"] as const
+  },
   VALOR_FIJO: {
     blockTitle: "VALOR_FIJO",
     branches: ["CONCEPTO"] as const
@@ -213,6 +217,10 @@ export function expandBracketBlocksToExpressions(expression: string): string {
       const typeArg = (block.args[1] ?? "").trim();
       const monthsArg = (block.args[2] ?? "").trim();
       out += `MES_ANTERIOR_ARG[[${conceptArg}@@${typeArg}@@${monthsArg}]]`;
+    } else if (block.name === "SUMA_ANUAL") {
+      const conceptArg = (block.args[0] ?? "").trim();
+      const typeArg = (block.args[1] ?? "").trim();
+      out += `SUMA_ANUAL_ARG[[${conceptArg}@@${typeArg}]]`;
     } else {
       out += blockRaw;
     }

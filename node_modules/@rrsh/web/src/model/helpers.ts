@@ -37,7 +37,12 @@ function isSingleBracketBlockStart(expression: string, index: number): boolean {
 function parseBlockToken(value: string): FormulaToken | null {
   const parsed = parseFunctionBlock(value);
   if (!parsed) return null;
-  const label = parsed.name === "MES_ANTERIOR" ? "MES-ANTERIOR" : parsed.name;
+  const label =
+    parsed.name === "MES_ANTERIOR"
+      ? "MES-ANTERIOR"
+      : parsed.name === "SUMA_ANUAL"
+        ? "SUMA-ANUAL"
+        : parsed.name;
   return token(label, value.trim(), "block");
 }
 

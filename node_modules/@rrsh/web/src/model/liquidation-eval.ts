@@ -187,6 +187,47 @@ function resolveMesAnteriorValue(
   return 0;
 }
 
+const annualAllLiquidationTypes = "(Todos)";
+
+function resolveSumaAnualValue(
+  rawArgs: string,
+  conceptCodeById: Record<number, string>,
+  legajo: LegajoLike | null,
+  asOfYear: number,
+  liquidacionesHistory: HistoricalLiquidacionRecord[]
+): number {
+  const [rawConcept = "", rawType = ""] = rawArgs.split("@@");
+  const conceptRef = resolveMesAnteriorConceptRef(rawConcept, conceptCodeById);
+  const liquidationType = resolveLiteralArg(rawType);
+  const legajoId = (legajo?.id ?? "").trim();
+  if (!legajoId) return 0;
+  const inYear = liquidacionesHistory.filter(
+    (item) =>
+      item.estado !== "Anulada" &&
+      item.year === asOfYear &&
+      (liquidationType === annualAllLiquidationTypes || item.liquidationType === liquidationType)
+  );
+  if (!inYear.length) return 0;
+  const latestByKey = new Map<string, HistoricalLiquidacionRecord>();
+  for (const liq of inYear) {
+    const key = `${liq.year}-${liq.month}-${liq.liquidationType}`;
+    const prev = latestByKey.get(key);
+    if (!prev || (liq.createdAt ?? "") > (prev.createdAt ?? "")) latestByKey.set(key, liq);
+  }
+  let sum = 0;
+  for (const liq of latestByKey.values()) {
+    const legajoRow = liq.legajos.find((row) => row.legajoId === legajoId);
+    if (!legajoRow) continue;
+    const found = legajoRow.conceptos.find((row) => {
+      if (conceptRef.conceptId !== undefined && row.conceptId === conceptRef.conceptId) return true;
+      if (conceptRef.conceptCode && row.conceptCode === conceptRef.conceptCode) return true;
+      return false;
+    });
+    if (found) sum += toNumericOrZero(found.value);
+  }
+  return sum;
+}
+
 function resolveAntiguedadYears(
   legajo: LegajoLike | null,
   asOfMonth: number,
@@ -345,6 +386,9 @@ export function evaluateConcepts({
               liquidacionesHistory
             )
           )
+        )
+        .replace(/SUMA_ANUAL_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
+          String(resolveSumaAnualValue(rawArgs, conceptCodeById, legajo, asOfYear, liquidacionesHistory))
         )
         .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, conceptoRaw: string) =>
           String(getValorLegajo(legajo, conceptoRaw, concept.code))

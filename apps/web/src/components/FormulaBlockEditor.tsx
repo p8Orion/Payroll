@@ -9,6 +9,7 @@ import {
 import { tokenizeFormulaExpression, token, getShapeGlyph } from "../model/helpers";
 import { formatConstDisplayValue } from "../model/formula-ui";
 import { FormulaToken, LIQUIDATION_TYPES } from "../model/types";
+const annualAllLiquidationTypes = "(Todos)";
 
 interface FormulaBlockEditorProps {
   blockExpr: string;
@@ -487,7 +488,9 @@ export function FormulaBlockEditor({
           -
         </button>
       ) : null}
-      <div className="si-block-title">{parsed.name === "MES_ANTERIOR" ? "MES-ANTERIOR" : parsed.name}</div>
+      <div className="si-block-title">
+        {parsed.name === "MES_ANTERIOR" ? "MES-ANTERIOR" : parsed.name === "SUMA_ANUAL" ? "SUMA-ANUAL" : parsed.name}
+      </div>
       {parsed.name === "MES_ANTERIOR" ? (
         <>
           <div className="mes-anterior-concept-row">
@@ -538,6 +541,37 @@ export function FormulaBlockEditor({
             </label>
           </div>
         </>
+      ) : parsed.name === "SUMA_ANUAL" ? (
+        <div className="suma-anual-row">
+          <div className="suma-anual-concept">
+            {renderBranchEditor(args[0] ?? "", 0, "CONCEPTO", "slot-cond")}
+          </div>
+          <label className="mes-anterior-control suma-anual-type">
+            <strong>TIPO</strong>
+            <select
+              value={(() => {
+                const raw = (args[1] ?? "").trim();
+                const parsedType = isConstExpression(raw) ? parseConstValue(raw) : raw.replace(/^"|"$/g, "");
+                return parsedType === annualAllLiquidationTypes ||
+                  LIQUIDATION_TYPES.includes(parsedType as (typeof LIQUIDATION_TYPES)[number])
+                  ? parsedType
+                  : LIQUIDATION_TYPES[0];
+              })()}
+              onChange={(e) => {
+                const nextArgs = [...args];
+                nextArgs[1] = buildConstExpression(e.target.value);
+                onChange(serializeFunctionBlock(parsed.name, nextArgs));
+              }}
+            >
+              <option value={annualAllLiquidationTypes}>{annualAllLiquidationTypes}</option>
+              {LIQUIDATION_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       ) : parsed.name === "SI" ? (
         <>
           {Array.from({ length: Math.max(1, Math.floor((args.length - 1) / 2)) }, (_, pairIndex) => {

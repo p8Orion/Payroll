@@ -229,7 +229,7 @@
     "name": "Sueldo básico",
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
-    "f1359FieldId": "",
+    "f1359FieldId": "REG03_CAMPO03",
     "formula": "VALOR_FIJO(\"Básico\")",
     "tags": [
       "base-tarea-profesional",
@@ -405,6 +405,18 @@
     "conceptType": "remunerativo",
     "f1359FieldId": "",
     "formula": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 960,
+    "code": "DEF_960",
+    "name": "Concepto definitivo 960",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "f1359FieldId": "",
+    "formula": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]",
     "tags": [
       "remunerativo"
     ]

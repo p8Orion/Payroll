@@ -7,7 +7,7 @@ interface FormulaToolsPanelProps {
   allTags: string[];
   fixedValueKeys: string[];
   insertAt: number;
-  onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR", index: number) => void;
+  onInsertBlockTemplate: (name: "SI" | "BLOQUE" | "TOPE" | "MES_ANTERIOR" | "SUMA_ANUAL", index: number) => void;
   onInsertConst: (index: number) => void;
   onInsertAntiguedad: (index: number) => void;
   onInsertAnteriores: (index: number) => void;
@@ -77,6 +77,26 @@ export function FormulaToolsPanel({
             token(
               "MES-ANTERIOR",
               serializeFunctionBlock("MES_ANTERIOR", ["", buildConstExpression("Normal"), buildConstExpression("1")]),
+              "block"
+            )
+          )
+        );
+      }
+    },
+    {
+      label: "SUMA-ANUAL",
+      detailedLabel: "Suma anual por concepto y tipo de liquidación",
+      onClick: () => onInsertBlockTemplate("SUMA_ANUAL", insertAt),
+      onDragStart: (e: DragEvent<HTMLElement>) => {
+        e.dataTransfer.effectAllowed = "copyMove";
+        e.dataTransfer.setData("text/plain", "SUMA-ANUAL");
+        setCursorGhost(e, "SUMA-ANUAL");
+        e.dataTransfer.setData(
+          "text/token-json",
+          JSON.stringify(
+            token(
+              "SUMA-ANUAL",
+              serializeFunctionBlock("SUMA_ANUAL", ["", buildConstExpression("Normal")]),
               "block"
             )
           )
