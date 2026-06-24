@@ -53,10 +53,9 @@
     "convenio": "Luz y Fuerza",
     "liquidationType": "Normal",
     "definitiveOrder": [
-      100,
+      945,
       120,
       904,
-      945,
       958
     ],
     "transitoryOrder": [
@@ -132,7 +131,8 @@
       951,
       959,
       960,
-      962
+      962,
+      963
     ],
     "transitoryOrder": [
       936,

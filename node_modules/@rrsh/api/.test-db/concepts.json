@@ -225,12 +225,12 @@
   },
   {
     "id": 945,
-    "code": "BASI",
+    "code": "BASICO",
     "name": "Sueldo básico",
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "REG03_CAMPO03",
-    "formula": "VALOR_FIJO(\"Básico\") CONSTANTE(\"20.000.000\")",
+    "formula": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")",
     "tags": [
       "base-tarea-profesional",
       "base-tareas-peligrosas",
@@ -261,6 +261,7 @@
     "formula": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
     "tags": [
       "base-tareas-peligrosas",
+      "dfsdfsdfsfds",
       "remunerativo"
     ]
   },
@@ -386,12 +387,12 @@
   },
   {
     "id": 958,
-    "code": "DEF_958",
-    "name": "Concepto definitivo 958",
+    "code": "PC",
+    "name": "Manejo PC",
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
-    "formula": "CONSTANTE(\"111\")",
+    "formula": "[BLOQUE|CONCEPTO(945) MATH(\"*\") CONSTANTE(\"50\")] MATH(\"*\") VALOR_FIJO(\"ManejoPC\")",
     "tags": [
       "base-tarea-profesional",
       "remunerativo"
@@ -428,9 +429,10 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
-    "formula": "300000",
+    "formula": "CONCEPTO(945)",
     "tags": [
       "basico",
+      "antiguedad",
       "remunerativo"
     ]
   },
@@ -441,7 +443,7 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
-    "formula": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")",
+    "formula": "CONCEPTO(945) * PARAM(\"porc_antiguedad\")",
     "tags": [
       "antiguedad",
       "remunerativo"
@@ -462,14 +464,26 @@
   },
   {
     "id": 962,
-    "code": "DEF_962",
-    "name": "Concepto definitivo 962",
+    "code": "GCIAS",
+    "name": "Retención Impuesto a las Ganancias",
     "conceptClass": "definitivo",
     "conceptType": "descuentos",
     "f1359FieldId": "",
     "formula": "GANANCIAS()",
     "tags": [
       "descuentos"
+    ]
+  },
+  {
+    "id": 963,
+    "code": "DEF_963",
+    "name": "Concepto definitivo 963",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "f1359FieldId": "",
+    "formula": "VALOR_FIJO(\"asdasdas\")",
+    "tags": [
+      "remunerativo"
     ]
   }
 ]

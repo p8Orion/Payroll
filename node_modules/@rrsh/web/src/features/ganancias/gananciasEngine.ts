@@ -27,6 +27,10 @@ export interface GananciasTrace {
     deduccionesTablaItems: Array<{ label: string; value: number }>;
     remuneracionGravada: number;
     deduccionesConceptos: number;
+    remuneracionGravadaLiquidacionesPrevias: number;
+    remuneracionGravadaMesActual: number;
+    deduccionesConceptosLiquidacionesPrevias: number;
+    deduccionesConceptosMesActual: number;
     deduccionesTabla: number;
     deduccionesF572: number;
     baseImponible: number;
@@ -80,6 +84,10 @@ export function computeGananciasTrace(concepts: ConceptModel[], values: Map<numb
       deduccionesTablaItems: [],
       remuneracionGravada: 0,
       deduccionesConceptos: 0,
+      remuneracionGravadaLiquidacionesPrevias: 0,
+      remuneracionGravadaMesActual: 0,
+      deduccionesConceptosLiquidacionesPrevias: 0,
+      deduccionesConceptosMesActual: 0,
       remuneracionGravadaItems: [],
       deduccionesConceptosItems: [],
       deduccionesTabla: 0,
@@ -240,11 +248,16 @@ export function computeGananciasFromHistory({
 
   let remuneracionGravada = 0;
   let deduccionesConceptos = 0;
+  let remuneracionGravadaLiquidacionesPrevias = 0;
+  let remuneracionGravadaMesActual = 0;
+  let deduccionesConceptosLiquidacionesPrevias = 0;
+  let deduccionesConceptosMesActual = 0;
   let retencionesPrevias = 0;
   const remuneracionGravadaItems: Array<{ conceptId: number; conceptCode: string; conceptName: string; value: number }> = [];
   const deduccionesConceptosItems: Array<{ conceptId: number; conceptCode: string; conceptName: string; value: number }> = [];
 
   for (const row of annualRows) {
+    const isCurrentMonth = row.month === asOfMonth;
     if (row.fieldId === "REG08_CAMPO06" && row.month < asOfMonth) {
       retencionesPrevias += row.value;
       continue;
@@ -252,6 +265,8 @@ export function computeGananciasFromHistory({
     if (row.concept.conceptType === "descuentos") {
       const value = Math.abs(row.value);
       deduccionesConceptos += value;
+      if (isCurrentMonth) deduccionesConceptosMesActual += value;
+      else deduccionesConceptosLiquidacionesPrevias += value;
       deduccionesConceptosItems.push({
         conceptId: row.concept.id,
         conceptCode: row.concept.code,
@@ -262,6 +277,8 @@ export function computeGananciasFromHistory({
     }
     if (row.concept.conceptType === "remunerativo" || row.concept.conceptType === "no_remunerativo") {
       remuneracionGravada += row.value;
+      if (isCurrentMonth) remuneracionGravadaMesActual += row.value;
+      else remuneracionGravadaLiquidacionesPrevias += row.value;
       remuneracionGravadaItems.push({
         conceptId: row.concept.id,
         conceptCode: row.concept.code,
@@ -306,6 +323,10 @@ export function computeGananciasFromHistory({
     grouped: {
       remuneracionGravada,
       deduccionesConceptos,
+      remuneracionGravadaLiquidacionesPrevias,
+      remuneracionGravadaMesActual,
+      deduccionesConceptosLiquidacionesPrevias,
+      deduccionesConceptosMesActual,
       remuneracionGravadaItems,
       deduccionesConceptosItems,
       deduccionesTablaItems,

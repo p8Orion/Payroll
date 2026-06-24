@@ -1,4 +1,5 @@
 import { DragEvent, ReactNode, RefObject } from "react";
+import { conceptShapeOptions } from "../../model/constants";
 import { buildConstExpression } from "../../model/formula-ui";
 import { token, getShapeGlyph } from "../../model/helpers";
 import {
@@ -316,14 +317,12 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
                 </span>
                 <strong>{concept.code}</strong> - {concept.name}
                 <span className="concept-type-inline">{getConceptTypeDefinition(concept.conceptType).label}</span>
+                {!hidePrecalculationPreview && cycleConceptIds.has(concept.id) ? <span className="concept-error-inline">CICLO</span> : null}
+                {!hidePrecalculationPreview && formulaErrorById.get(concept.id) ? <span className="concept-error-inline">ERROR</span> : null}
                 {showReceiptConceptDetail ? (
                   <span className="concept-meta-inline">
                     {!hidePrecalculationPreview ? (
-                      <>
-                        {cycleConceptIds.has(concept.id) ? <span className="concept-error-inline">CICLO</span> : null}
-                        {formulaErrorById.get(concept.id) ? <span className="concept-error-inline">ERROR</span> : null}
-                        #{dagOrderById.get(concept.id) ?? "-"} · {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
-                      </>
+                      <>#{dagOrderById.get(concept.id) ?? "-"} · {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} · </>
                     ) : null}
                     {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
                   </span>
@@ -361,14 +360,12 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
                 </span>
                 <strong>{concept.code}</strong> - {concept.name}
                 <span className="concept-type-inline">{getConceptTypeDefinition(concept.conceptType).label}</span>
+                {!hidePrecalculationPreview && cycleConceptIds.has(concept.id) ? <span className="concept-error-inline">CICLO</span> : null}
+                {!hidePrecalculationPreview && formulaErrorById.get(concept.id) ? <span className="concept-error-inline">ERROR</span> : null}
                 {showReceiptConceptDetail ? (
                   <span className="concept-meta-inline">
                     {!hidePrecalculationPreview ? (
-                      <>
-                        {cycleConceptIds.has(concept.id) ? <span className="concept-error-inline">CICLO</span> : null}
-                        {formulaErrorById.get(concept.id) ? <span className="concept-error-inline">ERROR</span> : null}
-                        #{dagOrderById.get(concept.id) ?? "-"} · {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} ·{" "}
-                      </>
+                      <>#{dagOrderById.get(concept.id) ?? "-"} · {formatPreviewAmount(previewValueById.get(concept.id) ?? 0)} · </>
                     ) : null}
                     {(concept.tags ?? []).map((tag) => `#${tag}`).join(" ")}
                   </span>
@@ -423,22 +420,7 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
                 <div className="appearance-section">
                   <strong>Forma</strong>
                   <div className="shape-options">
-                    {(
-                      [
-                        "circle",
-                        "square",
-                        "star",
-                        "triangle",
-                        "diamond",
-                        "plus",
-                        "moon",
-                        "clover",
-                        "xmark",
-                        "exclamation",
-                        "question",
-                        "bolt"
-                      ] as Exclude<ConceptShape, "hex">[]
-                    ).map((shape) => (
+                    {conceptShapeOptions.map((shape) => (
                       <button
                         key={shape}
                         type="button"
@@ -683,7 +665,7 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
         onInsertAnteriores={(index) =>
           insertTokenAt(token("Suma de Conceptos Previos del Recibo", "ANTERIORES()", "function"), index)
         }
-        onInsertGanancias={(index) => insertTokenAt(token("Ganancias (retenido)", "GANANCIAS()", "function"), index)}
+        onInsertGanancias={(index) => insertTokenAt(token("Cálculo Impuesto a las Ganancias", "GANANCIAS()", "function"), index)}
         onInsertFixedValue={(key, index) =>
           insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)
         }

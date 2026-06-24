@@ -57,6 +57,7 @@ export function useReceiptEditorController(params: {
   tagModal: TagModalState;
   setTagModal: Dispatch<SetStateAction<TagModalState>>;
   setCursorGhost: (event: DragEvent<HTMLElement>, label: string) => void;
+  onShowGananciasInfo?: () => void;
 }) {
   const {
     concepts, setConcepts, receipts, setReceipts, legajos, composiciones, liquidacionesHistory, gananciasTables, f1359Fields,
@@ -64,7 +65,8 @@ export function useReceiptEditorController(params: {
     simLegajoId, setSimLegajoId, simMonth, simYear, conceptCodeDraft, setConceptCodeDraft, conceptNameDraft, setConceptNameDraft,
     conceptTypeDraft, setConceptTypeDraft, newTagDraft, setNewTagDraft, appearanceOpen, setAppearanceOpen, showReceiptConceptDetail,
     setShowReceiptConceptDetail, membershipTypeDropdownOpen, setMembershipTypeDropdownOpen, membershipConvenioDropdownOpen,
-    setMembershipConvenioDropdownOpen, appearanceRef, membershipTypeComboRef, membershipConvenioComboRef, tagModal, setTagModal, setCursorGhost
+    setMembershipConvenioDropdownOpen, appearanceRef, membershipTypeComboRef, membershipConvenioComboRef, tagModal, setTagModal, setCursorGhost,
+    onShowGananciasInfo
   } = params;
 
   const [editingId, setEditingId] = useState<number>(concepts.find((c) => c.conceptClass === "definitivo")?.id ?? concepts[0]?.id ?? 1);
@@ -117,7 +119,7 @@ export function useReceiptEditorController(params: {
   const receiptOrderIds = useMemo(() => [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder], [activeReceipt.definitiveOrder, activeReceipt.transitoryOrder]);
   const getValorLegajoResolved = (concepto: string, fallbackConcepto: string): number => getValorLegajo(simLegajo, composiciones, concepto, fallbackConcepto);
   const resolveMesAnteriorForSimulation = (rawArgs: string): number => resolveMesAnteriorValue(rawArgs, conceptCodeById, simLegajo, simMonth, simYear, liquidacionesHistory);
-  const resolveSumaAnualForSimulation = (rawArgs: string): number => resolveSumaAnualValue(rawArgs, conceptCodeById, simLegajo, simYear, liquidacionesHistory);
+  const resolveSumaAnualForSimulation = (rawArgs: string): number => resolveSumaAnualValue(rawArgs, conceptCodeById, simLegajo, simMonth, simYear, liquidacionesHistory);
   const getAntiguedadYears = (): number => resolveAntiguedadYears(simLegajo, simMonth, simYear);
   const getAnterioresByType = (conceptId: number, conceptType: ConceptTypeId, values: Map<number, unknown>): number => {
     const receiptOrder = [...activeReceipt.definitiveOrder, ...activeReceipt.transitoryOrder];
@@ -184,7 +186,8 @@ export function useReceiptEditorController(params: {
       setNestedDragSource,
       setCursorGhost,
       getFormulaPillTitle,
-      onSelectConceptFromToken: selectConceptFromFormulaToken
+      onSelectConceptFromToken: selectConceptFromFormulaToken,
+      onShowGananciasInfo
     });
 
   const actions = useReceiptEditorActions({

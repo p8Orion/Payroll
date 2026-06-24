@@ -144,7 +144,7 @@ function labelForKnownExpression(
     return { label: "Suma de Conceptos Previos del Recibo", kind: "function" };
   }
   if (expression === "GANANCIAS()") {
-    return { label: "Ganancias (retenido)", kind: "function" };
+    return { label: "Cálculo Impuesto a las Ganancias", kind: "function" };
   }
 
   const valorFijo = expression.match(/^(?:VALOR_FIJO|VALOR_LEGAJO)\("([^"]*)"\)$/);
@@ -226,6 +226,83 @@ export function tokenizeFormulaExpression(expression: string, options?: Tokenize
 }
 
 export function getShapeGlyph(shape: ConceptShape): string {
+  const emojiGlyphByShape: Partial<Record<ConceptShape, string>> = {
+    rocket: "🚀",
+    moneyBag: "💰",
+    chart: "📈",
+    briefcase: "💼",
+    receipt: "🧾",
+    calculator: "🧮",
+    calendar: "📅",
+    clipboard: "📋",
+    book: "📘",
+    lock: "🔒",
+    key: "🔑",
+    gear: "⚙️",
+    wrench: "🔧",
+    hammer: "🔨",
+    magnet: "🧲",
+    link: "🔗",
+    pin: "📌",
+    bell: "🔔",
+    trophy: "🏆",
+    medal: "🏅",
+    gem: "💎",
+    crown: "👑",
+    fire: "🔥",
+    snowflake: "❄️",
+    sun: "☀️",
+    cloud: "☁️",
+    umbrella: "☂️",
+    leaf: "🍃",
+    tree: "🌳",
+    flower: "🌸",
+    apple: "🍎",
+    coffee: "☕",
+    house: "🏠",
+    car: "🚗",
+    train: "🚆",
+    plane: "✈️",
+    ship: "🚢",
+    hourglass: "⏳",
+    scale: "⚖️",
+    target: "🎯",
+    palmTree: "🌴",
+    children: "🧒",
+    baby: "👶",
+    couple: "💑",
+    family: "👨‍👩‍👧‍👦",
+    health: "⚕️",
+    hospital: "🏥",
+    stethoscope: "🩺",
+    pill: "💊",
+    syringe: "💉",
+    wheelchair: "♿",
+    shield: "🛡️",
+    coffin: "⚰️",
+    handshake: "🤝",
+    school: "🏫",
+    graduation: "🎓",
+    shirt: "👕",
+    oilDrum: "🛢️",
+    actorMasks: "🎭",
+    courthouse: "🏛️",
+    antarctica: "🐧",
+    broom: "🧹",
+    idCard: "🪪",
+    bank: "🏦",
+    worker: "👷",
+    gasBottle: "🧯",
+    warning: "⚠️",
+    biohazard: "☣️",
+    radioactive: "☢️",
+    olderAdult: "🧓",
+    grandfather: "👴",
+    coins: "🪙",
+    nestEgg: "🪺"
+  };
+  const emojiGlyph = emojiGlyphByShape[shape];
+  if (emojiGlyph) return emojiGlyph;
   if (shape === "xmark") return "✕";
   if (shape === "exclamation") return "❗";
   if (shape === "question") return "❓";

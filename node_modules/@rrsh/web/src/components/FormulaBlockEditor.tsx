@@ -8,7 +8,7 @@ import {
 } from "../model/function-blocks";
 import { tokenizeFormulaExpression, token, getShapeGlyph } from "../model/helpers";
 import { formatConstDisplayValue } from "../model/formula-ui";
-import { FormulaToken, LIQUIDATION_TYPES } from "../model/types";
+import { ConceptShape, FormulaToken, LIQUIDATION_TYPES } from "../model/types";
 const annualAllLiquidationTypes = "(Todos)";
 
 interface FormulaBlockEditorProps {
@@ -62,24 +62,11 @@ interface FormulaBlockEditorProps {
   isTagAggregationExpression: (expr: string) => boolean;
   conceptVisualForToken: (tk: FormulaToken) => {
     color: string;
-    shape:
-      | "circle"
-      | "square"
-      | "star"
-      | "triangle"
-      | "diamond"
-      | "plus"
-      | "moon"
-      | "clover"
-      | "xmark"
-      | "spark"
-      | "exclamation"
-      | "question"
-      | "bolt"
-      | "hex";
+    shape: ConceptShape;
   } | null;
   getPillTitle?: (tk: FormulaToken) => string | null;
   onConceptClick?: (tk: FormulaToken) => void;
+  onShowGananciasInfo?: () => void;
 }
 
 export function FormulaBlockEditor({
@@ -111,7 +98,8 @@ export function FormulaBlockEditor({
   isTagAggregationExpression,
   conceptVisualForToken,
   getPillTitle,
-  onConceptClick
+  onConceptClick,
+  onShowGananciasInfo
 }: FormulaBlockEditorProps): ReactNode {
   const parsed = parseFunctionBlock(blockExpr);
   if (!parsed) return <span className="formula-text">{blockExpr}</span>;
@@ -244,6 +232,7 @@ export function FormulaBlockEditor({
                     conceptVisualForToken={conceptVisualForToken}
                     getPillTitle={getPillTitle}
                     onConceptClick={onConceptClick}
+                    onShowGananciasInfo={onShowGananciasInfo}
                   />
                 </div>
               ) : branchToken.kind === "text" ? (
@@ -404,6 +393,7 @@ export function FormulaBlockEditor({
                   }}
                 />
               ) : (
+                <span className="formula-pill-wrap">
                 <button
                   className={`formula-pill ${branchToken.kind}${
                     isConstExpression(branchToken.expression)
@@ -414,6 +404,8 @@ export function FormulaBlockEditor({
                           ? " tag-pill"
                           : /^VALOR_(?:FIJO|LEGAJO)\("/.test(branchToken.expression)
                             ? " fixed-value-pill"
+                            : branchToken.expression.trim().toUpperCase() === "GANANCIAS()"
+                              ? " ganancias-pill"
                             : ""
                   }`}
                   draggable
@@ -476,6 +468,21 @@ export function FormulaBlockEditor({
                     branchToken.label
                   )}
                 </button>
+                {branchToken.expression.trim().toUpperCase() === "GANANCIAS()" ? (
+                  <button
+                    type="button"
+                    className="formula-pill-info"
+                    title="Ver explicación de Ganancias"
+                    aria-label="Ver explicación de Ganancias"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onShowGananciasInfo?.();
+                    }}
+                  >
+                    i
+                  </button>
+                ) : null}
+                </span>
               )
             }
           />

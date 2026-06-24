@@ -21,7 +21,7 @@ interface RootFormulaTokenRendererProps {
   editingTextDraft: string;
   setEditingTextTokenId: Dispatch<SetStateAction<string | null>>;
   setEditingTextDraft: Dispatch<SetStateAction<string>>;
-  textTokenEditRef: RefObject<HTMLDivElement>;
+  textTokenEditRef: RefObject<HTMLDivElement | null>;
   commitTextTokenEdit: () => void;
   removeEditingTextToken: () => void;
   startEditTextToken: (tk: FormulaToken) => void;
@@ -38,6 +38,7 @@ interface RootFormulaTokenRendererProps {
   getShapeGlyph: (shape: ConceptShape) => string;
   getPillTitle?: (tk: FormulaToken) => string | null;
   onConceptClick?: (tk: FormulaToken) => void;
+  onShowGananciasInfo?: () => void;
 }
 
 export function RootFormulaTokenRenderer({
@@ -70,7 +71,8 @@ export function RootFormulaTokenRenderer({
   conceptVisualForToken,
   getShapeGlyph,
   getPillTitle,
-  onConceptClick
+  onConceptClick,
+  onShowGananciasInfo
 }: RootFormulaTokenRendererProps) {
   if (tk.kind === "block") {
     return (
@@ -227,9 +229,12 @@ export function RootFormulaTokenRenderer({
     );
   }
 
+  const isGananciasToken = tk.expression.trim().toUpperCase() === "GANANCIAS()";
+
   return (
-    <button
-      className={`formula-pill ${tk.kind}${
+    <span className="formula-pill-wrap">
+      <button
+        className={`formula-pill ${tk.kind}${
         isConstExpression(tk.expression)
           ? " const-pill"
           : isMathExpression(tk.expression)
@@ -238,57 +243,74 @@ export function RootFormulaTokenRenderer({
               ? " tag-pill"
               : /^VALOR_(?:FIJO|LEGAJO)\("/.test(tk.expression)
                 ? " fixed-value-pill"
+              : isGananciasToken
+                ? " ganancias-pill"
               : ""
-      }`}
-      draggable
-      onDragStart={(e) => {
-        setRootDragSource(tk.id);
-        e.dataTransfer.setData("text/plain", tk.label);
-        e.dataTransfer.setData("text/formula-token-id", tk.id);
-        e.dataTransfer.effectAllowed = "move";
-        setCursorGhost(e, tk.label);
-        setDraggingFormulaTokenId(tk.id);
-      }}
-      onDragEnd={() => {
-        setDraggingFormulaTokenId(null);
-        setDragInsertIndex(null);
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (tk.kind === "concept") {
-          onConceptClick?.(tk);
-          return;
+        }`}
+        draggable
+        onDragStart={(e) => {
+          setRootDragSource(tk.id);
+          e.dataTransfer.setData("text/plain", tk.label);
+          e.dataTransfer.setData("text/formula-token-id", tk.id);
+          e.dataTransfer.effectAllowed = "move";
+          setCursorGhost(e, tk.label);
+          setDraggingFormulaTokenId(tk.id);
+        }}
+        onDragEnd={() => {
+          setDraggingFormulaTokenId(null);
+          setDragInsertIndex(null);
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (tk.kind === "concept") {
+            onConceptClick?.(tk);
+            return;
+          }
+          if (isConstExpression(tk.expression)) {
+            setEditingConstTokenId(tk.id);
+            setEditingConstDraft(parseConstValue(tk.expression));
+          }
+        }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          updateFormulaTokens(selectedFormulaTokens.filter((item) => item.id !== tk.id));
+        }}
+        title={
+          getPillTitle?.(tk) ??
+          (isConstExpression(tk.expression) ? "Click izq: editar constante. Click der: quitar" : "Click der: quitar")
         }
-        if (isConstExpression(tk.expression)) {
-          setEditingConstTokenId(tk.id);
-          setEditingConstDraft(parseConstValue(tk.expression));
-        }
-      }}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        updateFormulaTokens(selectedFormulaTokens.filter((item) => item.id !== tk.id));
-      }}
-      title={
-        getPillTitle?.(tk) ??
-        (isConstExpression(tk.expression) ? "Click izq: editar constante. Click der: quitar" : "Click der: quitar")
-      }
-      style={{ opacity: draggingFormulaTokenId === tk.id ? 0.12 : 1 }}
-    >
-      {tk.kind === "concept" ? (
-        <span className="formula-pill-concept">
-          <span
-            className="concept-marker"
-            style={{ color: conceptVisualForToken(tk)?.color ?? "#334155" }}
-          >
-            {getShapeGlyph(conceptVisualForToken(tk)?.shape ?? "circle")}
+        style={{ opacity: draggingFormulaTokenId === tk.id ? 0.12 : 1 }}
+      >
+        {tk.kind === "concept" ? (
+          <span className="formula-pill-concept">
+            <span
+              className="concept-marker"
+              style={{ color: conceptVisualForToken(tk)?.color ?? "#334155" }}
+            >
+              {getShapeGlyph(conceptVisualForToken(tk)?.shape ?? "circle")}
+            </span>
+            {tk.label}
           </span>
-          {tk.label}
-        </span>
-      ) : isMathExpression(tk.expression) ? (
-        tk.expression.match(/^MATH\("((?:[^"\\]|\\.)*)"\)$/)?.[1] ?? tk.label
-      ) : (
-        tk.label
-      )}
-    </button>
+        ) : isMathExpression(tk.expression) ? (
+          tk.expression.match(/^MATH\("((?:[^"\\]|\\.)*)"\)$/)?.[1] ?? tk.label
+        ) : (
+          tk.label
+        )}
+      </button>
+      {isGananciasToken ? (
+        <button
+          type="button"
+          className="formula-pill-info"
+          title="Ver explicación de Ganancias"
+          aria-label="Ver explicación de Ganancias"
+          onClick={(e) => {
+            e.stopPropagation();
+            onShowGananciasInfo?.();
+          }}
+        >
+          i
+        </button>
+      ) : null}
+    </span>
   );
 }

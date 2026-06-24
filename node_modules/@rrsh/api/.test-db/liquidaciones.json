@@ -1,5 +1,4979 @@
 [
   {
+    "id": "liq_2026_6_Normal_1782314802848",
+    "liquidationType": "Normal",
+    "estado": "Generada",
+    "month": 6,
+    "year": 2026,
+    "createdAt": "2026-06-24T15:26:42.848Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 52000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4680000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2834000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5668000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 6234800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7855848.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -6973186.447400002,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 963,
+            "conceptCode": "DEF_963",
+            "conceptName": "Concepto definitivo 963",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "VALOR_FIJO(\"asdasdas\")"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 56587778.0026
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_6_Normal_1782313873226",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 6,
+    "year": 2026,
+    "createdAt": "2026-06-24T15:11:13.226Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 52000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4680000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2834000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5668000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 6234800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7855848.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -6973186.447400002,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 963,
+            "conceptCode": "DEF_963",
+            "conceptName": "Concepto definitivo 963",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "VALOR_FIJO(\"asdasdas\")"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 56587778.0026
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_6_Normal_1782313546198",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 6,
+    "year": 2026,
+    "createdAt": "2026-06-24T15:05:46.198Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 52000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4680000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2834000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5668000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 6234800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7855848.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -6973186.447400002,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 963,
+            "conceptCode": "DEF_963",
+            "conceptName": "Concepto definitivo 963",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "VALOR_FIJO(\"asdasdas\")"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 56587778.0026
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_6_Normal_1782313523692",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 6,
+    "year": 2026,
+    "createdAt": "2026-06-24T15:05:23.692Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 52000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4680000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2834000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5668000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 6234800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7855848.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -6973186.447400002,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 963,
+            "conceptCode": "DEF_963",
+            "conceptName": "Concepto definitivo 963",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "VALOR_FIJO(\"asdasdas\")"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 56587778.0026
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_6_Normal_1782313444871",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 6,
+    "year": 2026,
+    "createdAt": "2026-06-24T15:04:04.871Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 52000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4680000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2834000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5668000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 6234800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7855848.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 963,
+            "conceptCode": "DEF_963",
+            "conceptName": "Concepto definitivo 963",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "VALOR_FIJO(\"asdasdas\")"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 63560964.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_6_Normal_1782311782713",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 6,
+    "year": 2026,
+    "createdAt": "2026-06-24T14:36:22.713Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 52000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4680000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2834000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5668000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 6234800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7855859.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 963,
+            "conceptCode": "DEF_963",
+            "conceptName": "Concepto definitivo 963",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 100,
+            "formulaUsed": "VALOR_FIJO(\"asdasdas\")"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 63561053.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_5_Normal_1777567879260",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 5,
+    "year": 2026,
+    "createdAt": "2026-04-30T16:51:19.260Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 32000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2880000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1744000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3488000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3836800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -9991168.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2880000,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 44000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 80837644.45
+      },
+      {
+        "legajoId": "legajo_2",
+        "legajoNro": "473",
+        "legajoNombre": "Juan",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30000100,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30336211,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 60672422
+      },
+      {
+        "legajoId": "legajo_3",
+        "legajoNro": "474",
+        "legajoNombre": "Pablo",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 60672622
+      },
+      {
+        "legajoId": "legajo_4_xt9uhw",
+        "legajoNro": "353",
+        "legajoNombre": "Sergio",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 32000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 9600000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2080000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4160000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4576000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -11661760.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 9600000,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 44000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 94354252.45
+      },
+      {
+        "legajoId": "legajo_5_0w45t1",
+        "legajoNro": "520",
+        "legajoNombre": "Gastón",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 60672622
+      },
+      {
+        "legajoId": "legajo_6_ih1vqz",
+        "legajoNro": "438",
+        "legajoNombre": "Diego",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 32000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4160000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1808000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3616000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3977600,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -10309376.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4160000,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 44000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 83412236.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_4_Normal_1777567458494",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 4,
+    "year": 2026,
+    "createdAt": "2026-04-30T16:44:18.494Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 32000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2880000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1744000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3488000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3836800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -6273168.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1080000,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 50755644.45
+      },
+      {
+        "legajoId": "legajo_2",
+        "legajoNro": "473",
+        "legajoNombre": "Juan",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30000100,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30336211,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 60672422
+      },
+      {
+        "legajoId": "legajo_3",
+        "legajoNro": "474",
+        "legajoNombre": "Pablo",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 60672622
+      },
+      {
+        "legajoId": "legajo_4_xt9uhw",
+        "legajoNro": "353",
+        "legajoNombre": "Sergio",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 32000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 9600000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2080000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4160000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4576000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -7481760.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3600000,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 60534252.45
+      },
+      {
+        "legajoId": "legajo_5_0w45t1",
+        "legajoNro": "520",
+        "legajoNombre": "Gastón",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 30336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 60672622
+      },
+      {
+        "legajoId": "legajo_6_ih1vqz",
+        "legajoNro": "438",
+        "legajoNombre": "Diego",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 32000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"30.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4160000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1808000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3616000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3977600,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -6503376.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 52618236.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_3_Normal_1777567147955",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 3,
+    "year": 2026,
+    "createdAt": "2026-04-30T16:39:07.955Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1080000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 654000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1308000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1438800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -3132888.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 25347924.45
+      },
+      {
+        "legajoId": "legajo_2",
+        "legajoNro": "473",
+        "legajoNombre": "Juan",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000100,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336211,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672422
+      },
+      {
+        "legajoId": "legajo_3",
+        "legajoNro": "474",
+        "legajoNombre": "Pablo",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672622
+      },
+      {
+        "legajoId": "legajo_4_xt9uhw",
+        "legajoNro": "353",
+        "legajoNombre": "Sergio",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3600000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 780000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1716000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -3482160.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 28173852.45
+      },
+      {
+        "legajoId": "legajo_5_0w45t1",
+        "legajoNro": "520",
+        "legajoNombre": "Gastón",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672622
+      },
+      {
+        "legajoId": "legajo_6_ih1vqz",
+        "legajoNro": "438",
+        "legajoNombre": "Diego",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 678000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1356000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1491600,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -3199416.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 25886196.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_4_Normal_1777567132981",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 4,
+    "year": 2026,
+    "createdAt": "2026-04-30T16:38:52.981Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1080000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 654000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1308000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1438800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -1812888.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 14667924.45
+      },
+      {
+        "legajoId": "legajo_2",
+        "legajoNro": "473",
+        "legajoNombre": "Juan",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000100,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336211,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672422
+      },
+      {
+        "legajoId": "legajo_3",
+        "legajoNro": "474",
+        "legajoNombre": "Pablo",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672622
+      },
+      {
+        "legajoId": "legajo_4_xt9uhw",
+        "legajoNro": "353",
+        "legajoNombre": "Sergio",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3600000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 780000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1716000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -2162160.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 17493852.45
+      },
+      {
+        "legajoId": "legajo_5_0w45t1",
+        "legajoNro": "520",
+        "legajoNombre": "Gastón",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672622
+      },
+      {
+        "legajoId": "legajo_6_ih1vqz",
+        "legajoNro": "438",
+        "legajoNombre": "Diego",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 678000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1356000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1491600,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -1879416.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 15206196.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_4_Normal_1777566748125",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 4,
+    "year": 2026,
+    "createdAt": "2026-04-30T16:32:28.125Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1080000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 654000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1308000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1438800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -1812888.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 14667924.45
+      },
+      {
+        "legajoId": "legajo_2",
+        "legajoNro": "473",
+        "legajoNombre": "Juan",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000100,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336211,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672422
+      },
+      {
+        "legajoId": "legajo_3",
+        "legajoNro": "474",
+        "legajoNombre": "Pablo",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672622
+      },
+      {
+        "legajoId": "legajo_4_xt9uhw",
+        "legajoNro": "353",
+        "legajoNombre": "Sergio",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 3600000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 780000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1716000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -2162160.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 17493852.45
+      },
+      {
+        "legajoId": "legajo_5_0w45t1",
+        "legajoNro": "520",
+        "legajoNombre": "Gastón",
+        "convenio": "Luz y Fuerza",
+        "conceptos": [
+          {
+            "conceptId": 100,
+            "conceptCode": "BASICO",
+            "conceptName": "Sueldo Basico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 300000,
+            "formulaUsed": "300000"
+          },
+          {
+            "conceptId": 120,
+            "conceptCode": "ANTIGUEDAD",
+            "conceptName": "Antiguedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 36000,
+            "formulaUsed": "CONCEPTO(100) * PARAM(\"porc_antiguedad\")"
+          },
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10000200,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 958,
+            "conceptCode": "DEF_958",
+            "conceptName": "Concepto definitivo 958",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 111,
+            "formulaUsed": "CONSTANTE(\"111\")"
+          },
+          {
+            "conceptId": 900,
+            "conceptCode": "BASE_REMU",
+            "conceptName": "Base Remunerativa",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 10336311,
+            "formulaUsed": "SUM_TAG(\"remunerativo\")"
+          }
+        ],
+        "total": 20672622
+      },
+      {
+        "legajoId": "legajo_6_ih1vqz",
+        "legajoNro": "438",
+        "legajoNombre": "Diego",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 12000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"10.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1560000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 678000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1356000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1491600,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -1879416.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "GCIAS",
+            "conceptName": "Retención Impuesto a las Ganancias",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 15206196.45
+      }
+    ]
+  },
+  {
+    "id": "liq_2026_4_Normal_1777566136254",
+    "liquidationType": "Normal",
+    "estado": "Anulada",
+    "month": 4,
+    "year": 2026,
+    "createdAt": "2026-04-30T16:22:16.254Z",
+    "legajos": [
+      {
+        "legajoId": "legajo_1",
+        "legajoNro": "472",
+        "legajoNombre": "Nestor",
+        "convenio": "Apuaye",
+        "conceptos": [
+          {
+            "conceptId": 945,
+            "conceptCode": "BASI",
+            "conceptName": "Sueldo básico",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 22000000,
+            "formulaUsed": "VALOR_FIJO(\"Básico\") CONSTANTE(\"20.000.000\")"
+          },
+          {
+            "conceptId": 946,
+            "conceptCode": "ANTIG",
+            "conceptName": "Bonificación por antigüedad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1980000,
+            "formulaUsed": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)"
+          },
+          {
+            "conceptId": 952,
+            "conceptCode": "ANTIG-A",
+            "conceptName": "Bonificación por antigüedad adicional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 1199000,
+            "formulaUsed": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]"
+          },
+          {
+            "conceptId": 947,
+            "conceptCode": "PROF",
+            "conceptName": "Tarea profesional",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2398000,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 948,
+            "conceptCode": "GAS",
+            "conceptName": "Asignación consumo de gas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 5,
+            "formulaUsed": "CONSTANTE(\"5\")"
+          },
+          {
+            "conceptId": 949,
+            "conceptCode": "PELIG",
+            "conceptName": "Tareas peligrosas",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 2637800,
+            "formulaUsed": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 950,
+            "conceptCode": "ELEC",
+            "conceptName": "Asignación consumo de electricidad",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "no_remunerativo",
+            "conceptColumn": 2,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 951,
+            "conceptCode": "JUB11",
+            "conceptName": "Jubilación Ley 18037",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": -3323628.55,
+            "formulaUsed": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")"
+          },
+          {
+            "conceptId": 959,
+            "conceptCode": "DEF_959",
+            "conceptName": "Concepto definitivo 959",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]"
+          },
+          {
+            "conceptId": 960,
+            "conceptCode": "DEF_960",
+            "conceptName": "Concepto definitivo 960",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]"
+          },
+          {
+            "conceptId": 962,
+            "conceptCode": "DEF_962",
+            "conceptName": "Concepto definitivo 962",
+            "conceptClass": "definitivo",
+            "conceptTypeId": "descuentos",
+            "conceptColumn": 3,
+            "conceptSign": -1,
+            "value": 0,
+            "formulaUsed": "GANANCIAS()"
+          },
+          {
+            "conceptId": 936,
+            "conceptCode": "TRANS_936",
+            "conceptName": "Transitorio 936",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 4,
+            "formulaUsed": "CONSTANTE(\"4\")"
+          },
+          {
+            "conceptId": 955,
+            "conceptCode": "XX",
+            "conceptName": "Transitorio 955",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 956,
+            "conceptCode": "TRANS_956",
+            "conceptName": "Transitorio 956",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          },
+          {
+            "conceptId": 957,
+            "conceptCode": "TRANS_957",
+            "conceptName": "Transitorio 957",
+            "conceptClass": "transitorio",
+            "conceptTypeId": "remunerativo",
+            "conceptColumn": 1,
+            "conceptSign": 1,
+            "value": 0,
+            "formulaUsed": ""
+          }
+        ],
+        "total": 26891184.45
+      }
+    ]
+  },
+  {
     "id": "liq_2026_4_Normal_1777481460958",
     "liquidationType": "Normal",
     "estado": "Anulada",

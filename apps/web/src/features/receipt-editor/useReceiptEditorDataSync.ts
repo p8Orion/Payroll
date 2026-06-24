@@ -299,14 +299,26 @@ export function useReceiptEditorDataSync({
     const loadLiquidaciones = async () => {
       try {
         const response = await fetch(`${apiBaseUrl}/liquidaciones`);
-        if (!response.ok) return;
+        if (!response.ok) throw new Error(`status ${response.status}`);
         const parsed = (await response.json()) as HistoricalLiquidacionRecord[];
         setLiquidacionesHistory(Array.isArray(parsed) ? parsed : []);
+        return true;
       } catch {
-        // noop
+        return false;
       }
     };
-    void loadLiquidaciones();
+    let cancelled = false;
+    const poll = async () => {
+      const ok = await loadLiquidaciones();
+      if (cancelled || ok) return;
+      setTimeout(() => {
+        if (!cancelled) void poll();
+      }, 2000);
+    };
+    void poll();
+    return () => {
+      cancelled = true;
+    };
   }, [setLiquidacionesHistory]);
 
   useEffect(() => {

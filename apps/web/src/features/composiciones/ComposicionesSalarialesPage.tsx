@@ -15,6 +15,7 @@ export interface ComposicionSalarialModel {
 
 interface ComposicionesSalarialesPageProps {
   composiciones: ComposicionSalarialModel[];
+  legajos: Array<{ id: string; nroLegajo: string; nombre: string; composicionSalarial: string }>;
   convenioOptions: string[];
   fixedValueKeys: string[];
   onEnsureFixedValueKey?: (key: string) => void;
@@ -51,6 +52,7 @@ function createComposicion(existing: ComposicionSalarialModel[]): ComposicionSal
 
 export function ComposicionesSalarialesPage({
   composiciones,
+  legajos,
   convenioOptions,
   fixedValueKeys,
   onChangeComposiciones
@@ -64,6 +66,16 @@ export function ComposicionesSalarialesPage({
     () => new Set((selected?.valoresFijos ?? []).map((item) => item.clave.trim().toLowerCase()).filter(Boolean)),
     [selected]
   );
+  const legajosConComposicion = useMemo(() => {
+    if (!selected) return [];
+    const selectedCode = selected.code.trim().toLowerCase();
+    return legajos
+      .filter((legajo) => {
+        const assigned = (legajo.composicionSalarial ?? "").trim();
+        return assigned === selected.id || (!!selectedCode && assigned.toLowerCase() === selectedCode);
+      })
+      .sort((a, b) => (a.nroLegajo || a.nombre).localeCompare(b.nroLegajo || b.nombre, "es", { numeric: true, sensitivity: "base" }));
+  }, [legajos, selected]);
 
   const updateSelected = (updater: (current: ComposicionSalarialModel) => ComposicionSalarialModel) => {
     if (!selected) return;
@@ -223,6 +235,21 @@ export function ComposicionesSalarialesPage({
                     <option key={key} value={key} />
                   ))}
               </datalist>
+            </div>
+
+            <div className="legajos-fixed-values">
+              <h3>Legajos</h3>
+              {legajosConComposicion.length === 0 ? (
+                <p className="concept-meta-inline">Sin legajos con esta composición.</p>
+              ) : (
+                <ul className="composition-legajos-list">
+                  {legajosConComposicion.map((legajo) => (
+                    <li key={legajo.id} className="composition-legajo-item">
+                      <strong>{legajo.nroLegajo || "S/N"}</strong> - {legajo.nombre || "Sin nombre"}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </>
         )}

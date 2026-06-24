@@ -198,6 +198,7 @@ export function resolveSumaAnualValue(
   rawArgs: string,
   conceptCodeById: Record<number, string>,
   legajo: LegajoLike | null,
+  asOfMonth: number,
   asOfYear: number,
   liquidacionesHistory: HistoricalLiquidacionRecord[]
 ): number {
@@ -210,6 +211,7 @@ export function resolveSumaAnualValue(
     (item) =>
       item.estado !== "Anulada" &&
       item.year === asOfYear &&
+      item.month < asOfMonth &&
       (liquidationType === annualAllLiquidationTypes || item.liquidationType === liquidationType)
   );
   if (!inYear.length) return 0;
@@ -404,7 +406,7 @@ export function evaluateConcepts({
           )
         )
         .replace(/SUMA_ANUAL_ARG\[\[([\s\S]*?)\]\]/g, (_, rawArgs: string) =>
-          String(resolveSumaAnualValue(rawArgs, conceptCodeById, legajo, asOfYear, liquidacionesHistory))
+          String(resolveSumaAnualValue(rawArgs, conceptCodeById, legajo, asOfMonth, asOfYear, liquidacionesHistory))
         )
         .replace(/VALOR_FIJO\("([^"]*)"\)/g, (_, conceptoRaw: string) =>
           String(getValorLegajo(legajo, conceptoRaw, concept.code))
@@ -520,6 +522,10 @@ export function evaluateConcepts({
         deduccionesTablaItems: [],
         remuneracionGravada: baseTrace.totalRetenido,
         deduccionesConceptos: 0,
+        remuneracionGravadaLiquidacionesPrevias: 0,
+        remuneracionGravadaMesActual: baseTrace.totalRetenido,
+        deduccionesConceptosLiquidacionesPrevias: 0,
+        deduccionesConceptosMesActual: 0,
         deduccionesTabla: 0,
         deduccionesF572: 0,
         baseImponible: baseTrace.totalRetenido,

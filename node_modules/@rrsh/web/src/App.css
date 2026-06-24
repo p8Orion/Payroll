@@ -230,6 +230,21 @@
   background: #f9fbff;
 }
 
+.composition-legajos-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.composition-legajo-item {
+  padding: 8px;
+  border: 1px solid #d7deef;
+  border-radius: 8px;
+  background: #f9fbff;
+}
+
 .fixed-value-key-input,
 .fixed-value-number-input {
   width: 100%;
@@ -546,6 +561,36 @@
   padding: 6px 10px;
   cursor: pointer;
   background: #eef3ff;
+}
+
+.formula-pill-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.formula-pill.ganancias-pill {
+  background: linear-gradient(180deg, #ecfeff 0%, #cffafe 100%);
+  border-color: #67e8f9;
+  color: #0f172a;
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.2);
+}
+
+.formula-pill-info {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.formula-pill-info:hover {
+  background: #dbeafe;
 }
 
 .formula-pill.operator {
@@ -881,8 +926,13 @@
 }
 
 .concept-marker {
-  font-size: 0.75rem;
-  margin-right: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  line-height: 1;
+  margin-right: 4px;
+  vertical-align: -0.12em;
 }
 
 .formula-placeholder {
@@ -1066,12 +1116,13 @@
   right: 0;
   left: auto;
   z-index: 20;
-  width: 260px;
+  width: 390px;
+  max-width: min(390px, calc(100vw - 32px));
   border: 1px solid #d9e0f0;
   border-radius: 10px;
   background: #fff;
   box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
-  padding: 10px;
+  padding: 12px;
 }
 
 .appearance-section {
@@ -1087,21 +1138,24 @@
 
 .shape-options {
   display: grid;
-  grid-template-columns: repeat(6, minmax(34px, 1fr));
+  grid-template-columns: repeat(8, minmax(38px, 1fr));
   gap: 8px;
+  max-height: 232px;
+  overflow: auto;
+  padding-right: 2px;
 }
 
 .shape-option {
   border: 1px solid #c6d0ea;
   border-radius: 8px;
-  min-width: 34px;
-  height: 32px;
+  min-width: 38px;
+  height: 36px;
   background: #f8faff;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 .shape-option.active {
@@ -1189,6 +1243,52 @@
   border: 1px solid #d9e0f0;
   padding: 16px;
   min-width: 340px;
+}
+
+.ganancias-info-modal {
+  width: min(960px, 95vw);
+  max-width: min(960px, 95vw);
+  max-height: 85vh;
+  overflow: auto;
+}
+
+.ganancias-info-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ganancias-info-modal-header h3 {
+  margin: 0;
+}
+
+.ganancias-info-button {
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+  border: 1px solid #86a5e8;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #2352a6;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ganancias-info-button:hover {
+  background: #dfeaff;
+}
+
+.close-modal-button {
+  border: 1px solid #c9d4ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #1f2d52;
+  padding: 6px 10px;
+  cursor: pointer;
 }
 
 .modal-actions {

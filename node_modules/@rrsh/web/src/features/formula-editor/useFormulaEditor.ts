@@ -56,6 +56,7 @@ interface UseFormulaEditorParams {
   setCursorGhost: (event: DragEvent<HTMLElement>, label: string) => void;
   getFormulaPillTitle?: (tk: FormulaToken) => string | null;
   onSelectConceptFromToken?: (tk: FormulaToken) => void;
+  onShowGananciasInfo?: () => void;
 }
 
 export function useFormulaEditor({
@@ -71,7 +72,8 @@ export function useFormulaEditor({
   setNestedDragSource,
   setCursorGhost,
   getFormulaPillTitle,
-  onSelectConceptFromToken
+  onSelectConceptFromToken,
+  onShowGananciasInfo
 }: UseFormulaEditorParams) {
   const [dragInsertIndex, setDragInsertIndex] = useState<number | null>(null);
   const [draggingFormulaTokenId, setDraggingFormulaTokenId] = useState<string | null>(null);
@@ -491,7 +493,8 @@ export function useFormulaEditor({
       isTagAggregationExpression,
       conceptVisualForToken,
       getPillTitle: getFormulaPillTitle,
-      onConceptClick: onSelectConceptFromToken
+      onConceptClick: onSelectConceptFromToken,
+      onShowGananciasInfo
     });
 
   const renderRootFormulaToken = (tk: FormulaToken): ReactNode =>
@@ -525,7 +528,8 @@ export function useFormulaEditor({
       conceptVisualForToken,
       getShapeGlyph,
       getPillTitle: getFormulaPillTitle,
-      onConceptClick: onSelectConceptFromToken
+      onConceptClick: onSelectConceptFromToken,
+      onShowGananciasInfo
     });
 
   const setFormulaExpressionText = (nextExpression: string) => {

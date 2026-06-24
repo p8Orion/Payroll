@@ -2,10 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { formulaToExpression } from "../../model/helpers";
 import { astToTokens } from "../../model/formula-dnd";
 import { evaluateConcepts } from "../../model/liquidation-eval";
+import { computeGananciasFromHistory } from "../ganancias/gananciasEngine";
+import { GananciasTracePanel } from "../ganancias/GananciasTracePanel";
 import {
   CONCEPT_TYPE_DEFINITIONS,
   ConceptModel,
   ConceptTypeId,
+  F1359FieldModel,
+  GananciasTableModel,
   getConceptTypeDefinition,
   LIQUIDATION_TYPES,
   ReceiptModel
@@ -19,6 +23,8 @@ interface LiquidacionesPageProps {
   receipts: ReceiptModel[];
   legajos: LegajoModel[];
   composiciones: ComposicionSalarialModel[];
+  gananciasTables: GananciasTableModel[];
+  f1359Fields: F1359FieldModel[];
 }
 
 const apiBaseUrl = "http://localhost:3001";
@@ -57,7 +63,14 @@ function resolveComposicionLegajo(
   );
 }
 
-export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }: LiquidacionesPageProps) {
+export function LiquidacionesPage({
+  concepts,
+  receipts,
+  legajos,
+  composiciones,
+  gananciasTables,
+  f1359Fields
+}: LiquidacionesPageProps) {
   const [liquidaciones, setLiquidaciones] = useState<LiquidacionRecord[]>([]);
   const [selectedLiquidacionId, setSelectedLiquidacionId] = useState<string>("");
   const [selectedLegajoId, setSelectedLegajoId] = useState<string>("");
@@ -66,6 +79,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [selectedLegajoIds, setSelectedLegajoIds] = useState<string[]>([]);
+  const [gananciasInfoModalOpen, setGananciasInfoModalOpen] = useState(false);
   const [filterType, setFilterType] = useState<string>("Todos");
   const [filterMonth, setFilterMonth] = useState<string>("Todos");
   const [filterYear, setFilterYear] = useState<string>("Todos");
@@ -202,15 +216,18 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
       const composicion = resolveComposicionLegajo(legajo, composiciones);
       const evalResult = evaluateConcepts({
         concepts: conceptScope,
+        allConcepts: concepts,
         conceptCodeById,
         legajo: {
           ...legajo,
           composicionValoresFijos: composicion?.valoresFijos ?? []
         },
         liquidacionesHistory: liquidaciones,
+        currentLiquidationType: selectedType,
         receiptOrderIds: [...(receipt?.definitiveOrder ?? []), ...(receipt?.transitoryOrder ?? [])],
         asOfMonth: selectedMonth,
-        asOfYear: selectedYear
+        asOfYear: selectedYear,
+        gananciasTables
       });
       const mapConceptRows = (
         ids: number[],
@@ -305,6 +322,33 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
     [concepts]
   );
   const selectedLegajoConceptos = selectedLegajoLiquidado?.conceptos ?? [];
+  const selectedGananciasTrace = useMemo(() => {
+    if (!selectedLiquidacion || !selectedLegajoLiquidado) return null;
+    try {
+      return computeGananciasFromHistory({
+        allConcepts: concepts,
+        currentValues: new Map(selectedLegajoLiquidado.conceptos.map((row) => [row.conceptId, row.value])),
+        currentReceiptConceptIds: selectedLegajoLiquidado.conceptos.map((row) => row.conceptId),
+        currentLiquidationType: selectedLiquidacion.liquidationType,
+        asOfMonth: selectedLiquidacion.month,
+        asOfYear: selectedLiquidacion.year,
+        legajoId: selectedLegajoLiquidado.legajoId,
+        liquidacionesHistory: liquidaciones,
+        gananciasTables
+      });
+    } catch {
+      return null;
+    }
+  }, [selectedLiquidacion, selectedLegajoLiquidado, concepts, liquidaciones, gananciasTables]);
+  const formatAmount = (value: unknown): string =>
+    typeof value === "number"
+      ? `$${value.toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : String(value);
+  const getF1359FieldLabel = (fieldId: string): string => {
+    const field = f1359Fields.find((item) => item.id === fieldId);
+    if (!field) return fieldId;
+    return `${field.id} - ${field.descripcion}`;
+  };
   const columnLabelByNumber = useMemo(() => {
     const map = new Map<number, string>();
     for (const definition of CONCEPT_TYPE_DEFINITIONS) {
@@ -315,7 +359,14 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
   const conceptosPorColumna = useMemo(() => {
     const grouped = new Map<
       number,
-      { conceptId: number; conceptCode: string; conceptName: string; value: unknown; typeId: ConceptTypeId }[]
+      {
+        conceptId: number;
+        conceptCode: string;
+        conceptName: string;
+        value: unknown;
+        typeId: ConceptTypeId;
+        hasGananciasFormula: boolean;
+      }[]
     >();
     for (const row of selectedLegajoConceptos) {
       const resolvedClass = row.conceptClass ?? conceptClassById.get(row.conceptId) ?? "definitivo";
@@ -328,7 +379,8 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
         conceptCode: row.conceptCode,
         conceptName: row.conceptName,
         value: row.value,
-        typeId: resolvedType
+        typeId: resolvedType,
+        hasGananciasFormula: row.formulaUsed.toUpperCase().includes("GANANCIAS()")
       });
       grouped.set(resolvedColumn, current);
     }
@@ -518,6 +570,20 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                           >
                             <div>
                               <strong>{row.conceptCode}</strong> - {row.conceptName}
+                              {row.hasGananciasFormula && selectedGananciasTrace ? (
+                                <button
+                                  type="button"
+                                  className="ganancias-info-button"
+                                  title="Ver explicación de Ganancias"
+                                  aria-label="Ver explicación de Ganancias"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setGananciasInfoModalOpen(true);
+                                  }}
+                                >
+                                  i
+                                </button>
+                              ) : null}
                             </div>
                             <span
                               className={`liquidacion-valor ${
@@ -529,10 +595,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                               }`}
                             >
                               {typeof row.value === "number"
-                                ? `$${row.value.toLocaleString("es-AR", {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                  })}`
+                                ? formatAmount(row.value)
                                 : String(row.value)}
                             </span>
                           </li>
@@ -581,6 +644,20 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                       >
                         <div>
                           <strong>{row.conceptCode}</strong> - {row.conceptName}
+                          {row.formulaUsed.toUpperCase().includes("GANANCIAS()") && selectedGananciasTrace ? (
+                            <button
+                              type="button"
+                              className="ganancias-info-button"
+                              title="Ver explicación de Ganancias"
+                              aria-label="Ver explicación de Ganancias"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setGananciasInfoModalOpen(true);
+                              }}
+                            >
+                              i
+                            </button>
+                          ) : null}
                         </div>
                         <span
                           className={`liquidacion-valor ${
@@ -588,10 +665,7 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
                           }`}
                         >
                           {typeof row.value === "number"
-                            ? `$${row.value.toLocaleString("es-AR", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                              })}`
+                            ? formatAmount(row.value)
                             : String(row.value)}
                         </span>
                       </li>
@@ -605,6 +679,25 @@ export function LiquidacionesPage({ concepts, receipts, legajos, composiciones }
           )}
         </article>
       </div>
+      {gananciasInfoModalOpen && selectedGananciasTrace ? (
+        <div className="modal-backdrop" onClick={() => setGananciasInfoModalOpen(false)}>
+          <div className="modal-card ganancias-info-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ganancias-info-modal-header">
+              <h3>Información de Ganancias liquidada</h3>
+              <button type="button" className="close-modal-button" onClick={() => setGananciasInfoModalOpen(false)}>
+                Cerrar
+              </button>
+            </div>
+            <GananciasTracePanel
+              trace={selectedGananciasTrace}
+              formatPreviewAmount={formatAmount}
+              getF1359FieldLabel={getF1359FieldLabel}
+              collapsible={false}
+              title="Explicación Ganancias liquidada"
+            />
+          </div>
+        </div>
+      ) : null}
       {createModalOpen ? (
         <div className="modal-backdrop" onClick={() => setCreateModalOpen(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()}>

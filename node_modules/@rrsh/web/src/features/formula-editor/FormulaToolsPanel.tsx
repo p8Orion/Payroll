@@ -75,7 +75,7 @@ export function FormulaToolsPanel({
         setCursorGhost(e, "GANANCIAS");
         e.dataTransfer.setData(
           "text/token-json",
-          JSON.stringify(token("Ganancias (retenido)", "GANANCIAS()", "function"))
+          JSON.stringify(token("Cálculo Impuesto a las Ganancias", "GANANCIAS()", "function"))
         );
       }
     },

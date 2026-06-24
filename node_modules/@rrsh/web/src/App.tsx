@@ -39,6 +39,7 @@ import {
 import { LegajoModel, LegajosPage } from "./features/legajos/LegajosPage";
 import { LiquidacionesPage } from "./features/liquidaciones/LiquidacionesPage";
 import { F1359InfoPage, HistoricalLiquidacionRecord } from "./features/informacion/F1359InfoPage";
+import { GananciasTracePanel } from "./features/ganancias/GananciasTracePanel";
 import {
   ComposicionSalarialModel,
   ComposicionesSalarialesPage
@@ -132,6 +133,7 @@ export function App() {
   const [liquidacionesHistory, setLiquidacionesHistory] = useState<HistoricalLiquidacionRecord[]>([]);
   const [f1359Fields, setF1359Fields] = useState<F1359FieldModel[]>([]);
   const [gananciasTables, setGananciasTables] = useState<GananciasTableModel[]>([]);
+  const [gananciasInfoModalOpen, setGananciasInfoModalOpen] = useState(false);
   const [conceptsLoaded, setConceptsLoaded] = useState(false);
   const [legajosLoaded, setLegajosLoaded] = useState(false);
   const { dragSourceRef: formulaDragSourceRef, setRootDragSource, setNestedDragSource } =
@@ -293,7 +295,8 @@ export function App() {
     membershipConvenioComboRef,
     tagModal,
     setTagModal,
-    setCursorGhost
+    setCursorGhost,
+    onShowGananciasInfo: () => setGananciasInfoModalOpen(true)
   });
 
   return (
@@ -327,6 +330,7 @@ export function App() {
         ) : menu === "composiciones" ? (
           <ComposicionesSalarialesPage
             composiciones={composiciones}
+            legajos={legajos}
             convenioOptions={convenioOptions}
             fixedValueKeys={fixedValueKeys}
             onEnsureFixedValueKey={() => {}}
@@ -338,6 +342,8 @@ export function App() {
             receipts={receipts}
             legajos={legajos}
             composiciones={composiciones}
+            gananciasTables={gananciasTables}
+            f1359Fields={f1359Fields}
           />
         ) : menu === "informacion-f1359" ? (
           <F1359InfoPage
@@ -446,6 +452,29 @@ export function App() {
               <button onClick={() => applyTagAggregation("max")}>Maximo de...</button>
               <button onClick={() => applyTagAggregation("min")}>Minimo de...</button>
             </div>
+          </div>
+        </div>
+      )}
+      {gananciasInfoModalOpen && (
+        <div className="modal-backdrop" onClick={() => setGananciasInfoModalOpen(false)}>
+          <div className="modal-card ganancias-info-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ganancias-info-modal-header">
+              <h3>Información de Ganancias (simulada)</h3>
+              <button type="button" className="close-modal-button" onClick={() => setGananciasInfoModalOpen(false)}>
+                Cerrar
+              </button>
+            </div>
+            <GananciasTracePanel
+              trace={gananciasTrace}
+              formatPreviewAmount={formatPreviewAmount}
+              getF1359FieldLabel={(fieldId) => {
+                const field = f1359Fields.find((item) => item.id === fieldId);
+                if (!field) return fieldId;
+                return `${field.id} - ${field.descripcion}`;
+              }}
+              collapsible={false}
+              title="Explicación Ganancias (simulada)"
+            />
           </div>
         </div>
       )}
