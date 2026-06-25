@@ -39,8 +39,8 @@ export function useReceiptEditorController(params: {
   setConceptCodeDraft: Dispatch<SetStateAction<string>>;
   conceptNameDraft: string;
   setConceptNameDraft: Dispatch<SetStateAction<string>>;
-  conceptTypeDraft: ConceptTypeId;
-  setConceptTypeDraft: Dispatch<SetStateAction<ConceptTypeId>>;
+  conceptTypeDraft: ConceptTypeId | "";
+  setConceptTypeDraft: Dispatch<SetStateAction<ConceptTypeId | "">>;
   newTagDraft: string;
   setNewTagDraft: Dispatch<SetStateAction<string>>;
   appearanceOpen: boolean;
@@ -157,7 +157,7 @@ export function useReceiptEditorController(params: {
     formulaErrorById: evaluation.errors,
     previewValueById: evaluation.values,
     selectedConceptId: selectedConcept.id,
-    selectedConceptType: selectedConcept.conceptType,
+    selectedConceptType: selectedConcept.conceptType ?? "remunerativo",
     getAnterioresByType,
     getValorLegajo: getValorLegajoResolved,
     resolveValorLegajoConceptCode: resolveValorLegajoConceptCodeResolved,
@@ -209,6 +209,7 @@ export function useReceiptEditorController(params: {
     receiptLiquidationTypeOptions,
     simLegajosForConvenio,
     selectedConcept,
+    editingId,
     setEditingId,
     conceptReceiptMembership,
     membershipConvenioOptions,

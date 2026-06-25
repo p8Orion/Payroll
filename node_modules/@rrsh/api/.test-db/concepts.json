@@ -6,6 +6,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#84CC16",
+    "shape": "diamond",
     "formula": "CONSTANTE(\"3\")",
     "tags": [
       "remunerativo"
@@ -18,6 +20,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#06B6D4",
+    "shape": "xmark",
     "formula": "[SI|CONSTANTE(\"1\")|CONSTANTE(\"1\")|CONSTANTE(\"0\")] MATH(\"+\") CONSTANTE(\"3\")",
     "tags": [
       "remunerativo"
@@ -30,8 +34,12 @@
     "conceptClass": "definitivo",
     "conceptType": "descuentos",
     "f1359FieldId": "",
+    "color": "#D946EF",
+    "shape": "star",
     "formula": "CONSTANTE(\"55\")",
-    "tags": []
+    "tags": [
+      "descuentos"
+    ]
   },
   {
     "id": 924,
@@ -40,16 +48,21 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#0284C7",
+    "shape": "bolt",
     "formula": "CONSTANTE(\"1\")",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 925,
     "code": "TRANS_925",
     "name": "Transitorio 925",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#2563EB",
+    "shape": "circle",
     "formula": "",
     "tags": []
   },
@@ -60,16 +73,21 @@
     "conceptClass": "definitivo",
     "conceptType": "no_remunerativo",
     "f1359FieldId": "",
+    "color": "#7C3AED",
+    "shape": "star",
     "formula": "CONSTANTE(\"5\")",
-    "tags": []
+    "tags": [
+      "no-remunerativo"
+    ]
   },
   {
     "id": 929,
     "code": "TRANS_929",
     "name": "Transitorio 929",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#C026D3",
+    "shape": "diamond",
     "formula": "VALOR_FIJO(\"A\")",
     "tags": []
   },
@@ -78,8 +96,9 @@
     "code": "TRANS_930",
     "name": "Transitorio 930",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#BE123C",
+    "shape": "plus",
     "formula": "",
     "tags": []
   },
@@ -88,8 +107,9 @@
     "code": "TRANS_931",
     "name": "Transitorio 931",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#EF4444",
+    "shape": "moon",
     "formula": "",
     "tags": []
   },
@@ -98,8 +118,9 @@
     "code": "TRANS_932",
     "name": "Transitorio 932",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#F97316",
+    "shape": "clover",
     "formula": "",
     "tags": []
   },
@@ -110,16 +131,21 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#F59E0B",
+    "shape": "xmark",
     "formula": "",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 934,
     "code": "TRANS_934",
     "name": "Transitorio 934",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#EAB308",
+    "shape": "exclamation",
     "formula": "CONSTANTE(\"2\")",
     "tags": []
   },
@@ -128,8 +154,9 @@
     "code": "TRANS_935",
     "name": "Transitorio 935",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#84CC16",
+    "shape": "question",
     "formula": "CONSTANTE(\"1\")",
     "tags": []
   },
@@ -138,8 +165,9 @@
     "code": "TRANS_936",
     "name": "Transitorio 936",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "REG01_CAMPO01",
+    "color": "#22C55E",
+    "shape": "bolt",
     "formula": "CONSTANTE(\"4\")",
     "tags": []
   },
@@ -150,8 +178,12 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#10B981",
+    "shape": "circle",
     "formula": "[BLOQUE|VALOR_FIJO(\"Básico\") MATH(\"+\") [SI|CONCEPTO(927)|CONSTANTE(\"4000000.1\")|CONSTANTE(\"1000000\")]]",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 938,
@@ -160,16 +192,21 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#14B8A6",
+    "shape": "square",
     "formula": "",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 939,
     "code": "TRANS_939",
     "name": "Transitorio 939",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#06B6D4",
+    "shape": "star",
     "formula": "",
     "tags": []
   },
@@ -180,8 +217,12 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#0EA5E9",
+    "shape": "triangle",
     "formula": "VALOR_FIJO(\"Básico\")",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 941,
@@ -190,8 +231,12 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#3B82F6",
+    "shape": "diamond",
     "formula": "VALOR_FIJO(\"Básico\")",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 942,
@@ -200,8 +245,12 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#6366F1",
+    "shape": "plus",
     "formula": "VALOR_FIJO(\"Básico\")",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 943,
@@ -210,8 +259,12 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#8B5CF6",
+    "shape": "moon",
     "formula": "MATH(\"-\") CONSTANTE(\"1\") MATH(\"*\") [BLOQUE|VALOR_FIJO(\"Básico\") VALOR_FIJO(\"Básico\")]",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 944,
@@ -220,8 +273,12 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#A855F7",
+    "shape": "clover",
     "formula": "ANTIGUEDAD()",
-    "tags": []
+    "tags": [
+      "remunerativo"
+    ]
   },
   {
     "id": 945,
@@ -230,10 +287,13 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "REG03_CAMPO03",
-    "formula": "VALOR_FIJO(\"Básico\") CONSTANTE(\"50.000.000\")",
+    "color": "#D946EF",
+    "shape": "apple",
+    "formula": "CONSTANTE(\"50.000.000\") VALOR_FIJO(\"Básico\")",
     "tags": [
       "base-tarea-profesional",
       "base-tareas-peligrosas",
+      "maxi",
       "remunerativo"
     ]
   },
@@ -244,6 +304,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#EC4899",
+    "shape": "medal",
     "formula": "[BLOQUE|ANTIGUEDAD() MATH(\"*\") CONSTANTE(\"1\") MATH(\"%\")] MATH(\"*\") CONCEPTO(945)",
     "tags": [
       "base-tarea-profesional",
@@ -258,6 +320,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#F43F5E",
+    "shape": "briefcase",
     "formula": "TAG_OP(\"sum\",\"base-tarea-profesional\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
     "tags": [
       "base-tareas-peligrosas",
@@ -272,6 +336,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#DC2626",
+    "shape": "gasBottle",
     "formula": "CONSTANTE(\"5\")",
     "tags": [
       "remunerativo"
@@ -284,8 +350,11 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
-    "formula": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\")",
+    "color": "#EA580C",
+    "shape": "biohazard",
+    "formula": "TAG_OP(\"sum\",\"base-tareas-peligrosas\") MATH(\"*\") CONSTANTE(\"10\") MATH(\"%\") TAG_OP(\"sum\",\"maxi\")",
     "tags": [
+      "maxi",
       "remunerativo"
     ]
   },
@@ -296,6 +365,8 @@
     "conceptClass": "definitivo",
     "conceptType": "no_remunerativo",
     "f1359FieldId": "",
+    "color": "#CA8A04",
+    "shape": "bolt",
     "formula": "CONSTANTE(\"4\")",
     "tags": [
       "no-remunerativo"
@@ -308,6 +379,8 @@
     "conceptClass": "definitivo",
     "conceptType": "descuentos",
     "f1359FieldId": "REG05_CAMPO03",
+    "color": "#65A30D",
+    "shape": "leaf",
     "formula": "TAG_OP(\"sum\",\"remunerativo\") MATH(\"*\") CONSTANTE(\"11\") MATH(\"%\")",
     "tags": [
       "descuentos"
@@ -320,6 +393,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#16A34A",
+    "shape": "medal",
     "formula": "ANTERIORES() MATH(\"*\") [SI|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"2\")|CONSTANTE(\"0.5\") MATH(\"%\")|ANTIGUEDAD() MATH(\">\") CONSTANTE(\"20\")|CONSTANTE(\"1\") MATH(\"%\")|CONSTANTE(\"0\")]",
     "tags": [
       "remunerativo"
@@ -332,6 +407,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#0D9488",
+    "shape": "diamond",
     "formula": "",
     "tags": [
       "remunerativo"
@@ -344,6 +421,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#0284C7",
+    "shape": "plus",
     "formula": "",
     "tags": [
       "remunerativo"
@@ -354,36 +433,33 @@
     "code": "XX",
     "name": "Transitorio 955",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#2563EB",
+    "shape": "moon",
     "formula": "",
-    "tags": [
-      "remunerativo"
-    ]
+    "tags": []
   },
   {
     "id": 956,
     "code": "TRANS_956",
     "name": "Transitorio 956",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#4F46E5",
+    "shape": "clover",
     "formula": "",
-    "tags": [
-      "remunerativo"
-    ]
+    "tags": []
   },
   {
     "id": 957,
     "code": "TRANS_957",
     "name": "Transitorio 957",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#7C3AED",
+    "shape": "xmark",
     "formula": "",
-    "tags": [
-      "remunerativo"
-    ]
+    "tags": []
   },
   {
     "id": 958,
@@ -392,6 +468,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#9333EA",
+    "shape": "exclamation",
     "formula": "[BLOQUE|CONCEPTO(945) MATH(\"*\") CONSTANTE(\"50\")] MATH(\"*\") VALOR_FIJO(\"ManejoPC\")",
     "tags": [
       "base-tarea-profesional",
@@ -405,6 +483,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#C026D3",
+    "shape": "question",
     "formula": "[MES_ANTERIOR|CONCEPTO(946)|CONSTANTE(\"Normal\")|CONSTANTE(\"1\")]",
     "tags": [
       "remunerativo"
@@ -417,6 +497,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#BE123C",
+    "shape": "bolt",
     "formula": "[SUMA_ANUAL|CONCEPTO(945)|CONSTANTE(\"Normal\")]",
     "tags": [
       "remunerativo"
@@ -429,6 +511,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#0EA5E9",
+    "shape": "triangle",
     "formula": "CONCEPTO(945)",
     "tags": [
       "basico",
@@ -443,6 +527,8 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#BE123C",
+    "shape": "bolt",
     "formula": "CONCEPTO(945) * PARAM(\"porc_antiguedad\")",
     "tags": [
       "antiguedad",
@@ -454,12 +540,12 @@
     "code": "BASE_REMU",
     "name": "Base Remunerativa",
     "conceptClass": "transitorio",
-    "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#BE123C",
+    "shape": "bolt",
     "formula": "SUM_TAG(\"remunerativo\")",
     "tags": [
-      "base",
-      "remunerativo"
+      "base"
     ]
   },
   {
@@ -469,6 +555,8 @@
     "conceptClass": "definitivo",
     "conceptType": "descuentos",
     "f1359FieldId": "",
+    "color": "#F97316",
+    "shape": "target",
     "formula": "GANANCIAS()",
     "tags": [
       "descuentos"
@@ -481,7 +569,22 @@
     "conceptClass": "definitivo",
     "conceptType": "remunerativo",
     "f1359FieldId": "",
+    "color": "#F59E0B",
+    "shape": "star",
     "formula": "VALOR_FIJO(\"asdasdas\")",
+    "tags": [
+      "remunerativo"
+    ]
+  },
+  {
+    "id": 964,
+    "code": "DEF_964",
+    "name": "Concepto definitivo 964",
+    "conceptClass": "definitivo",
+    "conceptType": "remunerativo",
+    "color": "#EAB308",
+    "shape": "triangle",
+    "formula": "[SI|VALOR_FIJO(\"ManejoPC\")|CONSTANTE(\"50000\")|CONSTANTE(\"1\")]",
     "tags": [
       "remunerativo"
     ]

@@ -41,7 +41,6 @@ export const initialConcepts: ConceptModel[] = [
     code: "BASE_REMU",
     name: "Base Remunerativa",
     conceptClass: "transitorio",
-    conceptType: "remunerativo",
     color: colorPalette30[2],
     shape: "star",
     tags: ["base"],

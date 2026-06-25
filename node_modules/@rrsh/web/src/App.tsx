@@ -161,13 +161,6 @@ export function App() {
     }, 0);
   };
 
-  const { undo, redo, canUndo, canRedo } = useEditorHistory({
-    concepts,
-    receipts,
-    conceptsLoaded,
-    setConcepts,
-    setReceipts
-  });
   const definitivos = concepts.filter((c) => c.conceptClass === "definitivo");
   const convenios = useMemo(
     () =>
@@ -213,6 +206,7 @@ export function App() {
     receiptLiquidationTypeOptions,
     simLegajosForConvenio,
     selectedConcept,
+    editingId,
     setEditingId,
     conceptReceiptMembership,
     membershipConvenioOptions,
@@ -297,6 +291,19 @@ export function App() {
     setTagModal,
     setCursorGhost,
     onShowGananciasInfo: () => setGananciasInfoModalOpen(true)
+  });
+  const { undo, redo, canUndo, canRedo } = useEditorHistory({
+    concepts,
+    receipts,
+    menu,
+    activeReceiptId,
+    editingId,
+    conceptsLoaded,
+    setConcepts,
+    setReceipts,
+    setMenu,
+    setActiveReceiptId,
+    setEditingId
   });
 
   return (

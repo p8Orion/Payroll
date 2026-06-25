@@ -1,7 +1,8 @@
 import { colorPalette30, shapeCycle } from "../../model/constants";
 import { astToTokens, parseExpressionToAst } from "../../model/formula-dnd";
 import { formulaToExpression } from "../../model/helpers";
-import { ConceptModel, ConceptTypeId, LIQUIDATION_TYPES, LiquidationType, ReceiptModel } from "../../model/types";
+import { ConceptModel, ConceptShape, ConceptTypeId, LIQUIDATION_TYPES, LiquidationType, ReceiptModel } from "../../model/types";
+import type { AppMenu } from "../topbar/useTopbarMenu";
 
 export interface ApiConcept {
   id: number;
@@ -10,6 +11,8 @@ export interface ApiConcept {
   conceptClass: "definitivo" | "transitorio";
   conceptType?: ConceptTypeId;
   f1359FieldId?: string;
+  color?: string;
+  shape?: ConceptShape;
   formula?: string;
   tags: string[];
 }
@@ -60,6 +63,9 @@ export interface ApiGananciasTable {
 export interface EditorSnapshot {
   concepts: ConceptModel[];
   receipts: ReceiptModel[];
+  menu: AppMenu;
+  activeReceiptId: string;
+  editingId: number;
 }
 
 export const apiBaseUrl = "http://localhost:3001";
@@ -104,6 +110,9 @@ export const normalizeTagsWithImplicitType = (tags: string[], type: ConceptTypeI
   const explicit = tags.filter((tag) => !implicitTypeTagValues.has(tag as ConceptTypeId));
   return [...new Set([...explicit, implicitTagForType(type)])];
 };
+
+export const stripImplicitTypeTags = (tags: string[]): string[] =>
+  tags.filter((tag) => !implicitTypeTagValues.has(tag as ConceptTypeId));
 
 export function receiptId(convenio: string, liquidationType: LiquidationType): string {
   return `${convenio}__${liquidationType}`;
@@ -195,8 +204,10 @@ export function toApiConcept(concept: ConceptModel): ApiConcept {
     code: concept.code,
     name: concept.name,
     conceptClass: concept.conceptClass,
-    conceptType: concept.conceptType,
+    conceptType: concept.conceptClass === "transitorio" ? undefined : concept.conceptType,
     f1359FieldId: concept.f1359FieldId,
+    color: concept.color,
+    shape: concept.shape,
     formula: formulaToExpression(astToTokens(concept.formulaAst ?? [])),
     tags: concept.tags
   };
@@ -211,11 +222,14 @@ export function fromApiConcept(
     code: concept.code,
     name: concept.name,
     conceptClass: concept.conceptClass,
-    conceptType: concept.conceptType ?? "remunerativo",
+    conceptType: concept.conceptClass === "transitorio" ? undefined : (concept.conceptType ?? "remunerativo"),
     f1359FieldId: concept.f1359FieldId ?? "",
-    color: colorPalette30[(concept.id - 1) % colorPalette30.length],
-    shape: shapeCycle[(concept.id - 1) % shapeCycle.length],
-    tags: concept.tags ?? [],
+    color: concept.color ?? colorPalette30[(concept.id - 1) % colorPalette30.length],
+    shape: concept.shape ?? shapeCycle[(concept.id - 1) % shapeCycle.length],
+    tags:
+      concept.conceptClass === "transitorio"
+        ? stripImplicitTypeTags(concept.tags ?? [])
+        : normalizeTagsWithImplicitType(concept.tags ?? [], concept.conceptType ?? "remunerativo"),
     formulaAst: concept.formula
       ? parseExpressionToAst(concept.formula, conceptCodeById)
       : []

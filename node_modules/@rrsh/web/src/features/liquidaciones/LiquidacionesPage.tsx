@@ -238,14 +238,18 @@ export function LiquidacionesPage({
           .filter((c): c is ConceptModel => Boolean(c))
           .map((concept) => {
             const value = evalResult.values.get(concept.id) ?? 0;
+            const typeDefinition =
+              conceptClass === "transitorio" || !concept.conceptType
+                ? null
+                : getConceptTypeDefinition(concept.conceptType);
             return {
               conceptId: concept.id,
               conceptCode: concept.code,
               conceptName: concept.name,
               conceptClass,
-              conceptTypeId: concept.conceptType,
-              conceptColumn: getConceptTypeDefinition(concept.conceptType).column,
-              conceptSign: getConceptTypeDefinition(concept.conceptType).sign,
+              conceptTypeId: conceptClass === "transitorio" ? undefined : concept.conceptType,
+              conceptColumn: typeDefinition?.column,
+              conceptSign: typeDefinition?.sign,
               value,
               formulaUsed: formulaToExpression(astToTokens(concept.formulaAst ?? []))
             };
@@ -569,7 +573,7 @@ export function LiquidacionesPage({
                             className="concept-item"
                           >
                             <div>
-                              <strong>{row.conceptCode}</strong> - {row.conceptName}
+                              <strong>{row.conceptName}</strong>
                               {row.hasGananciasFormula && selectedGananciasTrace ? (
                                 <button
                                   type="button"
@@ -643,7 +647,7 @@ export function LiquidacionesPage({
                         className="concept-item transitorio-item"
                       >
                         <div>
-                          <strong>{row.conceptCode}</strong> - {row.conceptName}
+                          <strong>{row.conceptName}</strong>
                           {row.formulaUsed.toUpperCase().includes("GANANCIAS()") && selectedGananciasTrace ? (
                             <button
                               type="button"

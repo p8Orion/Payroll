@@ -153,7 +153,7 @@ export interface ConceptModel {
   code: string;
   name: string;
   conceptClass: ConceptClass;
-  conceptType: ConceptTypeId;
+  conceptType?: ConceptTypeId;
   f1359FieldId?: string;
   color: string;
   shape: ConceptShape;

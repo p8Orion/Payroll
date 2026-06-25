@@ -84,6 +84,7 @@ export function toNumericOrZero(value: unknown): number {
 
 function applyConceptSign(concept: ConceptModel, value: unknown): unknown {
   if (typeof value !== "number" || !Number.isFinite(value)) return value;
+  if (!concept.conceptType) return value;
   const sign = getConceptTypeDefinition(concept.conceptType).sign;
   return value * sign;
 }
@@ -316,7 +317,7 @@ export function evaluateConcepts({
     }
     if (/ANTERIORES\(\)/.test(expression)) {
       const currentOrder = receiptIndexById.get(concept.id);
-      if (currentOrder !== undefined) {
+      if (currentOrder !== undefined && concept.conceptType) {
         for (const depConcept of concepts) {
           if (depConcept.id === concept.id || seenDeps.has(depConcept.id)) continue;
           if (depConcept.conceptType !== concept.conceptType) continue;
@@ -366,6 +367,7 @@ export function evaluateConcepts({
     if (!concept) continue;
     const expression = conceptExpression(concept);
     const anterioresValue = (() => {
+      if (!concept.conceptType) return 0;
       const currentOrder = receiptIndexById.get(concept.id);
       if (currentOrder === undefined) return 0;
       let sum = 0;

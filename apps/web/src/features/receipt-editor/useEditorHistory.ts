@@ -1,21 +1,34 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { ConceptModel, ReceiptModel } from "../../model/types";
 import { EditorSnapshot, maxHistoryEntries } from "./receiptEditorUtils";
+import type { AppMenu } from "../topbar/useTopbarMenu";
 
 interface UseEditorHistoryParams {
   concepts: ConceptModel[];
   receipts: ReceiptModel[];
+  menu: AppMenu;
+  activeReceiptId: string;
+  editingId: number;
   conceptsLoaded: boolean;
   setConcepts: Dispatch<SetStateAction<ConceptModel[]>>;
   setReceipts: Dispatch<SetStateAction<ReceiptModel[]>>;
+  setMenu: Dispatch<SetStateAction<AppMenu>>;
+  setActiveReceiptId: Dispatch<SetStateAction<string>>;
+  setEditingId: Dispatch<SetStateAction<number>>;
 }
 
 export function useEditorHistory({
   concepts,
   receipts,
+  menu,
+  activeReceiptId,
+  editingId,
   conceptsLoaded,
   setConcepts,
-  setReceipts
+  setReceipts,
+  setMenu,
+  setActiveReceiptId,
+  setEditingId
 }: UseEditorHistoryParams) {
   const [historyPast, setHistoryPast] = useState<EditorSnapshot[]>([]);
   const [historyFuture, setHistoryFuture] = useState<EditorSnapshot[]>([]);
@@ -25,9 +38,12 @@ export function useEditorHistory({
   const createSnapshot = useCallback(
     (): EditorSnapshot => ({
       concepts: JSON.parse(JSON.stringify(concepts)) as ConceptModel[],
-      receipts: JSON.parse(JSON.stringify(receipts)) as ReceiptModel[]
+      receipts: JSON.parse(JSON.stringify(receipts)) as ReceiptModel[],
+      menu,
+      activeReceiptId,
+      editingId
     }),
-    [concepts, receipts]
+    [concepts, receipts, menu, activeReceiptId, editingId]
   );
 
   const applySnapshot = useCallback(
@@ -35,8 +51,11 @@ export function useEditorHistory({
       historyApplyingRef.current = true;
       setConcepts(snapshot.concepts);
       setReceipts(snapshot.receipts);
+      setMenu(snapshot.menu);
+      setActiveReceiptId(snapshot.activeReceiptId);
+      setEditingId(snapshot.editingId);
     },
-    [setConcepts, setReceipts]
+    [setConcepts, setReceipts, setMenu, setActiveReceiptId, setEditingId]
   );
 
   const undo = useCallback(() => {
@@ -63,7 +82,7 @@ export function useEditorHistory({
 
   useEffect(() => {
     if (!conceptsLoaded) return;
-    const serialized = JSON.stringify({ concepts, receipts });
+    const serialized = JSON.stringify({ concepts, receipts, menu, activeReceiptId, editingId });
     if (!historyLastRef.current) {
       historyLastRef.current = serialized;
       return;
@@ -80,7 +99,7 @@ export function useEditorHistory({
     setHistoryPast((prev) => [...prev, previous].slice(-maxHistoryEntries));
     setHistoryFuture([]);
     historyLastRef.current = serialized;
-  }, [concepts, receipts, conceptsLoaded]);
+  }, [concepts, receipts, menu, activeReceiptId, editingId, conceptsLoaded]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

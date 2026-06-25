@@ -4,6 +4,10 @@ export interface ConceptDefinition {
     code: string;
     name: string;
     conceptClass: ConceptClass;
+    conceptType?: "remunerativo" | "no_remunerativo" | "descuentos" | "aportes_patronales";
+    color?: string;
+    shape?: string;
+    f1359FieldId?: string;
     formula?: string;
     tags: string[];
     acceptsNews?: boolean;

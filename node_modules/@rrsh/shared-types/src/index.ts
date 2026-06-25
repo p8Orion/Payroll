@@ -6,6 +6,8 @@ export interface ConceptDefinition {
   name: string;
   conceptClass: ConceptClass;
   conceptType?: "remunerativo" | "no_remunerativo" | "descuentos" | "aportes_patronales";
+  color?: string;
+  shape?: string;
   formula?: string;
   tags: string[];
   f1359FieldId?: string;

@@ -125,7 +125,7 @@
   background: #fff;
   border-radius: 14px;
   border: 1px solid #d9e0f0;
-  padding: 16px;
+  padding: 20px;
   box-shadow: 0 4px 16px rgba(20, 30, 60, 0.08);
   min-width: 0;
 }
@@ -137,9 +137,98 @@
 
 .modelo-grid {
   display: grid;
-  gap: 16px;
-  grid-template-columns: 3fr 5fr 2fr;
+  gap: 24px;
+  grid-template-columns: 3fr 5fr 58px;
   align-items: start;
+}
+
+.modelo-grid.tools-drawer-pinned {
+  grid-template-columns: 3fr 5fr 2fr;
+}
+
+.tools-drawer-shell {
+  position: relative;
+  min-width: 58px;
+  align-self: stretch;
+}
+
+.tools-drawer-shell .drawer {
+  position: sticky;
+  top: 88px;
+  z-index: 18;
+  width: 300px;
+  max-height: calc(100vh - 112px);
+  overflow: auto;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.12s ease;
+}
+
+.tools-drawer-shell:not(.pinned) .drawer {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(0);
+}
+
+.tools-drawer-shell:not(.pinned):hover .drawer,
+.tools-drawer-shell:not(.pinned):focus-within .drawer {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(calc(-100% + 58px));
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.22);
+}
+
+.tools-drawer-shell.pinned .drawer {
+  width: auto;
+  opacity: 1;
+  transform: none;
+}
+
+.tools-drawer-tab {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 19;
+  width: 58px;
+  min-height: 220px;
+  border: 1px solid #c6d0ea;
+  border-radius: 12px;
+  background: #f8faff;
+  color: #1f2d52;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tools-drawer-tab-icon {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.tools-drawer-shell:hover .tools-drawer-tab,
+.tools-drawer-shell:focus-within .tools-drawer-tab,
+.tools-drawer-shell.pinned .tools-drawer-tab {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tools-pin-button {
+  border: 1px solid #c6d0ea;
+  border-radius: 8px;
+  background: #f8faff;
+  cursor: pointer;
+  padding: 5px 8px;
+  line-height: 1;
+}
+
+.tools-pin-button.active {
+  border-color: #395eff;
+  background: #eef2ff;
 }
 
 .legajos-grid {
@@ -953,6 +1042,26 @@
 
 .receipt-simulation-toolbar {
   grid-template-columns: 2fr 1fr 1fr;
+  margin: 10px 0 0;
+}
+
+.receipt-simulation-accordion {
+  margin-top: 8px;
+  margin-bottom: 22px;
+  border-top: 1px dashed #d5deee;
+  padding-top: 8px;
+}
+
+.receipt-simulation-accordion summary {
+  width: fit-content;
+  border: 1px solid #c6d0ea;
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: #f8faff;
+  color: #1f2d52;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.86rem;
 }
 
 .receipt-toolbar label {

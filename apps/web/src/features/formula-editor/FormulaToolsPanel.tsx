@@ -15,6 +15,8 @@ interface FormulaToolsPanelProps {
   onInsertFixedValue: (key: string, index: number) => void;
   onInsertMath: (op: string, index: number) => void;
   onOpenTagModal: (tag: string, insertAt: number) => void;
+  isPinned: boolean;
+  onTogglePinned: () => void;
   setCursorGhost: (event: DragEvent<HTMLElement>, label: string) => void;
 }
 
@@ -30,6 +32,8 @@ export function FormulaToolsPanel({
   onInsertFixedValue,
   onInsertMath,
   onOpenTagModal,
+  isPinned,
+  onTogglePinned,
   setCursorGhost
 }: FormulaToolsPanelProps) {
   const functionItems: Array<{
@@ -169,7 +173,18 @@ export function FormulaToolsPanel({
 
   return (
     <article className="panel drawer">
-      <h2>Herramientas</h2>
+      <div className="drawer-header">
+        <h2>Herramientas</h2>
+        <button
+          type="button"
+          className={isPinned ? "tools-pin-button active" : "tools-pin-button"}
+          onClick={onTogglePinned}
+          title={isPinned ? "Soltar herramientas" : "Fijar herramientas"}
+          aria-pressed={isPinned}
+        >
+          📌
+        </button>
+      </div>
 
       <h3>Funciones</h3>
       <div className="chip-wrap">

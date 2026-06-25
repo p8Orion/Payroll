@@ -33,8 +33,8 @@ export interface UseReceiptEditorUiStateResult {
   setConceptCodeDraft: Dispatch<SetStateAction<string>>;
   conceptNameDraft: string;
   setConceptNameDraft: Dispatch<SetStateAction<string>>;
-  conceptTypeDraft: ConceptTypeId;
-  setConceptTypeDraft: Dispatch<SetStateAction<ConceptTypeId>>;
+  conceptTypeDraft: ConceptTypeId | "";
+  setConceptTypeDraft: Dispatch<SetStateAction<ConceptTypeId | "">>;
   membershipTypeDropdownOpen: boolean;
   setMembershipTypeDropdownOpen: Dispatch<SetStateAction<boolean>>;
   membershipConvenioDropdownOpen: boolean;
@@ -63,7 +63,7 @@ export function useReceiptEditorUiState(): UseReceiptEditorUiStateResult {
   const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [conceptCodeDraft, setConceptCodeDraft] = useState("");
   const [conceptNameDraft, setConceptNameDraft] = useState("");
-  const [conceptTypeDraft, setConceptTypeDraft] = useState<ConceptTypeId>("remunerativo");
+  const [conceptTypeDraft, setConceptTypeDraft] = useState<ConceptTypeId | "">("remunerativo");
   const [membershipTypeDropdownOpen, setMembershipTypeDropdownOpen] = useState(false);
   const [membershipConvenioDropdownOpen, setMembershipConvenioDropdownOpen] = useState(false);
   const [showReceiptConceptDetail, setShowReceiptConceptDetail] = useState(false);

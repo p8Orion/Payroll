@@ -3,7 +3,13 @@ import { colorPalette30, shapeCycle } from "../../model/constants";
 import { token } from "../../model/helpers";
 import { buildConstExpression } from "../../model/formula-ui";
 import { ConceptModel, ConceptTypeId, ReceiptModel, TagAggregationOp } from "../../model/types";
-import { apiBaseUrl, implicitTagForType, implicitTypeTagValues, normalizeTagsWithImplicitType } from "./receiptEditorUtils";
+import {
+  apiBaseUrl,
+  implicitTagForType,
+  implicitTypeTagValues,
+  normalizeTagsWithImplicitType,
+  stripImplicitTypeTags
+} from "./receiptEditorUtils";
 
 interface TagModalState {
   open: boolean;
@@ -25,7 +31,7 @@ interface UseReceiptEditorActionsParams {
   setNewTagDraft: Dispatch<SetStateAction<string>>;
   setConceptCodeDraft: Dispatch<SetStateAction<string>>;
   setConceptNameDraft: Dispatch<SetStateAction<string>>;
-  setConceptTypeDraft: Dispatch<SetStateAction<ConceptTypeId>>;
+  setConceptTypeDraft: Dispatch<SetStateAction<ConceptTypeId | "">>;
   appearanceOpen: boolean;
   setAppearanceOpen: Dispatch<SetStateAction<boolean>>;
   appearanceRef: RefObject<HTMLDivElement | null>;
@@ -102,10 +108,9 @@ export function useReceiptEditorActions({
       code: `TRANS_${newId}`,
       name: `Transitorio ${newId}`,
       conceptClass: "transitorio",
-      conceptType: "remunerativo",
       color: colorPalette30[(newId - 1) % colorPalette30.length],
       shape: shapeCycle[(newId - 1) % shapeCycle.length],
-      tags: [implicitTagForType("remunerativo")],
+      tags: [],
       formulaAst: []
     };
     setConcepts((prev) => [...prev, newConcept]);
@@ -245,10 +250,23 @@ export function useReceiptEditorActions({
       prev.map((c) => {
         if (c.id !== selectedConcept.id) return c;
         if (implicitTypeTagValues.has(normalized)) {
-          return { ...c, tags: normalizeTagsWithImplicitType(c.tags, c.conceptType) };
+          return {
+            ...c,
+            tags:
+              c.conceptClass === "transitorio" || !c.conceptType
+                ? stripImplicitTypeTags(c.tags)
+                : normalizeTagsWithImplicitType(c.tags, c.conceptType)
+          };
         }
         if (c.tags.includes(normalized)) return c;
-        return { ...c, tags: normalizeTagsWithImplicitType([...c.tags, normalized], c.conceptType) };
+        const nextTags = [...c.tags, normalized];
+        return {
+          ...c,
+          tags:
+            c.conceptClass === "transitorio" || !c.conceptType
+              ? stripImplicitTypeTags(nextTags)
+              : normalizeTagsWithImplicitType(nextTags, c.conceptType)
+        };
       })
     );
     setNewTagDraft("");
@@ -281,10 +299,11 @@ export function useReceiptEditorActions({
   };
 
   const updateSelectedConceptType = (nextType: ConceptTypeId) => {
+    if (selectedConcept.conceptClass === "transitorio") return;
     setConceptTypeDraft(nextType);
     setConcepts((prev) =>
       prev.map((c) =>
-        c.id === selectedConcept.id
+        c.id === selectedConcept.id && c.conceptClass !== "transitorio"
           ? { ...c, conceptType: nextType, tags: normalizeTagsWithImplicitType(c.tags, nextType) }
           : c
       )
@@ -331,16 +350,19 @@ export function useReceiptEditorActions({
   };
 
   const removeTagFromSelectedConcept = (tagToRemove: string) => {
-    if (tagToRemove === implicitTagForType(selectedConcept.conceptType)) return;
+    if (selectedConcept.conceptType && tagToRemove === implicitTagForType(selectedConcept.conceptType)) return;
     setConcepts((prev) =>
       prev.map((c) =>
         c.id === selectedConcept.id
           ? {
               ...c,
-              tags: normalizeTagsWithImplicitType(
-                c.tags.filter((tag) => tag !== tagToRemove),
-                c.conceptType
-              )
+              tags:
+                c.conceptClass === "transitorio" || !c.conceptType
+                  ? stripImplicitTypeTags(c.tags.filter((tag) => tag !== tagToRemove))
+                  : normalizeTagsWithImplicitType(
+                      c.tags.filter((tag) => tag !== tagToRemove),
+                      c.conceptType
+                    )
             }
           : c
       )
@@ -376,12 +398,23 @@ export function useReceiptEditorActions({
   useEffect(() => {
     setConcepts((prev) => {
       const next = prev.map((concept) => {
-        const normalizedTags = normalizeTagsWithImplicitType(concept.tags ?? [], concept.conceptType);
+        if (concept.conceptClass === "transitorio") {
+          const normalizedTags = stripImplicitTypeTags(concept.tags ?? []);
+          const currentTags = concept.tags ?? [];
+          const tagsUnchanged =
+            normalizedTags.length === currentTags.length &&
+            normalizedTags.every((tag, i) => tag === currentTags[i]);
+          return tagsUnchanged && concept.conceptType === undefined
+            ? concept
+            : { ...concept, conceptType: undefined, tags: normalizedTags };
+        }
+        const normalizedTags = normalizeTagsWithImplicitType(concept.tags ?? [], concept.conceptType ?? "remunerativo");
         const currentTags = concept.tags ?? [];
         const unchanged =
           normalizedTags.length === currentTags.length &&
-          normalizedTags.every((tag, i) => tag === currentTags[i]);
-        return unchanged ? concept : { ...concept, tags: normalizedTags };
+          normalizedTags.every((tag, i) => tag === currentTags[i]) &&
+          concept.conceptType !== undefined;
+        return unchanged ? concept : { ...concept, conceptType: concept.conceptType ?? "remunerativo", tags: normalizedTags };
       });
       const changed = next.some((concept, i) => concept !== prev[i]);
       return changed ? next : prev;
@@ -391,7 +424,7 @@ export function useReceiptEditorActions({
   useEffect(() => {
     setConceptCodeDraft(selectedConcept.code);
     setConceptNameDraft(selectedConcept.name);
-    setConceptTypeDraft(selectedConcept.conceptType ?? "remunerativo");
+    setConceptTypeDraft(selectedConcept.conceptClass === "transitorio" ? "" : (selectedConcept.conceptType ?? "remunerativo"));
   }, [selectedConcept.id, selectedConcept.code, selectedConcept.name, selectedConcept.conceptType, setConceptCodeDraft, setConceptNameDraft, setConceptTypeDraft]);
 
   useEffect(() => {

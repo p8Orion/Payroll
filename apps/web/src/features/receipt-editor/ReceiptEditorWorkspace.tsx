@@ -1,4 +1,4 @@
-import { DragEvent, ReactNode, RefObject } from "react";
+import { DragEvent, ReactNode, RefObject, useState } from "react";
 import { conceptShapeOptions } from "../../model/constants";
 import { buildConstExpression } from "../../model/formula-ui";
 import { token, getShapeGlyph } from "../../model/helpers";
@@ -75,7 +75,7 @@ interface ReceiptEditorWorkspaceProps {
   membershipConvenioDropdownOpen: boolean;
   membershipConvenioOptions: string[];
   setSelectedConceptMembershipByConvenio: (convenio: string, shouldBelong: boolean) => void;
-  conceptTypeDraft: ConceptTypeId;
+  conceptTypeDraft: ConceptTypeId | "";
   updateSelectedConceptType: (value: ConceptTypeId) => void;
   updateSelectedConceptF1359Field: (fieldId: string) => void;
   newTagDraft: string;
@@ -183,9 +183,10 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
     setTagModal,
     gananciasTrace
   } = props;
+  const [toolsPinned, setToolsPinned] = useState(false);
 
   return (
-    <section className="modelo-grid">
+    <section className={toolsPinned ? "modelo-grid tools-drawer-pinned" : "modelo-grid"}>
       <article className="panel concept-panel">
         <h2>Editor de Recibo</h2>
         <div className="receipt-toolbar">
@@ -236,53 +237,56 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
             </select>
           </div>
         </div>
-        <div className="receipt-toolbar receipt-simulation-toolbar" style={{ marginTop: 8, borderTop: "1px dashed #d5deee", paddingTop: 10 }}>
-          <div>
-            <label htmlFor="sim-legajo">Legajo (simulación)</label>
-            <select
-              id="sim-legajo"
-              value={simLegajoId}
-              onChange={(e) => setSimLegajoId(e.target.value)}
-              disabled={!simLegajosForConvenio.length}
-            >
-              {simLegajosForConvenio.length === 0 ? (
-                <option value="">Sin legajos para este convenio</option>
-              ) : (
-                simLegajosForConvenio.map((legajo) => (
-                  <option key={legajo.id} value={legajo.id}>
-                    {legajo.nroLegajo || "S/N"} - {legajo.nombre || "Sin nombre"}
+        <details className="receipt-simulation-accordion">
+          <summary>Simulación</summary>
+          <div className="receipt-toolbar receipt-simulation-toolbar">
+            <div>
+              <label htmlFor="sim-legajo">Legajo (simulación)</label>
+              <select
+                id="sim-legajo"
+                value={simLegajoId}
+                onChange={(e) => setSimLegajoId(e.target.value)}
+                disabled={!simLegajosForConvenio.length}
+              >
+                {simLegajosForConvenio.length === 0 ? (
+                  <option value="">Sin legajos para este convenio</option>
+                ) : (
+                  simLegajosForConvenio.map((legajo) => (
+                    <option key={legajo.id} value={legajo.id}>
+                      {legajo.nroLegajo || "S/N"} - {legajo.nombre || "Sin nombre"}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="sim-month">Mes simulación</label>
+              <select id="sim-month" value={simMonth} onChange={(e) => setSimMonth(Number(e.target.value))}>
+                {simulationMonthOptions.map((month) => (
+                  <option key={month.value} value={month.value}>
+                    {month.label}
                   </option>
-                ))
-              )}
-            </select>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="sim-year">Año simulación</label>
+              <input
+                id="sim-year"
+                type="number"
+                min={1970}
+                max={2200}
+                step={1}
+                value={simYear}
+                onChange={(e) => {
+                  const parsedYear = Math.floor(Number(e.target.value || String(simYear)));
+                  if (!Number.isFinite(parsedYear)) return;
+                  setSimYear(Math.min(2200, Math.max(1970, parsedYear)));
+                }}
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="sim-month">Mes simulación</label>
-            <select id="sim-month" value={simMonth} onChange={(e) => setSimMonth(Number(e.target.value))}>
-              {simulationMonthOptions.map((month) => (
-                <option key={month.value} value={month.value}>
-                  {month.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="sim-year">Año simulación</label>
-            <input
-              id="sim-year"
-              type="number"
-              min={1970}
-              max={2200}
-              step={1}
-              value={simYear}
-              onChange={(e) => {
-                const parsedYear = Math.floor(Number(e.target.value || String(simYear)));
-                if (!Number.isFinite(parsedYear)) return;
-                setSimYear(Math.min(2200, Math.max(1970, parsedYear)));
-              }}
-            />
-          </div>
-        </div>
+        </details>
         <div className="panel-actions">
           <button className="add-button" onClick={addDefinitiveToReceipt}>
             + Agregar concepto definitivo
@@ -316,7 +320,9 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
                   {getShapeGlyph(concept.shape)}
                 </span>
                 <strong>{concept.code}</strong> - {concept.name}
-                <span className="concept-type-inline">{getConceptTypeDefinition(concept.conceptType).label}</span>
+                {concept.conceptClass === "transitorio" || !concept.conceptType ? null : (
+                  <span className="concept-type-inline">{getConceptTypeDefinition(concept.conceptType).label}</span>
+                )}
                 {!hidePrecalculationPreview && cycleConceptIds.has(concept.id) ? <span className="concept-error-inline">CICLO</span> : null}
                 {!hidePrecalculationPreview && formulaErrorById.get(concept.id) ? <span className="concept-error-inline">ERROR</span> : null}
                 {showReceiptConceptDetail ? (
@@ -359,7 +365,9 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
                   {getShapeGlyph(concept.shape)}
                 </span>
                 <strong>{concept.code}</strong> - {concept.name}
-                <span className="concept-type-inline">{getConceptTypeDefinition(concept.conceptType).label}</span>
+                {concept.conceptClass === "transitorio" || !concept.conceptType ? null : (
+                  <span className="concept-type-inline">{getConceptTypeDefinition(concept.conceptType).label}</span>
+                )}
                 {!hidePrecalculationPreview && cycleConceptIds.has(concept.id) ? <span className="concept-error-inline">CICLO</span> : null}
                 {!hidePrecalculationPreview && formulaErrorById.get(concept.id) ? <span className="concept-error-inline">ERROR</span> : null}
                 {showReceiptConceptDetail ? (
@@ -579,8 +587,20 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
                   value={conceptTypeDraft}
                   onChange={(e) => updateSelectedConceptType(e.target.value as ConceptTypeId)}
                   title="Tipo de concepto"
-                  style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid #c9d4ea", background: "#fff" }}
+                  disabled={selectedConcept.conceptClass === "transitorio"}
+                  style={{
+                    width: "100%",
+                    padding: "8px 10px",
+                    borderRadius: 8,
+                    border: "1px solid #c9d4ea",
+                    background: selectedConcept.conceptClass === "transitorio" ? "#eef2f7" : "#fff",
+                    color: selectedConcept.conceptClass === "transitorio" ? "#6b7280" : undefined,
+                    cursor: selectedConcept.conceptClass === "transitorio" ? "not-allowed" : undefined
+                  }}
                 >
+                  {selectedConcept.conceptClass === "transitorio" ? (
+                    <option value="">Sin tipo (transitorio)</option>
+                  ) : null}
                   {CONCEPT_TYPE_DEFINITIONS.map((definition) => (
                     <option key={definition.id} value={definition.id}>
                       {definition.label}
@@ -655,24 +675,37 @@ export function ReceiptEditorWorkspace(props: ReceiptEditorWorkspaceProps) {
         />
       </article>
 
-      <FormulaToolsPanel
-        allTags={allTags}
-        fixedValueKeys={fixedValueKeys}
-        insertAt={selectedFormulaTokens.length}
-        onInsertBlockTemplate={insertBlockTemplateAt}
-        onInsertConst={(index) => insertTokenAt(token("const", buildConstExpression("0"), "function"), index)}
-        onInsertAntiguedad={(index) => insertTokenAt(token("Antigüedad", "ANTIGUEDAD()", "function"), index)}
-        onInsertAnteriores={(index) =>
-          insertTokenAt(token("Suma de Conceptos Previos del Recibo", "ANTERIORES()", "function"), index)
-        }
-        onInsertGanancias={(index) => insertTokenAt(token("Cálculo Impuesto a las Ganancias", "GANANCIAS()", "function"), index)}
-        onInsertFixedValue={(key, index) =>
-          insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)
-        }
-        onInsertMath={(op, index) => insertTokenAt(token(op, `MATH("${op}")`, "function"), index)}
-        onOpenTagModal={(tag, insertAt) => setTagModal({ open: true, tag, insertAt })}
-        setCursorGhost={setCursorGhost}
-      />
+      <div className={toolsPinned ? "tools-drawer-shell pinned" : "tools-drawer-shell"}>
+        <button
+          type="button"
+          className="tools-drawer-tab"
+          onClick={() => setToolsPinned(true)}
+          title="Abrir herramientas"
+        >
+          <span className="tools-drawer-tab-icon">🛠</span>
+          <span>Herramientas</span>
+        </button>
+        <FormulaToolsPanel
+          allTags={allTags}
+          fixedValueKeys={fixedValueKeys}
+          insertAt={selectedFormulaTokens.length}
+          isPinned={toolsPinned}
+          onTogglePinned={() => setToolsPinned((prev) => !prev)}
+          onInsertBlockTemplate={insertBlockTemplateAt}
+          onInsertConst={(index) => insertTokenAt(token("const", buildConstExpression("0"), "function"), index)}
+          onInsertAntiguedad={(index) => insertTokenAt(token("Antigüedad", "ANTIGUEDAD()", "function"), index)}
+          onInsertAnteriores={(index) =>
+            insertTokenAt(token("Suma de Conceptos Previos del Recibo", "ANTERIORES()", "function"), index)
+          }
+          onInsertGanancias={(index) => insertTokenAt(token("Cálculo Impuesto a las Ganancias", "GANANCIAS()", "function"), index)}
+          onInsertFixedValue={(key, index) =>
+            insertTokenAt(token(`Valor Fijo ${key}`, `VALOR_FIJO("${key}")`, "function"), index)
+          }
+          onInsertMath={(op, index) => insertTokenAt(token(op, `MATH("${op}")`, "function"), index)}
+          onOpenTagModal={(tag, insertAt) => setTagModal({ open: true, tag, insertAt })}
+          setCursorGhost={setCursorGhost}
+        />
+      </div>
     </section>
   );
 }
